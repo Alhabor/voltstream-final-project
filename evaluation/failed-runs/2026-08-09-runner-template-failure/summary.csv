@@ -1,0 +1,2 @@
+strategy,field_value_accuracy,mapping_accuracy,decision_accuracy,unsafe_under_routing_rate,correct_abstention_rate,unsupported_value_rate,issue_micro_precision,issue_micro_recall,issue_micro_f1,latency_ms_total,input_tokens_total,output_tokens_total,estimated_cost_usd_total,model_calls_total,hard_safety_veto_triggered,limited_human_reviewed_pilot_threshold_pass
+baseline,0.4125,0.35714285714285715,0.4,0.0,1.0,0.0,0.14285714285714285,0.625,0.23255813953488372,0.0,0,0,0.0,0,False,False

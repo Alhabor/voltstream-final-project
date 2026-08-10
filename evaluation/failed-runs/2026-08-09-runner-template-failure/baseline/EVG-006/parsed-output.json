@@ -1,0 +1,35 @@
+{
+  "case_id": "EVG-006",
+  "record": {
+    "station_id": null,
+    "address": "606 Test Lane Staten Island NY 10301",
+    "charger_level": null,
+    "port_count": 4,
+    "power_kw": null,
+    "connector_type": "CCS1",
+    "operational_status": "operational",
+    "source_record_id": null
+  },
+  "source_mappings": {
+    "station_id": null,
+    "address": "address",
+    "charger_level": null,
+    "port_count": "ports",
+    "power_kw": null,
+    "connector_type": "connector",
+    "operational_status": "status",
+    "source_record_id": null
+  },
+  "decision": "REJECT",
+  "issue_codes": [
+    "OUTPUT_SCHEMA_ERROR",
+    "MISSING_STABLE_IDENTITY",
+    "MISSING_SOURCE_LINEAGE",
+    "MISSING_REQUIRED_FIELD"
+  ],
+  "latency_ms": 0.0,
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "estimated_cost_usd": 0.0,
+  "model_calls": 0
+}

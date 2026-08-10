@@ -39,6 +39,17 @@ class ExperimentRunnerTests(unittest.TestCase):
         }
         self.assertEqual(render_case_prompt(template, case), "A text synthetic extract payload")
 
+    def test_case_prompt_allows_nested_json_closing_braces(self):
+        case = {
+            "case_id": "A",
+            "input_format": "json",
+            "source_name": "synthetic",
+            "task": "extract",
+            "payload": '{"outer":{"inner":1}}',
+        }
+        rendered = render_case_prompt("{{case_id}}\n{{payload}}", case)
+        self.assertEqual(rendered, 'A\n{"outer":{"inner":1}}')
+
     def test_deepseek_cost_separates_cached_and_uncached_tokens(self):
         response = ProviderResponse(
             content="{}",

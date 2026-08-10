@@ -1,0 +1,10 @@
+{
+  "status": "FAILED_INFRASTRUCTURE_RUN",
+  "failed_strategy": "deepseek-flash-guarded",
+  "failed_case_id": "EVG-003",
+  "completed_model_responses_before_failure": 2,
+  "exception_type": "ValueError",
+  "sanitized_error": "case prompt contains an unresolved template variable",
+  "root_cause": "The unresolved-placeholder guard treated adjacent JSON closing braces as a template token.",
+  "disposition": "Preserved without scoring. Fix the renderer, add a regression test, commit the fix, and restart all strategies under a new run ID."
+}

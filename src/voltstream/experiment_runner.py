@@ -11,6 +11,7 @@ from __future__ import annotations
 import hashlib
 import json
 import platform
+import re
 import subprocess
 import sys
 from dataclasses import asdict
@@ -61,7 +62,11 @@ def render_case_prompt(template: str, case: Mapping[str, Any]) -> str:
     rendered = template
     for key in ("case_id", "input_format", "source_name", "task", "payload"):
         rendered = rendered.replace("{{" + key + "}}", str(case[key]))
-    if "{{" in rendered or "}}" in rendered:
+    # JSON payloads legitimately contain adjacent closing braces. Only an
+    # unresolved variable from this template's fixed vocabulary is an error.
+    if re.search(
+        r"\{\{(?:case_id|input_format|source_name|task|payload)\}\}", rendered
+    ):
         raise ValueError("case prompt contains an unresolved template variable")
     return rendered
 
