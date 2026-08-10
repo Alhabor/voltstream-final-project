@@ -1,4 +1,5 @@
 import html
+import hashlib
 import json
 import re
 import unittest
@@ -19,6 +20,9 @@ class PresentationContractTests(unittest.TestCase):
             (PRESENTATION / "slides.zh.json").read_text(encoding="utf-8")
         )
         cls.document = (PRESENTATION / "index.html").read_text(encoding="utf-8")
+        cls.evidence = json.loads(
+            (PRESENTATION / "evidence.json").read_text(encoding="utf-8")
+        )
 
     def test_slide_count_ids_and_required_order(self):
         slides = self.source["slides"]
@@ -254,6 +258,39 @@ class PresentationContractTests(unittest.TestCase):
         self.assertNotRegex(self.document, r'<link[^>]+href=')
         self.assertNotIn("http://", self.document)
         self.assertNotIn("https://", self.document)
+
+    def test_every_slide_links_to_bilingual_original_file_evidence(self):
+        slide_ids = {slide["id"] for slide in self.source["slides"]}
+        self.assertEqual(set(self.evidence["slides"]), slide_ids)
+        for slide_id, links in self.evidence["slides"].items():
+            self.assertGreaterEqual(len(links), 1, slide_id)
+            self.assertLessEqual(len(links), 3, slide_id)
+            for link in links:
+                source = self.evidence["files"][link["file"]]
+                self.assertTrue(link["en"])
+                self.assertTrue(link["zh"])
+                href = f'evidence/{source}.html'
+                self.assertIn(f'href="{href}"', self.document)
+                self.assertIn('target="_blank" rel="noopener noreferrer"', self.document)
+
+    def test_published_evidence_copies_are_exact_and_viewable(self):
+        repository_root = PRESENTATION.parent
+        referenced = {
+            link["file"]
+            for links in self.evidence["slides"].values()
+            for link in links
+        }
+        for file_id in referenced:
+            source = Path(self.evidence["files"][file_id])
+            original = repository_root / source
+            copied = PRESENTATION / "evidence" / source
+            viewer = Path(f"{copied}.html")
+            self.assertEqual(copied.read_bytes(), original.read_bytes(), source)
+            viewer_html = viewer.read_text(encoding="utf-8")
+            digest = hashlib.sha256(original.read_bytes()).hexdigest()
+            self.assertIn(html.escape(source.as_posix()), viewer_html)
+            self.assertIn(digest, viewer_html)
+            self.assertIn("Open raw file", viewer_html)
 
     def test_build_receipt_matches_final_deck(self):
         receipt = json.loads((PRESENTATION / "BUILD_RECEIPT.json").read_text(encoding="utf-8"))

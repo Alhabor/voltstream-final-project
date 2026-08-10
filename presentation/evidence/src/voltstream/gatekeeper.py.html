@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light"><title>gatekeeper.py — VoltStream evidence</title>
+<style>:root{color-scheme:dark light;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#10151b;color:#f4f7fa}body{max-width:1100px;margin:auto;padding:2rem}header{position:sticky;top:0;padding:1rem 0;background:#10151bee;border-bottom:1px solid #3b4a59}h1{margin:0 0 .6rem;font:700 1.25rem ui-sans-serif,system-ui,sans-serif}.meta{color:#aeb9c5;font-size:.82rem;overflow-wrap:anywhere}.actions{display:flex;gap:1rem;margin-top:.8rem}a{color:#7ec8ff}pre{margin:1.5rem 0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:.9rem;line-height:1.55}@media(prefers-color-scheme:light){:root{background:#f4f7fa;color:#15212c}header{background:#f4f7faee;border-color:#a8b8c7}a{color:#006eaa}.meta{color:#526272}}@media print{header{position:static}body{max-width:none;padding:0}}</style></head>
+<body><header><h1>src/voltstream/gatekeeper.py</h1><div class="meta">Read-only copy from the VoltStream source repository · SHA-256 c00ac8fe90a98d8725e8ee6cd6f3ab89ba9aa550fe496defea7eaae6c6d7f9ac</div><nav class="actions"><a href="gatekeeper.py">Open raw file</a><a href="../../../index.html">Return to presentation</a></nav></header><pre>&quot;&quot;&quot;Application service composing parse, validation, and routing steps.&quot;&quot;&quot;
+
+from __future__ import annotations
+
+from .baseline import DeterministicBaseline
+from .models import InputEnvelope, InputFormat, ProcessingResult, RecordResult
+from typing import Optional
+
+from .validation import detect_payload_issues, route_for_issues, validate_record
+
+
+class IntakeGatekeeper:
+    &quot;&quot;&quot;Process contractor submissions with an evidence-first baseline.&quot;&quot;&quot;
+
+    def __init__(self, baseline: Optional[DeterministicBaseline] = None) -&gt; None:
+        self._baseline = baseline or DeterministicBaseline()
+
+    def process(self, envelope: InputEnvelope) -&gt; ProcessingResult:
+        raw_rows, submission_issues = self._baseline.parse_envelope(envelope)
+        payload_issues = detect_payload_issues(envelope.content)
+        results: list[RecordResult] = []
+        for index, raw_row in enumerate(raw_rows):
+            parsed = self._baseline.canonicalize(raw_row)
+            issues = [*parsed.issues, *validate_record(parsed.record), *payload_issues]
+            results.append(
+                RecordResult(
+                    record=parsed.record,
+                    decision=route_for_issues(issues),
+                    issues=issues,
+                    unmapped_fields=parsed.unmapped_fields,
+                    source_index=index,
+                )
+            )
+        return ProcessingResult(
+            source_name=envelope.source_name,
+            input_format=envelope.input_format,
+            records=results,
+            submission_issues=submission_issues,
+        )
+
+
+def process_content(content: str, input_format: str, source_name: str = &quot;unknown&quot;) -&gt; dict:
+    &quot;&quot;&quot;Convenience API for integrations that prefer ordinary dictionaries.&quot;&quot;&quot;
+
+    envelope = InputEnvelope(
+        content=content,
+        input_format=InputFormat(input_format.lower()),
+        source_name=source_name,
+    )
+    return IntakeGatekeeper().process(envelope).to_dict()
+</pre></body></html>

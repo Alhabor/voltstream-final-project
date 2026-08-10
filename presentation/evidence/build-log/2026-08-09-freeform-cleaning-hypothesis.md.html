@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light"><title>2026-08-09-freeform-cleaning-hypothesis.md — VoltStream evidence</title>
+<style>:root{color-scheme:dark light;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#10151b;color:#f4f7fa}body{max-width:1100px;margin:auto;padding:2rem}header{position:sticky;top:0;padding:1rem 0;background:#10151bee;border-bottom:1px solid #3b4a59}h1{margin:0 0 .6rem;font:700 1.25rem ui-sans-serif,system-ui,sans-serif}.meta{color:#aeb9c5;font-size:.82rem;overflow-wrap:anywhere}.actions{display:flex;gap:1rem;margin-top:.8rem}a{color:#7ec8ff}pre{margin:1.5rem 0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:.9rem;line-height:1.55}@media(prefers-color-scheme:light){:root{background:#f4f7fa;color:#15212c}header{background:#f4f7faee;border-color:#a8b8c7}a{color:#006eaa}.meta{color:#526272}}@media print{header{position:static}body{max-width:none;padding:0}}</style></head>
+<body><header><h1>build-log/2026-08-09-freeform-cleaning-hypothesis.md</h1><div class="meta">Read-only copy from the VoltStream source repository · SHA-256 f59a5cf08c9b884114384caffba44ec4826d7bbf363de12f893c12e22e78f9f6</div><nav class="actions"><a href="2026-08-09-freeform-cleaning-hypothesis.md">Open raw file</a><a href="../../index.html">Return to presentation</a></nav></header><pre># Rejected as default, pending test: unrestricted end-to-end LLM cleaning
+
+- Date: 2026-08-09
+- Owner/agent: project team
+- Status: PROPOSED
+- Related commit(s): to be added by the integrating agent
+- Related cases/results: none yet
+
+## Question
+
+Should one language-model prompt be allowed to parse, infer missing values,
+resolve conflicts, “clean” the record, and approve it without deterministic
+validation or human review?
+
+## Hypothesis written before the test
+
+An unrestricted cleaner may produce fluent and complete-looking records, but
+is expected to have a higher unsupported-value or unsafe-acceptance rate on
+missing, conflicting, and adversarial cases than a guarded pipeline.
+
+This is a **risk hypothesis**, not an experimental result. The project must not
+present it as a demonstrated failure until the planned comparison is run.
+
+## Why it is not the implementation default
+
+- It collapses extraction, transformation, validation, and approval into an
+  output that is difficult to audit.
+- A complete-looking record can hide whether a value came from the source, a
+  deterministic conversion, or model inference.
+- Source text may contain instructions that should be treated as data.
+- It removes the explicit abstention and human-review boundary required by the
+  selected product concept.
+
+These are architectural reasons to quarantine the route, not measured evidence
+that it performs worse.
+
+## Current decision
+
+Reject unrestricted cleaning as the prototype&#39;s default architecture because
+it violates the chosen provenance, abstention, and deterministic-approval
+boundaries. Keep it as a quarantined experimental comparator so the final
+presentation can distinguish an architectural rejection from a measured
+performance failure. Its experimental status remains `PROPOSED`.
+
+## Planned method
+
+After the answer key is frozen, run an unrestricted-cleaner prompt on the same
+fixed cases used by the guarded pipeline. At minimum, compare:
+
+- exact field/value accuracy;
+- unsupported-field rate;
+- unsafe acceptance rate;
+- correct abstention rate;
+- category-level errors on missing, conflict, and prompt-injection cases; and
+- latency/token use when available.
+
+Record the exact prompt/model/version and raw outputs. Do not permit the trial
+output to modify source files or an authoritative dataset.
+
+## Stop/continue rule
+
+- Mark `STOPPED` if the route creates unsupported critical values or unsafe
+  approvals at a rate that violates the predeclared evaluation threshold.
+- Mark `NOT_SUPPORTED` if it does not show a meaningful quality benefit over
+  the guarded approach.
+- Keep `PROPOSED` or `IN_PROGRESS` until evidence exists.
+- If it shows useful extraction behavior, preserve that evidence as a possible
+  component while still evaluating whether deterministic validation is needed.
+
+## Evidence
+
+No model run has been completed at the time of this entry. There is currently
+no empirical basis for calling the route failed.
+
+## Next action
+
+Freeze cases, answer key, rubric, and thresholds; then conduct the controlled
+comparison and update this log without deleting the pre-test hypothesis.
+</pre></body></html>

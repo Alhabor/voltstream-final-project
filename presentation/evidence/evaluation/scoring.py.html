@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light"><title>scoring.py — VoltStream evidence</title>
+<style>:root{color-scheme:dark light;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#10151b;color:#f4f7fa}body{max-width:1100px;margin:auto;padding:2rem}header{position:sticky;top:0;padding:1rem 0;background:#10151bee;border-bottom:1px solid #3b4a59}h1{margin:0 0 .6rem;font:700 1.25rem ui-sans-serif,system-ui,sans-serif}.meta{color:#aeb9c5;font-size:.82rem;overflow-wrap:anywhere}.actions{display:flex;gap:1rem;margin-top:.8rem}a{color:#7ec8ff}pre{margin:1.5rem 0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:.9rem;line-height:1.55}@media(prefers-color-scheme:light){:root{background:#f4f7fa;color:#15212c}header{background:#f4f7faee;border-color:#a8b8c7}a{color:#006eaa}.meta{color:#526272}}@media print{header{position:static}body{max-width:none;padding:0}}</style></head>
+<body><header><h1>evaluation/scoring.py</h1><div class="meta">Read-only copy from the VoltStream source repository · SHA-256 751b06df94973d46c755fc9062127e437f0f6af47b692711c276739a8452bcc2</div><nav class="actions"><a href="scoring.py">Open raw file</a><a href="../../index.html">Return to presentation</a></nav></header><pre>&quot;&quot;&quot;Deterministic scoring for the VoltStream fixed evaluation benchmark.
+
+The scorer intentionally uses only the Python standard library so evaluation
+does not depend on the model runtime.  It reports separate quality, safety,
+routing, mapping, and efficiency metrics; it never creates a composite score.
+
+Public entry points:
+
+``score_case``
+    Score one answer-key row against one prediction row.
+
+``aggregate_scores``
+    Score aligned JSON-like rows and optionally create input-format and tag
+    slices from the case metadata.
+
+``load_jsonl``
+    Read machine-produced JSONL while giving useful line-numbered errors.
+&quot;&quot;&quot;
+
+from __future__ import annotations
+
+import json
+import math
+import re
+import statistics
+from collections.abc import Iterable, Mapping, Sequence
+from pathlib import Path
+from typing import Any
+
+
+CANONICAL_FIELDS: tuple[str, ...] = (
+    &quot;station_id&quot;,
+    &quot;address&quot;,
+    &quot;charger_level&quot;,
+    &quot;port_count&quot;,
+    &quot;power_kw&quot;,
+    &quot;connector_type&quot;,
+    &quot;operational_status&quot;,
+    &quot;source_record_id&quot;,
+)
+
+DECISION_SEVERITY = {&quot;ACCEPT&quot;: 0, &quot;HUMAN_REVIEW&quot;: 1, &quot;REJECT&quot;: 2}
+_MISSING = object()
+
+
+def load_jsonl(path: str | Path) -&gt; list[dict[str, Any]]:
+    &quot;&quot;&quot;Load nonblank JSONL rows and report malformed rows with line numbers.&quot;&quot;&quot;
+
+    rows: list[dict[str, Any]] = []
+    source = Path(path)
+    with source.open(&quot;r&quot;, encoding=&quot;utf-8&quot;) as handle:
+        for line_number, line in enumerate(handle, start=1):
+            if not line.strip():
+                continue
+            try:
+                row = json.loads(line)
+            except json.JSONDecodeError as exc:
+                raise ValueError(f&quot;{source}:{line_number}: invalid JSON: {exc.msg}&quot;) from exc
+            if not isinstance(row, dict):
+                raise ValueError(f&quot;{source}:{line_number}: each JSONL row must be an object&quot;)
+            rows.append(row)
+    return rows
+
+
+def score_case(
+    answer: Mapping[str, Any],
+    prediction: Mapping[str, Any],
+    expected_mappings: Mapping[str, Any] | None = None,
+) -&gt; dict[str, Any]:
+    &quot;&quot;&quot;Score one prediction and return additive counts plus case metadata.
+
+    ``expected_mappings`` is optional because text cases have no structured
+    mapping answer.  When a mapping answer exists but the prediction provides
+    ``source_mappings=null`` (or omits individual mapping keys), all omitted
+    mappings are counted as incorrect.  An explicitly predicted ``null`` can
+    receive credit when the expected mapping is deliberately ``null``.
+    &quot;&quot;&quot;
+
+    answer_id = _required_string(answer, &quot;case_id&quot;, &quot;answer&quot;)
+    prediction_id = _required_string(prediction, &quot;case_id&quot;, &quot;prediction&quot;)
+    if answer_id != prediction_id:
+        raise ValueError(f&quot;case_id mismatch: answer={answer_id!r}, prediction={prediction_id!r}&quot;)
+
+    expected_record = _required_record(answer, &quot;expected_record&quot;, &quot;answer&quot;)
+    predicted_record = _required_record(prediction, &quot;record&quot;, &quot;prediction&quot;)
+
+    field_correct = 0
+    expected_null = 0
+    correct_abstentions = 0
+    predicted_non_null = 0
+    unsupported_values = 0
+    for field in CANONICAL_FIELDS:
+        expected = expected_record[field]
+        predicted = predicted_record[field]
+        if _values_equal(expected, predicted):
+            field_correct += 1
+        if expected is None:
+            expected_null += 1
+            if predicted is None:
+                correct_abstentions += 1
+            elif predicted is not None:
+                # With this benchmark&#39;s closed answer key, a non-null value
+                # where gold requires abstention is unsupported by definition.
+                unsupported_values += 1
+        if predicted is not None:
+            predicted_non_null += 1
+
+    expected_decision = answer.get(&quot;expected_decision&quot;)
+    predicted_decision = prediction.get(&quot;decision&quot;)
+    if expected_decision not in DECISION_SEVERITY:
+        raise ValueError(f&quot;answer {answer_id}: invalid expected_decision {expected_decision!r}&quot;)
+    decision_correct = int(predicted_decision == expected_decision)
+    expected_non_accept = int(expected_decision != &quot;ACCEPT&quot;)
+    unsafe_acceptance = int(expected_non_accept == 1 and predicted_decision == &quot;ACCEPT&quot;)
+    # Unknown decisions are treated as severity -1: failing to produce a safe
+    # route is under-routing, rather than an exception that hides the failure.
+    predicted_severity = DECISION_SEVERITY.get(predicted_decision, -1)
+    unsafe_under_routing = int(predicted_severity &lt; DECISION_SEVERITY[expected_decision])
+
+    expected_issues = _as_string_set(answer.get(&quot;expected_issue_codes&quot;), &quot;expected_issue_codes&quot;)
+    predicted_issues = _as_string_set(prediction.get(&quot;issue_codes&quot;), &quot;issue_codes&quot;)
+    issue_tp = len(expected_issues &amp; predicted_issues)
+    issue_fp = len(predicted_issues - expected_issues)
+    issue_fn = len(expected_issues - predicted_issues)
+
+    mapping_correct = 0
+    mapping_total = 0
+    if expected_mappings is not None:
+        _require_exact_fields(expected_mappings, &quot;expected_mappings&quot;, answer_id)
+        mapping_total = len(CANONICAL_FIELDS)
+        predicted_mappings = prediction.get(&quot;source_mappings&quot;)
+        if not isinstance(predicted_mappings, Mapping):
+            predicted_mappings = {}
+        for field in CANONICAL_FIELDS:
+            predicted_source = predicted_mappings.get(field, _MISSING)
+            if predicted_source is not _MISSING and _values_equal(
+                expected_mappings[field], predicted_source
+            ):
+                mapping_correct += 1
+
+    # Providers do not expose every efficiency metric. Missing values remain
+    # explicit ``None`` rather than being guessed or silently converted to 0.
+    latency_ms = _optional_nonnegative_number(prediction, &quot;latency_ms&quot;)
+    input_tokens = _optional_nonnegative_integer(prediction, &quot;input_tokens&quot;)
+    output_tokens = _optional_nonnegative_integer(prediction, &quot;output_tokens&quot;)
+    estimated_cost_usd = _optional_nonnegative_number(
+        prediction, &quot;estimated_cost_usd&quot;
+    )
+
+    return {
+        &quot;case_id&quot;: answer_id,
+        &quot;field_value_correct&quot;: field_correct,
+        &quot;field_value_total&quot;: len(CANONICAL_FIELDS),
+        &quot;expected_abstention_count&quot;: expected_null,
+        &quot;correct_abstention_count&quot;: correct_abstentions,
+        &quot;predicted_non_null_count&quot;: predicted_non_null,
+        &quot;unsupported_value_count&quot;: unsupported_values,
+        &quot;decision_correct_count&quot;: decision_correct,
+        &quot;decision_total&quot;: 1,
+        &quot;expected_non_accept_count&quot;: expected_non_accept,
+        &quot;unsafe_acceptance_count&quot;: unsafe_acceptance,
+        &quot;unsafe_under_routing_count&quot;: unsafe_under_routing,
+        &quot;issue_true_positive&quot;: issue_tp,
+        &quot;issue_false_positive&quot;: issue_fp,
+        &quot;issue_false_negative&quot;: issue_fn,
+        &quot;issue_exact_set_count&quot;: int(expected_issues == predicted_issues),
+        &quot;issue_case_total&quot;: 1,
+        &quot;mapping_correct&quot;: mapping_correct,
+        &quot;mapping_total&quot;: mapping_total,
+        &quot;latency_ms&quot;: latency_ms,
+        &quot;input_tokens&quot;: input_tokens,
+        &quot;output_tokens&quot;: output_tokens,
+        &quot;estimated_cost_usd&quot;: estimated_cost_usd,
+    }
+
+
+def aggregate_scores(
+    answers: Sequence[Mapping[str, Any]],
+    predictions: Sequence[Mapping[str, Any]],
+    *,
+    cases: Sequence[Mapping[str, Any]] | None = None,
+    mapping_answers: Sequence[Mapping[str, Any]] | None = None,
+) -&gt; dict[str, Any]:
+    &quot;&quot;&quot;Score a complete run and optionally aggregate by format and case tag.
+
+    Answer and prediction IDs must form the same unique set. This fail-closed
+    alignment prevents a missing model output from disappearing from reported
+    denominators. ``mapping_answers`` may cover only structured cases.
+    &quot;&quot;&quot;
+
+    answer_by_id = _index_unique(answers, &quot;answers&quot;)
+    prediction_by_id = _index_unique(predictions, &quot;predictions&quot;)
+    _require_same_ids(answer_by_id, prediction_by_id, &quot;predictions&quot;)
+
+    mapping_by_id: dict[str, Mapping[str, Any]] = {}
+    if mapping_answers is not None:
+        raw_mapping_by_id = _index_unique(mapping_answers, &quot;mapping_answers&quot;)
+        unknown = sorted(set(raw_mapping_by_id) - set(answer_by_id))
+        if unknown:
+            raise ValueError(f&quot;mapping_answers contain unknown case_ids: {unknown}&quot;)
+        for case_id, row in raw_mapping_by_id.items():
+            value = row.get(&quot;expected_mappings&quot;)
+            if not isinstance(value, Mapping):
+                raise ValueError(f&quot;mapping answer {case_id}: expected_mappings must be an object&quot;)
+            mapping_by_id[case_id] = value
+
+    per_case = [
+        score_case(
+            answer_by_id[case_id],
+            prediction_by_id[case_id],
+            mapping_by_id.get(case_id),
+        )
+        for case_id in answer_by_id
+    ]
+    result: dict[str, Any] = {
+        &quot;overall&quot;: _summarize(per_case),
+        &quot;by_format&quot;: {},
+        &quot;by_tag&quot;: {},
+        &quot;cases&quot;: per_case,
+    }
+
+    if cases is not None:
+        case_by_id = _index_unique(cases, &quot;cases&quot;)
+        _require_same_ids(answer_by_id, case_by_id, &quot;cases&quot;)
+        scores_by_id = {row[&quot;case_id&quot;]: row for row in per_case}
+
+        formats = sorted({_required_string(row, &quot;input_format&quot;, &quot;case&quot;) for row in cases})
+        for input_format in formats:
+            selected = [
+                scores_by_id[case_id]
+                for case_id, row in case_by_id.items()
+                if row[&quot;input_format&quot;] == input_format
+            ]
+            result[&quot;by_format&quot;][input_format] = _summarize(selected)
+
+        tags = sorted({tag for row in cases for tag in _case_tags(row)})
+        for tag in tags:
+            selected = [
+                scores_by_id[case_id]
+                for case_id, row in case_by_id.items()
+                if tag in _case_tags(row)
+            ]
+            result[&quot;by_tag&quot;][tag] = _summarize(selected)
+
+    return result
+
+
+def _summarize(case_scores: Sequence[Mapping[str, Any]]) -&gt; dict[str, Any]:
+    &quot;&quot;&quot;Aggregate additive case counts and derive independent metrics.&quot;&quot;&quot;
+
+    def total(key: str) -&gt; int | float:
+        return sum(row[key] for row in case_scores)
+
+    field_correct = int(total(&quot;field_value_correct&quot;))
+    field_total = int(total(&quot;field_value_total&quot;))
+    expected_abstentions = int(total(&quot;expected_abstention_count&quot;))
+    correct_abstentions = int(total(&quot;correct_abstention_count&quot;))
+    predicted_non_null = int(total(&quot;predicted_non_null_count&quot;))
+    unsupported_values = int(total(&quot;unsupported_value_count&quot;))
+    decision_correct = int(total(&quot;decision_correct_count&quot;))
+    decision_total = int(total(&quot;decision_total&quot;))
+    expected_non_accept = int(total(&quot;expected_non_accept_count&quot;))
+    unsafe_acceptances = int(total(&quot;unsafe_acceptance_count&quot;))
+    unsafe_under_routing = int(total(&quot;unsafe_under_routing_count&quot;))
+    issue_tp = int(total(&quot;issue_true_positive&quot;))
+    issue_fp = int(total(&quot;issue_false_positive&quot;))
+    issue_fn = int(total(&quot;issue_false_negative&quot;))
+    issue_exact = int(total(&quot;issue_exact_set_count&quot;))
+    issue_case_total = int(total(&quot;issue_case_total&quot;))
+    mapping_correct = int(total(&quot;mapping_correct&quot;))
+    mapping_total = int(total(&quot;mapping_total&quot;))
+
+    issue_precision = _safe_divide(issue_tp, issue_tp + issue_fp)
+    issue_recall = _safe_divide(issue_tp, issue_tp + issue_fn)
+    # The count form remains defined as 0.0 when gold issues exist but the
+    # system predicts none; it is only not-applicable when neither side has an
+    # issue anywhere in the selected slice.
+    issue_f1 = _safe_divide(2 * issue_tp, 2 * issue_tp + issue_fp + issue_fn)
+    latencies = [
+        float(row[&quot;latency_ms&quot;])
+        for row in case_scores
+        if row[&quot;latency_ms&quot;] is not None
+    ]
+    input_tokens = [
+        int(row[&quot;input_tokens&quot;])
+        for row in case_scores
+        if row[&quot;input_tokens&quot;] is not None
+    ]
+    output_tokens = [
+        int(row[&quot;output_tokens&quot;])
+        for row in case_scores
+        if row[&quot;output_tokens&quot;] is not None
+    ]
+    costs = [
+        float(row[&quot;estimated_cost_usd&quot;])
+        for row in case_scores
+        if row[&quot;estimated_cost_usd&quot;] is not None
+    ]
+
+    return {
+        &quot;case_count&quot;: len(case_scores),
+        &quot;field_value_correct&quot;: field_correct,
+        &quot;field_value_total&quot;: field_total,
+        &quot;field_value_accuracy&quot;: _safe_divide(field_correct, field_total),
+        &quot;correct_abstention_count&quot;: correct_abstentions,
+        &quot;expected_abstention_count&quot;: expected_abstentions,
+        &quot;correct_abstention_rate&quot;: _safe_divide(correct_abstentions, expected_abstentions),
+        &quot;unsupported_value_count&quot;: unsupported_values,
+        &quot;predicted_non_null_count&quot;: predicted_non_null,
+        &quot;unsupported_value_rate&quot;: _safe_divide(unsupported_values, predicted_non_null),
+        &quot;decision_correct_count&quot;: decision_correct,
+        &quot;decision_total&quot;: decision_total,
+        &quot;decision_accuracy&quot;: _safe_divide(decision_correct, decision_total),
+        &quot;unsafe_acceptance_count&quot;: unsafe_acceptances,
+        &quot;expected_non_accept_count&quot;: expected_non_accept,
+        &quot;unsafe_acceptance_rate&quot;: _safe_divide(unsafe_acceptances, expected_non_accept),
+        &quot;unsafe_under_routing_count&quot;: unsafe_under_routing,
+        &quot;unsafe_under_routing_rate&quot;: _safe_divide(unsafe_under_routing, decision_total),
+        &quot;issue_true_positive&quot;: issue_tp,
+        &quot;issue_false_positive&quot;: issue_fp,
+        &quot;issue_false_negative&quot;: issue_fn,
+        &quot;issue_micro_precision&quot;: issue_precision,
+        &quot;issue_micro_recall&quot;: issue_recall,
+        &quot;issue_micro_f1&quot;: issue_f1,
+        &quot;issue_exact_set_count&quot;: issue_exact,
+        &quot;issue_exact_set_rate&quot;: _safe_divide(issue_exact, issue_case_total),
+        &quot;mapping_correct&quot;: mapping_correct,
+        &quot;mapping_total&quot;: mapping_total,
+        &quot;mapping_accuracy&quot;: _safe_divide(mapping_correct, mapping_total),
+        &quot;latency_observed_count&quot;: len(latencies),
+        &quot;latency_ms_total&quot;: sum(latencies) if latencies else None,
+        &quot;latency_ms_median&quot;: statistics.median(latencies) if latencies else None,
+        &quot;input_tokens_observed_count&quot;: len(input_tokens),
+        &quot;input_tokens_total&quot;: sum(input_tokens) if input_tokens else None,
+        &quot;output_tokens_observed_count&quot;: len(output_tokens),
+        &quot;output_tokens_total&quot;: sum(output_tokens) if output_tokens else None,
+        &quot;estimated_cost_observed_count&quot;: len(costs),
+        &quot;estimated_cost_usd_total&quot;: sum(costs) if costs else None,
+    }
+
+
+def _values_equal(expected: Any, predicted: Any) -&gt; bool:
+    &quot;&quot;&quot;Compare canonical values with only harmless whitespace normalization.&quot;&quot;&quot;
+
+    if isinstance(expected, str) and isinstance(predicted, str):
+        normalize = lambda value: re.sub(r&quot;\s+&quot;, &quot; &quot;, value).strip()
+        return normalize(expected) == normalize(predicted)
+    # bool is a subclass of int but should never equal a numeric field value.
+    if isinstance(expected, bool) or isinstance(predicted, bool):
+        return expected is predicted
+    if isinstance(expected, (int, float)) and isinstance(predicted, (int, float)):
+        return math.isfinite(float(expected)) and math.isfinite(float(predicted)) and expected == predicted
+    return expected == predicted
+
+
+def _safe_divide(numerator: int | float, denominator: int | float) -&gt; float | None:
+    &quot;&quot;&quot;Return ``None`` when a metric has no eligible denominator.&quot;&quot;&quot;
+
+    return numerator / denominator if denominator else None
+
+
+def _required_string(row: Mapping[str, Any], key: str, owner: str) -&gt; str:
+    value = row.get(key)
+    if not isinstance(value, str) or not value:
+        raise ValueError(f&quot;{owner}: {key} must be a non-empty string&quot;)
+    return value
+
+
+def _required_record(row: Mapping[str, Any], key: str, owner: str) -&gt; Mapping[str, Any]:
+    value = row.get(key)
+    if not isinstance(value, Mapping):
+        raise ValueError(f&quot;{owner}: {key} must be an object&quot;)
+    _require_exact_fields(value, key, _required_string(row, &quot;case_id&quot;, owner))
+    return value
+
+
+def _require_exact_fields(record: Mapping[str, Any], owner: str, case_id: str) -&gt; None:
+    actual = set(record)
+    expected = set(CANONICAL_FIELDS)
+    if actual != expected:
+        missing = sorted(expected - actual)
+        extra = sorted(actual - expected)
+        raise ValueError(f&quot;{case_id} {owner}: canonical fields differ; missing={missing}, extra={extra}&quot;)
+
+
+def _as_string_set(value: Any, owner: str) -&gt; set[str]:
+    if not isinstance(value, list) or any(not isinstance(item, str) for item in value):
+        raise ValueError(f&quot;{owner} must be a list of strings&quot;)
+    return set(value)
+
+
+def _optional_nonnegative_number(row: Mapping[str, Any], key: str) -&gt; float | None:
+    value = row.get(key)
+    if value is None:
+        return None
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise ValueError(f&quot;prediction {row.get(&#39;case_id&#39;)}: {key} must be numeric&quot;)
+    numeric = float(value)
+    if not math.isfinite(numeric) or numeric &lt; 0:
+        raise ValueError(f&quot;prediction {row.get(&#39;case_id&#39;)}: {key} must be finite and nonnegative&quot;)
+    return numeric
+
+
+def _optional_nonnegative_integer(row: Mapping[str, Any], key: str) -&gt; int | None:
+    value = row.get(key)
+    if value is None:
+        return None
+    if isinstance(value, bool) or not isinstance(value, int) or value &lt; 0:
+        raise ValueError(f&quot;prediction {row.get(&#39;case_id&#39;)}: {key} must be a nonnegative integer&quot;)
+    return value
+
+
+def _index_unique(rows: Iterable[Mapping[str, Any]], owner: str) -&gt; dict[str, Mapping[str, Any]]:
+    indexed: dict[str, Mapping[str, Any]] = {}
+    for row in rows:
+        case_id = _required_string(row, &quot;case_id&quot;, owner)
+        if case_id in indexed:
+            raise ValueError(f&quot;{owner} contain duplicate case_id {case_id!r}&quot;)
+        indexed[case_id] = row
+    if not indexed:
+        raise ValueError(f&quot;{owner} must not be empty&quot;)
+    return indexed
+
+
+def _require_same_ids(
+    expected: Mapping[str, Any], actual: Mapping[str, Any], owner: str
+) -&gt; None:
+    missing = sorted(set(expected) - set(actual))
+    extra = sorted(set(actual) - set(expected))
+    if missing or extra:
+        raise ValueError(f&quot;{owner} case_ids differ; missing={missing}, extra={extra}&quot;)
+
+
+def _case_tags(case: Mapping[str, Any]) -&gt; set[str]:
+    tags = case.get(&quot;tags&quot;)
+    if not isinstance(tags, list) or any(not isinstance(tag, str) for tag in tags):
+        raise ValueError(f&quot;case {case.get(&#39;case_id&#39;)}: tags must be a list of strings&quot;)
+    return set(tags)
+</pre></body></html>

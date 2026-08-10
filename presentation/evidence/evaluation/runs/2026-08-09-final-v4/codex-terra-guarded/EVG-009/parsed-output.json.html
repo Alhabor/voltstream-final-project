@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light"><title>parsed-output.json — VoltStream evidence</title>
+<style>:root{color-scheme:dark light;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#10151b;color:#f4f7fa}body{max-width:1100px;margin:auto;padding:2rem}header{position:sticky;top:0;padding:1rem 0;background:#10151bee;border-bottom:1px solid #3b4a59}h1{margin:0 0 .6rem;font:700 1.25rem ui-sans-serif,system-ui,sans-serif}.meta{color:#aeb9c5;font-size:.82rem;overflow-wrap:anywhere}.actions{display:flex;gap:1rem;margin-top:.8rem}a{color:#7ec8ff}pre{margin:1.5rem 0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:.9rem;line-height:1.55}@media(prefers-color-scheme:light){:root{background:#f4f7fa;color:#15212c}header{background:#f4f7faee;border-color:#a8b8c7}a{color:#006eaa}.meta{color:#526272}}@media print{header{position:static}body{max-width:none;padding:0}}</style></head>
+<body><header><h1>evaluation/runs/2026-08-09-final-v4/codex-terra-guarded/EVG-009/parsed-output.json</h1><div class="meta">Read-only copy from the VoltStream source repository · SHA-256 cbefca32595a32724d7184f4c7c470f1e3f99ee82d5f0aa4b5e704487bb7e648</div><nav class="actions"><a href="parsed-output.json">Open raw file</a><a href="../../../../../../index.html">Return to presentation</a></nav></header><pre>{
+  &quot;case_id&quot;: &quot;EVG-009&quot;,
+  &quot;record&quot;: {
+    &quot;station_id&quot;: &quot;ALPHA-909&quot;,
+    &quot;address&quot;: &quot;909 Sandbox Way Brooklyn NY 11215&quot;,
+    &quot;charger_level&quot;: &quot;L2&quot;,
+    &quot;port_count&quot;: null,
+    &quot;power_kw&quot;: 7.2,
+    &quot;connector_type&quot;: &quot;J1772&quot;,
+    &quot;operational_status&quot;: &quot;operational&quot;,
+    &quot;source_record_id&quot;: &quot;A-909&quot;
+  },
+  &quot;source_mappings&quot;: {
+    &quot;station_id&quot;: &quot;$.station&quot;,
+    &quot;address&quot;: &quot;$.location&quot;,
+    &quot;charger_level&quot;: &quot;$.equipment_summary.level&quot;,
+    &quot;port_count&quot;: null,
+    &quot;power_kw&quot;: &quot;$.equipment_summary.power_per_port_kw&quot;,
+    &quot;connector_type&quot;: &quot;$.equipment_summary.connector&quot;,
+    &quot;operational_status&quot;: &quot;$.reported_status&quot;,
+    &quot;source_record_id&quot;: &quot;$.record_id&quot;
+  },
+  &quot;decision&quot;: &quot;HUMAN_REVIEW&quot;,
+  &quot;issue_codes&quot;: [
+    &quot;MISSING_REQUIRED_FIELD&quot;,
+    &quot;AMBIGUOUS_FIELD_VALUE&quot;
+  ],
+  &quot;latency_ms&quot;: 8460.235,
+  &quot;input_tokens&quot;: 15610,
+  &quot;output_tokens&quot;: 273,
+  &quot;cached_input_tokens&quot;: 13056,
+  &quot;estimated_cost_usd&quot;: null,
+  &quot;model_calls&quot;: 1,
+  &quot;provider_model&quot;: &quot;gpt-5.6-terra&quot;
+}
+</pre></body></html>

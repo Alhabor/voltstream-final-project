@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light"><title>2026-08-09-scope-decision.md — VoltStream evidence</title>
+<style>:root{color-scheme:dark light;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#10151b;color:#f4f7fa}body{max-width:1100px;margin:auto;padding:2rem}header{position:sticky;top:0;padding:1rem 0;background:#10151bee;border-bottom:1px solid #3b4a59}h1{margin:0 0 .6rem;font:700 1.25rem ui-sans-serif,system-ui,sans-serif}.meta{color:#aeb9c5;font-size:.82rem;overflow-wrap:anywhere}.actions{display:flex;gap:1rem;margin-top:.8rem}a{color:#7ec8ff}pre{margin:1.5rem 0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:.9rem;line-height:1.55}@media(prefers-color-scheme:light){:root{background:#f4f7fa;color:#15212c}header{background:#f4f7faee;border-color:#a8b8c7}a{color:#006eaa}.meta{color:#526272}}@media print{header{position:static}body{max-width:none;padding:0}}</style></head>
+<body><header><h1>build-log/2026-08-09-scope-decision.md</h1><div class="meta">Read-only copy from the VoltStream source repository · SHA-256 d6f48fc0e6239b1fca9b0c48fd403e1c99a90e91611f6d5f6a80c758bd0632f2</div><nav class="actions"><a href="2026-08-09-scope-decision.md">Open raw file</a><a href="../../index.html">Return to presentation</a></nav></header><pre># Scope decision: intake gatekeeping only
+
+- Date: 2026-08-09
+- Owner/agent: project team
+- Status: SUPPORTED
+- Related commit(s): to be added by the integrating agent
+- Related cases/results: evaluation cases not yet created
+
+## Question
+
+What portion of the five-layer VoltStream product vision can be implemented,
+tested, and explained honestly for the capstone?
+
+## Alternatives considered
+
+1. Build the full five-layer data platform.
+2. Build station reconciliation across multiple master-data sources.
+3. Build charging-session anomaly diagnosis.
+4. Build one intake gatekeeper for CSV, JSON, and plain-text submissions.
+
+## Evidence and constraints
+
+- The capstone explicitly favors one specific, defensible slice over a complete
+  system.
+- Intake extraction and routing permit a fixed answer key, simple baseline,
+  multi-model comparison, category-level scoring, abstention cases, and a live
+  demonstration within one coherent task.
+- The broader alternatives add databases, entity-resolution truth sets, sensor
+  behavior, or production integrations that are unnecessary to answer the
+  selected research question.
+- Public DOE/AFDC evidence confirms that EV charging data can enter a major
+  station directory through APIs, spreadsheets, and manual workflows.
+
+## Decision
+
+Implement and evaluate only **VoltStream Intake Gatekeeper**:
+
+&gt; supported input -&gt; canonical candidate -&gt; deterministic validation -&gt;
+&gt; `ACCEPT`, `HUMAN_REVIEW`, or `REJECT`
+
+The complete five-layer materials in `../Doc/` remain product vision and
+supporting ideation. They are not implementation claims and are outside the Git
+repository.
+
+## Guardrails
+
+- No silent imputation or overwrite.
+- Public/synthetic data only.
+- CSV, JSON, and plain text only.
+- No production deployment or regulatory-compliance claim.
+- Evaluation evidence must precede the recommendation.
+
+## Next action
+
+Freeze the canonical contract, cases, and answer key before running models.
+
+</pre></body></html>

@@ -1,0 +1,86 @@
+{
+  "version": 1,
+  "files": {
+    "project-scope": "docs/PROJECT_SCOPE.md",
+    "background-research": "research/BACKGROUND_RESEARCH.md",
+    "research-sources": "research/SOURCES.md",
+    "scope-decision": "build-log/2026-08-09-scope-decision.md",
+    "architecture": "docs/ARCHITECTURE.md",
+    "gatekeeper-code": "src/voltstream/gatekeeper.py",
+    "freeform-hypothesis": "build-log/2026-08-09-freeform-cleaning-hypothesis.md",
+    "final-run-log": "build-log/2026-08-09-final-experiment-results.md",
+    "test-cases": "data/cases.jsonl",
+    "answer-key": "data/answer_key.jsonl",
+    "experiment-plan": "docs/EXPERIMENT_PLAN.md",
+    "prompt-index": "prompts/README.md",
+    "evaluation-spec": "evaluation/EVALUATION_SPEC.md",
+    "scoring-code": "evaluation/scoring.py",
+    "results": "evaluation/RESULTS.md",
+    "summary-csv": "evaluation/runs/2026-08-09-final-v4/summary.csv",
+    "run-manifest": "evaluation/runs/2026-08-09-final-v4/manifest.json",
+    "evg009-codex": "evaluation/runs/2026-08-09-final-v4/codex-terra-guarded/EVG-009/parsed-output.json",
+    "evg009-deepseek": "evaluation/runs/2026-08-09-final-v4/deepseek-flash-guarded/EVG-009/parsed-output.json",
+    "recommendation": "docs/FINAL_RECOMMENDATION.md",
+    "qa-report": "docs/QA_REPORT.md"
+  },
+  "slides": {
+    "decision": [{"file": "project-scope", "en": "Project scope", "zh": "项目范围"}],
+    "problem": [
+      {"file": "project-scope", "en": "Problem definition", "zh": "问题定义"},
+      {"file": "background-research", "en": "Background research", "zh": "背景研究"}
+    ],
+    "charger-basics": [{"file": "background-research", "en": "Charging-data background", "zh": "充电数据背景"}],
+    "research": [
+      {"file": "background-research", "en": "Research notes", "zh": "研究笔记"},
+      {"file": "research-sources", "en": "Source list", "zh": "来源清单"}
+    ],
+    "ideation": [{"file": "scope-decision", "en": "Scope decision log", "zh": "范围决策记录"}],
+    "prototype": [
+      {"file": "architecture", "en": "System architecture", "zh": "系统架构"},
+      {"file": "gatekeeper-code", "en": "Decision code", "zh": "判定代码"}
+    ],
+    "failed": [
+      {"file": "freeform-hypothesis", "en": "Failed-idea record", "zh": "失败思路记录"},
+      {"file": "final-run-log", "en": "Final run log", "zh": "最终实验记录"}
+    ],
+    "evg009": [
+      {"file": "test-cases", "en": "Original test cases", "zh": "原始测试案例"},
+      {"file": "evg009-codex", "en": "Codex EVG-009 output", "zh": "Codex 的 EVG-009 输出"},
+      {"file": "evg009-deepseek", "en": "DeepSeek EVG-009 output", "zh": "DeepSeek 的 EVG-009 输出"}
+    ],
+    "future": [
+      {"file": "recommendation", "en": "Recommendation evidence", "zh": "建议依据"},
+      {"file": "results", "en": "Detailed results", "zh": "详细结果"}
+    ],
+    "testing": [
+      {"file": "test-cases", "en": "10 test cases", "zh": "10 个测试案例"},
+      {"file": "answer-key", "en": "Prewritten answer key", "zh": "预先编写的答案表"},
+      {"file": "experiment-plan", "en": "Experiment plan", "zh": "实验计划"}
+    ],
+    "strategies": [
+      {"file": "experiment-plan", "en": "Strategy definitions", "zh": "策略定义"},
+      {"file": "prompt-index", "en": "Frozen prompt index", "zh": "冻结提示词索引"}
+    ],
+    "metrics": [
+      {"file": "evaluation-spec", "en": "Scoring specification", "zh": "评分规范"},
+      {"file": "scoring-code", "en": "Scoring code", "zh": "评分代码"}
+    ],
+    "system": [
+      {"file": "experiment-plan", "en": "Pre-set pass rules", "zh": "预设通过规则"},
+      {"file": "run-manifest", "en": "Frozen run manifest", "zh": "冻结实验清单"}
+    ],
+    "quality": [
+      {"file": "results", "en": "Full results audit", "zh": "完整结果审计"},
+      {"file": "summary-csv", "en": "Result table (CSV)", "zh": "结果表（CSV）"}
+    ],
+    "efficiency": [
+      {"file": "results", "en": "Cost and timing details", "zh": "成本与耗时明细"},
+      {"file": "summary-csv", "en": "Measured totals (CSV)", "zh": "测量汇总（CSV）"}
+    ],
+    "recommendation": [{"file": "recommendation", "en": "Final recommendation", "zh": "最终建议"}],
+    "risks": [
+      {"file": "qa-report", "en": "Independent QA report", "zh": "独立 QA 报告"},
+      {"file": "recommendation", "en": "Limits and next gate", "zh": "限制与下一道门槛"}
+    ]
+  }
+}

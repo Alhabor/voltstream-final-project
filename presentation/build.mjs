@@ -6,20 +6,24 @@
  * deck reviewable, reproducible, and safe to regenerate after content edits.
  */
 
-import { readFile, writeFile } from "node:fs/promises";
-import { dirname, join } from "node:path";
+import { createHash } from "node:crypto";
+import { cp, mkdir, readFile, rm, stat, writeFile } from "node:fs/promises";
+import { dirname, isAbsolute, join, normalize, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const directory = dirname(fileURLToPath(import.meta.url));
 const sourcePath = join(directory, "slides.json");
 const chineseSourcePath = join(directory, "slides.zh.json");
+const evidencePath = join(directory, "evidence.json");
 const outputPath = join(directory, "index.html");
 const deck = JSON.parse(await readFile(sourcePath, "utf8"));
 const chineseDeck = JSON.parse(await readFile(chineseSourcePath, "utf8"));
+const evidence = JSON.parse(await readFile(evidencePath, "utf8"));
 
 validateDeck(deck);
 validateDeck(chineseDeck);
 validateTranslation(deck, chineseDeck);
+await validateAndBuildEvidence(evidence, deck);
 
 const slides = deck.slides.map((slide, index) => renderSlide(slide, chineseDeck.slides[index], index, deck.slides.length)).join("\n");
 const html = `<!doctype html>
@@ -223,6 +227,17 @@ const html = `<!doctype html>
       padding-right: calc(var(--u) * 17);
     }
     .slide-footer .section-label { text-align: right; }
+    .footer-evidence { display: flex; min-width: 0; align-items: baseline; gap: calc(var(--u) * .55); }
+    .evidence-label { flex: 0 0 auto; }
+    .evidence-links { display: flex; min-width: 0; flex-wrap: wrap; gap: calc(var(--u) * .25) calc(var(--u) * .6); }
+    .evidence-link {
+      color: var(--subtle);
+      text-decoration-color: color-mix(in srgb, var(--blue) 55%, transparent);
+      text-underline-offset: .2em;
+      white-space: nowrap;
+    }
+    .evidence-link:hover, .evidence-link:focus-visible { color: var(--blue); }
+    .evidence-link:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
     .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: calc(var(--u) * 2.4); }
     .panel {
       min-width: 0;
@@ -610,7 +625,7 @@ const html = `<!doctype html>
       });
 
       stage.addEventListener('pointerdown', (event) => {
-        if (event.target.closest('button')) return;
+        if (event.target.closest('a, button')) return;
         pointerStart = { x: event.clientX, y: event.clientY, time: performance.now() };
       });
       stage.addEventListener('pointerup', (event) => {
@@ -685,11 +700,11 @@ function renderSlide(slide, chineseSlide, index, total) {
 }
 
 function renderCopy(slide, language, index, total) {
-  const footer = language === "zh" ? "VoltStream · 仅使用模拟/公开数据，未使用公司记录" : "VoltStream · made-up/public test data; no company records";
+  const evidenceLinks = renderEvidenceLinks(slide.id, language);
   return `<div class="slide-copy" data-copy="${language}" lang="${language === "zh" ? "zh-CN" : "en"}">
     <header class="slide-header"><p class="eyebrow">${escapeHtml(slide.eyebrow)}</p><h${index === 0 ? "1" : "2"}>${escapeHtml(slide.title)}</h${index === 0 ? "1" : "2"}></header>
     <div class="body ${slide.layout === "score-table" ? "score-wrap" : ""}">${renderBody(slide, language)}</div>
-    <footer class="slide-footer"><span>${footer}</span><span class="section-label">${escapeHtml(slide.sectionLabel || slide.section)} · ${index + 1}/${total}</span></footer>
+    <footer class="slide-footer"><div class="footer-evidence"><span>VoltStream</span>${evidenceLinks}</div><span class="section-label">${escapeHtml(slide.sectionLabel || slide.section)} · ${index + 1}/${total}</span></footer>
   </div>`;
 }
 
@@ -739,6 +754,73 @@ function renderBody(slide, language) {
 
 function list(items) {
   return `<ul>${items.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
+}
+
+function renderEvidenceLinks(slideId, language) {
+  const links = evidence.slides[slideId] || [];
+  if (!links.length) return "";
+  const prefix = language === "zh" ? "原始文件：" : "Files:";
+  return `<span class="evidence-label">${prefix}</span><span class="evidence-links">${links.map(link => {
+    const source = evidence.files[link.file];
+    const label = language === "zh" ? link.zh : link.en;
+    return `<a class="evidence-link" href="evidence/${escapeHtml(source)}.html" target="_blank" rel="noopener noreferrer">${escapeHtml(label)} ↗</a>`;
+  }).join("")}</span>`;
+}
+
+async function validateAndBuildEvidence(manifest, sourceDeck) {
+  if (!manifest || manifest.version !== 1 || !manifest.files || !manifest.slides) {
+    throw new Error("evidence.json must contain version 1 files and slides maps");
+  }
+  const repositoryRoot = resolve(directory, "..");
+  const evidenceRoot = join(directory, "evidence");
+  const slideIds = new Set(sourceDeck.slides.map(slide => slide.id));
+  const referencedFiles = new Set();
+
+  for (const [slideId, links] of Object.entries(manifest.slides)) {
+    if (!slideIds.has(slideId)) throw new Error(`Evidence references unknown slide: ${slideId}`);
+    if (!Array.isArray(links) || links.length < 1 || links.length > 3) {
+      throw new Error(`Slide ${slideId} must link to between 1 and 3 evidence files`);
+    }
+    for (const link of links) {
+      if (!manifest.files[link.file]) throw new Error(`Unknown evidence file ID: ${link.file}`);
+      if (!link.en || !link.zh) throw new Error(`Evidence link ${link.file} needs English and Chinese labels`);
+      referencedFiles.add(link.file);
+    }
+  }
+  for (const slideId of slideIds) {
+    if (!manifest.slides[slideId]) throw new Error(`Slide has no evidence links: ${slideId}`);
+  }
+
+  await rm(evidenceRoot, { recursive: true, force: true });
+  for (const fileId of referencedFiles) {
+    const source = manifest.files[fileId];
+    if (isAbsolute(source) || normalize(source).startsWith(`..${sep}`) || source.includes("\\")) {
+      throw new Error(`Unsafe evidence path: ${source}`);
+    }
+    const sourceFile = resolve(repositoryRoot, source);
+    if (relative(repositoryRoot, sourceFile).startsWith(`..${sep}`)) {
+      throw new Error(`Evidence path escapes repository: ${source}`);
+    }
+    const details = await stat(sourceFile);
+    if (!details.isFile()) throw new Error(`Evidence source is not a file: ${source}`);
+    const content = await readFile(sourceFile);
+    const destination = join(evidenceRoot, source);
+    await mkdir(dirname(destination), { recursive: true });
+    await cp(sourceFile, destination);
+    await writeFile(`${destination}.html`, renderEvidenceViewer(source, content));
+  }
+}
+
+function renderEvidenceViewer(source, content) {
+  const text = content.toString("utf8");
+  const sha256 = createHash("sha256").update(content).digest("hex");
+  const rawName = source.split("/").at(-1);
+  const returnPath = `${"../".repeat(source.split("/").length)}index.html`;
+  return `<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light"><title>${escapeHtml(rawName)} — VoltStream evidence</title>
+<style>:root{color-scheme:dark light;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#10151b;color:#f4f7fa}body{max-width:1100px;margin:auto;padding:2rem}header{position:sticky;top:0;padding:1rem 0;background:#10151bee;border-bottom:1px solid #3b4a59}h1{margin:0 0 .6rem;font:700 1.25rem ui-sans-serif,system-ui,sans-serif}.meta{color:#aeb9c5;font-size:.82rem;overflow-wrap:anywhere}.actions{display:flex;gap:1rem;margin-top:.8rem}a{color:#7ec8ff}pre{margin:1.5rem 0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:.9rem;line-height:1.55}@media(prefers-color-scheme:light){:root{background:#f4f7fa;color:#15212c}header{background:#f4f7faee;border-color:#a8b8c7}a{color:#006eaa}.meta{color:#526272}}@media print{header{position:static}body{max-width:none;padding:0}}</style></head>
+<body><header><h1>${escapeHtml(source)}</h1><div class="meta">Read-only copy from the VoltStream source repository · SHA-256 ${sha256}</div><nav class="actions"><a href="${escapeHtml(rawName)}">Open raw file</a><a href="${returnPath}">Return to presentation</a></nav></header><pre>${escapeHtml(text)}</pre></body></html>`;
 }
 
 function escapeHtml(value) {

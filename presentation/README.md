@@ -70,6 +70,28 @@ The current slide is stored in the URL hash. A URL ending in `#slide-6` opens
 slide 6 and returns to it after refresh. / 当前页码保存在 URL hash 中；以
 `#slide-6` 结尾的地址会打开第 6 页，刷新后仍恢复到该页。
 
+## Source-file links / 原始文件链接
+
+Every slide has one to three small `Files:` links in its lower-left footer.
+Each link opens a read-only web view of the exact project file that supports
+that slide, in a new tab, so the live presentation remains on the current
+slide. The evidence view shows the repository path and SHA-256 checksum and
+also offers the unchanged raw file. The Chinese review mode displays translated
+link labels but opens the same evidence.
+
+每页左下角均提供一至三个低干扰的“原始文件”链接。链接会在新标签页打开支撑该页内容
+的项目文件只读视图，因此演示页会保留在当前页。证据页面显示仓库路径与 SHA-256 校验值，
+并可继续打开未经改写的原始文件；中文审阅模式仅翻译链接名称，打开的证据与英文版一致。
+
+`evidence.json` is the maintained slide-to-file map. Regeneration validates
+every path, requires evidence for all slides, copies only the listed files into
+`presentation/evidence/`, and builds a self-contained viewer beside each copy.
+Do not edit the generated evidence copies or viewer pages by hand.
+
+`evidence.json` 是可维护的“页面—原始文件”映射。重新生成时会验证所有路径，要求每页都
+存在证据，只将清单内文件复制到 `presentation/evidence/`，并为每份副本生成自包含查看页。
+请勿手工修改生成的证据副本或查看页。
+
 ## Controls / 操作
 
 - Next / 下一页：`→`、`↓`、空格或 `PageDown`
@@ -98,18 +120,19 @@ browser offers that option.
 ## Verification / 验证
 
 `BUILD_RECEIPT.json` records the generated artifact and browser QA. The deck
-passed 417 real-Chrome checks at 1920×1080 and 1280×800 across English/dark,
+passed 912 real-Chrome checks at 1920×1080 and 1280×800 across English/dark,
 English/light, Chinese/dark, and Chinese/light. Coverage includes navigation,
 rapid switching, hash recovery, language/theme persistence, fullscreen,
 reduced motion, contrast, external requests, browser errors, control overlap,
-content clipping, and the low-prominence preference controls in default, hover,
-focus, and touch states. The checks include a dedicated typography gate for
-every slide in both languages. English/dark and Chinese/light print outputs
-were each confirmed as 17 independent 960×540-point pages.
+content clipping, every slide's evidence links, safe new-tab behavior, all 21
+evidence viewers, and the low-prominence preference controls. The checks include
+a dedicated typography gate for every slide in both languages. English/dark and
+Chinese/light print outputs were each confirmed as 17 independent 960×540-point
+pages.
 
 `BUILD_RECEIPT.json` 记录生成产物与浏览器 QA。演示在 1920×1080 和 1280×800
-视口下，对英文深色、英文浅色、中文深色、中文浅色四种组合完成 417 项真实 Chrome
+视口下，对英文深色、英文浅色、中文深色、中文浅色四种组合完成 912 项真实 Chrome
 检查，覆盖导航、快速切页、hash 恢复、语言与主题持久化、全屏、减少动态效果、对比度、
-外部请求、浏览器错误、控件遮挡、内容裁切，以及设置控件在默认、悬停、聚焦和触屏状态
-下的低存在感与可操作性，并逐页检查中英文标题平衡与最小正文字号。英文深色与中文浅色
-打印稿均验证为 17 个独立的 960×540 点页面。
+外部请求、浏览器错误、控件遮挡、内容裁切、每页证据链接、新标签页安全行为与全部 21 个
+证据查看页，以及设置控件的低存在感与可操作性，并逐页检查中英文标题平衡与最小正文字号。
+英文深色与中文浅色打印稿均验证为 17 个独立的 960×540 点页面。

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light"><title>manifest.json — VoltStream evidence</title>
+<style>:root{color-scheme:dark light;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#10151b;color:#f4f7fa}body{max-width:1100px;margin:auto;padding:2rem}header{position:sticky;top:0;padding:1rem 0;background:#10151bee;border-bottom:1px solid #3b4a59}h1{margin:0 0 .6rem;font:700 1.25rem ui-sans-serif,system-ui,sans-serif}.meta{color:#aeb9c5;font-size:.82rem;overflow-wrap:anywhere}.actions{display:flex;gap:1rem;margin-top:.8rem}a{color:#7ec8ff}pre{margin:1.5rem 0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:.9rem;line-height:1.55}@media(prefers-color-scheme:light){:root{background:#f4f7fa;color:#15212c}header{background:#f4f7faee;border-color:#a8b8c7}a{color:#006eaa}.meta{color:#526272}}@media print{header{position:static}body{max-width:none;padding:0}}</style></head>
+<body><header><h1>evaluation/runs/2026-08-09-final-v4/manifest.json</h1><div class="meta">Read-only copy from the VoltStream source repository · SHA-256 d452d297d42cc0c33cbb1b4e0fb53554f59108a2f25b13018029cf7268874965</div><nav class="actions"><a href="manifest.json">Open raw file</a><a href="../../../../index.html">Return to presentation</a></nav></header><pre>{
+  &quot;run_id&quot;: &quot;2026-08-09-final-v4&quot;,
+  &quot;created_at_utc&quot;: &quot;2026-08-10T01:45:45.956113+00:00&quot;,
+  &quot;git_commit&quot;: &quot;7516ab3f6cb9662eddac389e11d59e74554ec1be&quot;,
+  &quot;git_status&quot;: &quot;&quot;,
+  &quot;python&quot;: &quot;3.9.6 (default, May 22 2026, 11:13:45) \n[Clang 21.0.0 (clang-2100.1.1.101)]&quot;,
+  &quot;platform&quot;: &quot;macOS-26.5.2-arm64-arm-64bit&quot;,
+  &quot;frozen_sha256&quot;: {
+    &quot;data/cases.jsonl&quot;: &quot;e57eb737d5984798c4760e4705f545f450f5acfa7a4bcc255abfa3c68418394d&quot;,
+    &quot;data/answer_key.jsonl&quot;: &quot;5dd523c26ab9cceea151536bc5a302d1e9f4a8f19b14e0f2caa50b5c30368d4e&quot;,
+    &quot;data/mapping_answer_key.jsonl&quot;: &quot;d39f5737defbecdea0a9e2252305b7880443cd1f1fa6d8028d9776f3346fb99b&quot;,
+    &quot;evaluation/EVALUATION_SPEC.md&quot;: &quot;89acc167822396de85159c1d4632890b090b911ef22a9bc1100854916a202ad1&quot;,
+    &quot;evaluation/canonical_record.schema.json&quot;: &quot;46439c7c46b7b4c3616d1a01e4c51f602ca134e3af79a486312d332aeab126cc&quot;,
+    &quot;evaluation/model_response.schema.json&quot;: &quot;e316e1f66ccc19468b30c58387ccb290a3a9f86c42b2506773d250051b26f366&quot;,
+    &quot;prompts/README.md&quot;: &quot;f36a1b629b7bed339e1657bbb0a9e4dcc0e2204452cda78e1b230d3cd653af13&quot;,
+    &quot;prompts/case_user_template_v1.md&quot;: &quot;d5f17d556021e6f5e71fdd52bb40a0dae5848332d8130ca933bf2687ce393a1b&quot;,
+    &quot;prompts/guarded_system_v1.md&quot;: &quot;1966a728323e27a3f72d6a82e4586e6d2041bcfe1e312f925fee6623b6915ae3&quot;,
+    &quot;prompts/unrestricted_cleaner_system_v1.md&quot;: &quot;15d12015f1afe37dbdfc36d3927220da69f5300067733a5259754bfafc4e10a9&quot;,
+    &quot;prompts/validator_feedback_v1.md&quot;: &quot;d0575b206848344006f5f8b3ec3819afa452b52cf0965ce0e2748d402ad30a8a&quot;
+  },
+  &quot;pricing_snapshot&quot;: &quot;evaluation/pricing_2026-08-09.json&quot;,
+  &quot;strategies_completed&quot;: [
+    {
+      &quot;strategy&quot;: &quot;baseline&quot;,
+      &quot;completed_at_utc&quot;: &quot;2026-08-10T01:45:46.060343+00:00&quot;
+    },
+    {
+      &quot;strategy&quot;: &quot;deepseek-flash-guarded&quot;,
+      &quot;completed_at_utc&quot;: &quot;2026-08-10T01:46:14.459739+00:00&quot;
+    },
+    {
+      &quot;strategy&quot;: &quot;codex-terra-guarded&quot;,
+      &quot;completed_at_utc&quot;: &quot;2026-08-10T01:47:51.354193+00:00&quot;
+    },
+    {
+      &quot;strategy&quot;: &quot;rules-first-cascade&quot;,
+      &quot;completed_at_utc&quot;: &quot;2026-08-10T01:48:12.528010+00:00&quot;
+    },
+    {
+      &quot;strategy&quot;: &quot;deepseek-pro-quality&quot;,
+      &quot;completed_at_utc&quot;: &quot;2026-08-10T01:48:56.002116+00:00&quot;
+    },
+    {
+      &quot;strategy&quot;: &quot;deepseek-flash-unrestricted&quot;,
+      &quot;completed_at_utc&quot;: &quot;2026-08-10T01:49:24.509180+00:00&quot;
+    }
+  ]
+}
+</pre></body></html>
