@@ -237,6 +237,18 @@ class PresentationContractTests(unittest.TestCase):
         ]:
             self.assertIn(text, self.document)
 
+    def test_review_controls_are_visually_quiet_but_accessible(self):
+        for text in [
+            "opacity: .24",
+            ".preferences:hover, .preferences:focus-within { opacity: 1; }",
+            "border: 1px solid transparent",
+            "@media (hover: none)",
+            "@media (pointer: coarse)",
+            "outline: 2px solid var(--blue)",
+            '>中</button>',
+        ]:
+            self.assertIn(text, self.document)
+
     def test_html_is_self_contained(self):
         self.assertNotRegex(self.document, r'<script[^>]+src=')
         self.assertNotRegex(self.document, r'<link[^>]+href=')

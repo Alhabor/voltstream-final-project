@@ -23,14 +23,17 @@ or assignment brief to supply missing context.
 
 ## Review modes / 审阅模式
 
-The default is English with the dark theme. Use the two buttons in the upper
-right to switch language (`中文` / `EN`) and theme (`☀` / `☾`). Both choices
-are saved locally, so refresh, hash navigation, and reopening the file preserve
-the last review mode. Switching does not change the current slide.
+The default is English with the dark theme. The two compact controls in the
+upper right switch language (`中` / `EN`) and theme (`☀` / `☾`). They remain
+visually quiet during the talk and become fully visible on hover or keyboard
+focus; touch devices retain larger tap targets. Both choices are saved locally,
+so refresh, hash navigation, and reopening the file preserve the last review
+mode. Switching does not change the current slide.
 
-默认显示英文深色版。右上角两个按钮分别切换语言（`中文` / `EN`）和主题（`☀` /
-`☾`）。浏览器会在本地保存两项选择，因此刷新、使用 hash 导航或重新打开时，均会
-恢复上一次的审阅模式；切换语言或主题不会改变当前页码。
+默认显示英文深色版。右上角两个紧凑控件分别切换语言（`中` / `EN`）和主题（`☀` /
+`☾`）。演示过程中控件保持低存在感，鼠标悬停或键盘聚焦时才完整显示；触屏设备仍保留
+较大的点击区域。浏览器会在本地保存两项选择，因此刷新、使用 hash 导航或重新打开时，
+均会恢复上一次的审阅模式；切换语言或主题不会改变当前页码。
 
 ## Regenerate / 重新生成
 
@@ -95,16 +98,18 @@ browser offers that option.
 ## Verification / 验证
 
 `BUILD_RECEIPT.json` records the generated artifact and browser QA. The deck
-passed 403 real-Chrome checks at 1920×1080 and 1280×800 across English/dark,
+passed 417 real-Chrome checks at 1920×1080 and 1280×800 across English/dark,
 English/light, Chinese/dark, and Chinese/light. Coverage includes navigation,
 rapid switching, hash recovery, language/theme persistence, fullscreen,
 reduced motion, contrast, external requests, browser errors, control overlap,
-and content clipping. The checks include a dedicated typography gate for every
-slide in both languages. English/dark and Chinese/light print outputs were each
-confirmed as 17 independent 960×540-point pages.
+content clipping, and the low-prominence preference controls in default, hover,
+focus, and touch states. The checks include a dedicated typography gate for
+every slide in both languages. English/dark and Chinese/light print outputs
+were each confirmed as 17 independent 960×540-point pages.
 
 `BUILD_RECEIPT.json` 记录生成产物与浏览器 QA。演示在 1920×1080 和 1280×800
-视口下，对英文深色、英文浅色、中文深色、中文浅色四种组合完成 403 项真实 Chrome
+视口下，对英文深色、英文浅色、中文深色、中文浅色四种组合完成 417 项真实 Chrome
 检查，覆盖导航、快速切页、hash 恢复、语言与主题持久化、全屏、减少动态效果、对比度、
-外部请求、浏览器错误、控件遮挡和内容裁切，并逐页检查中英文标题平衡与最小正文
-字号。英文深色与中文浅色打印稿均验证为 17 个独立的 960×540 点页面。
+外部请求、浏览器错误、控件遮挡、内容裁切，以及设置控件在默认、悬停、聚焦和触屏状态
+下的低存在感与可操作性，并逐页检查中英文标题平衡与最小正文字号。英文深色与中文浅色
+打印稿均验证为 17 个独立的 960×540 点页面。

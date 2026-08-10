@@ -12,17 +12,19 @@
     "name": "Google Chrome",
     "version": "151.0.7922.77",
     "automation": "Playwright 1.62.0",
-    "checks_passed": 403,
+    "checks_passed": 417,
     "checks_breakdown": {
       "viewport_language_theme_and_clipping": 104,
       "navigation_preferences_fullscreen_gestures_and_reduced_motion": 21,
       "per_slide_typography": 272,
-      "print_visibility_and_language_selection": 6
+      "print_visibility_and_language_selection": 6,
+      "deemphasized_preferences_hover_focus_touch": 14
     },
     "viewports": ["1920x1080", "1280x800"],
     "combinations": ["en/dark", "en/light", "zh-CN/dark", "zh-CN/light"],
     "language_switch_and_persistence": "passed",
     "theme_switch_and_persistence": "passed",
+    "preference_controls": "passed: 24% default opacity, full hover/focus visibility, compact transparent controls, and 44px touch targets",
     "keyboard_navigation": "passed",
     "button_navigation": "passed",
     "rapid_switching": "passed",

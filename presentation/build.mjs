@@ -394,12 +394,15 @@ const html = `<!doctype html>
     }
     .preferences {
       position: absolute;
-      inset: calc(var(--u) * 1.05) calc(var(--u) * 1.25) auto auto;
+      inset: calc(var(--u) * .72) calc(var(--u) * .82) auto auto;
       z-index: 22;
       display: flex;
-      gap: calc(var(--u) * .45);
+      gap: calc(var(--u) * .12);
+      opacity: .24;
+      transition: opacity .18s ease;
     }
-    .nav-button, .preference-button {
+    .preferences:hover, .preferences:focus-within { opacity: 1; }
+    .nav-button {
       display: grid;
       place-items: center;
       width: calc(var(--u) * 3.2);
@@ -409,9 +412,22 @@ const html = `<!doctype html>
       background: var(--control-bg);
       cursor: pointer;
     }
-    .preference-button.language { width: calc(var(--u) * 4.2); font-weight: 780; }
-    .nav-button:hover, .nav-button:focus-visible,
-    .preference-button:hover, .preference-button:focus-visible { border-color: var(--blue); outline: none; background: var(--control-hover); }
+    .preference-button {
+      display: grid;
+      place-items: center;
+      width: max(30px, calc(var(--u) * 1.9));
+      height: max(30px, calc(var(--u) * 1.9));
+      border: 1px solid transparent;
+      color: var(--subtle);
+      background: transparent;
+      font-size: max(12px, calc(var(--u) * .72));
+      line-height: 1;
+      cursor: pointer;
+    }
+    .preference-button.language { width: max(34px, calc(var(--u) * 2.05)); font-weight: 720; }
+    .nav-button:hover, .nav-button:focus-visible { border-color: var(--blue); outline: none; background: var(--control-hover); }
+    .preference-button:hover { border-color: var(--line); color: var(--ink); background: var(--control-bg); }
+    .preference-button:focus-visible { border-color: var(--blue); color: var(--ink); outline: 2px solid var(--blue); outline-offset: 1px; background: var(--control-bg); }
     .nav-button:disabled { opacity: .3; cursor: default; }
     .page-count { min-width: calc(var(--u) * 4.3); color: var(--muted); text-align: center; font-size: calc(var(--u) * .92); font-variant-numeric: tabular-nums; }
     .progress { position: absolute; z-index: 21; inset: auto 0 0; height: calc(var(--u) * .24); background: var(--progress-track); }
@@ -420,6 +436,14 @@ const html = `<!doctype html>
 
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+    }
+
+    @media (hover: none) {
+      .preferences { opacity: .52; }
+    }
+
+    @media (pointer: coarse) {
+      .preference-button, .preference-button.language { width: 44px; height: 44px; }
     }
 
     @media print {
@@ -450,7 +474,7 @@ const html = `<!doctype html>
   <main class="stage" aria-label="VoltStream slide presentation">
     <div class="deck" id="deck">${slides}</div>
     <nav class="preferences" aria-label="Display preferences">
-      <button class="preference-button language" id="language" type="button" aria-label="切换至中文" title="切换至中文">中文</button>
+      <button class="preference-button language" id="language" type="button" aria-label="切换至中文" title="切换至中文">中</button>
       <button class="preference-button" id="theme" type="button" aria-label="Switch to light theme" title="Switch to light theme">☀</button>
     </nav>
     <nav class="controls" aria-label="Slide navigation">
@@ -530,7 +554,7 @@ const html = `<!doctype html>
         document.documentElement.dataset.language = language;
         document.documentElement.dataset.theme = theme;
         document.documentElement.lang = language === 'zh' ? 'zh-CN' : 'en';
-        languageButton.textContent = language === 'en' ? '中文' : 'EN';
+        languageButton.textContent = language === 'en' ? '中' : 'EN';
         languageButton.setAttribute('aria-label', labels.language);
         languageButton.title = labels.language;
         themeButton.textContent = theme === 'dark' ? '☀' : '☾';
