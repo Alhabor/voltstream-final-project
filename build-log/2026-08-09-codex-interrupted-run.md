@@ -1,18 +1,23 @@
-# Interrupted Run: Missing Case-Level Resume
+# Corrected Observation: Late Codex Completion and Resume Gap
 
 ## What happened
 
-After the live schema repair, run `2026-08-09-final-v3` completed the baseline,
-DeepSeek Flash, and nine valid Codex Terra responses. The outer experiment
-process ended during EVG-010 without a Python traceback. EVG-010 contains only
-request metadata; no model response or parsed prediction was recorded.
+After the live schema repair, run `2026-08-09-final-v3` completed the baseline
+and DeepSeek Flash. An early filesystem check during Codex EVG-010 found only
+request metadata and no terminal output. A later evidence review showed that
+the process had still been finishing: all ten raw responses, parsed outputs,
+the strategy predictions file, and the manifest completion timestamp are
+present.
 
-The exact external termination cause is unavailable, so it is not attributed
-to the model. The actionable engineering failure is clear: the runner wrote
-the strategy-level predictions file only after all ten cases and refused an
-existing strategy directory, despite its documentation claiming recovery.
+The earlier description of v3 as interrupted is therefore retracted. The
+process-status check raced the final artifact writes; this is not a model or
+provider failure.
 
-## Correction
+## Engineering correction
+
+The race still exposed a real recovery gap: before the change below, a
+genuinely interrupted strategy would write its aggregate predictions only
+after all ten cases and refuse its existing directory on restart.
 
 The runner now supports explicit `--resume`. It loads completed per-case
 `parsed-output.json` files without rewriting them and runs only incomplete
@@ -20,7 +25,8 @@ cases. A resumed incomplete case receives `resume.json` audit metadata. A
 regression test proves the completed case file is unchanged.
 
 The provider response schema is also added to the manifest's frozen hashes.
-Because this changes the runner after v3 began, v3 is retained under
-`evaluation/failed-runs/2026-08-09-codex-interrupted-run/` and is not used in
-the final comparison.
+Because those changes occurred after v3 began, v3 is retained under the
+historically named `evaluation/failed-runs/2026-08-09-codex-interrupted-run/`
+and excluded from the final comparison. Its corrected `failure.json` controls
+interpretation of the folder name.
 

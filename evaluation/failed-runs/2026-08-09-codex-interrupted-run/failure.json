@@ -1,9 +1,8 @@
 {
-  "status": "INTERRUPTED_COMPARISON_RUN",
-  "failed_strategy": "codex-terra-guarded",
-  "completed_model_responses_before_interruption": 9,
-  "incomplete_case_id": "EVG-010",
-  "observed_state": "The request metadata existed, but no raw response, validation, metrics, parsed output, or strategy-level predictions file was written.",
-  "root_cause": "The outer orchestration process ended without a Python traceback; the exact external termination cause is unavailable.",
-  "disposition": "Preserved without final scoring. Add tested case-level resume support and include the provider response schema in frozen hashes before starting a new run."
+  "status": "LATE_COMPLETION_EXCLUDED_RUN",
+  "strategy": "codex-terra-guarded",
+  "initial_observation": "EVG-010 temporarily had request metadata only while the external process was still completing.",
+  "corrected_observation": "All ten model responses, parsed outputs, the strategy predictions file, and the manifest completion timestamp are present.",
+  "root_cause_of_misclassification": "A process-status check raced the final case write and incorrectly treated the absence of immediate terminal output as termination.",
+  "disposition": "Do not describe this as an interrupted or failed model run. It remains excluded from the final comparison because the response schema was not in the manifest hash set and the runner code changed before the preregistered all-strategy run completed."
 }
