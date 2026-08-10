@@ -91,16 +91,38 @@
       "id": "prototype",
       "section": "Ideation process",
       "sectionLabel": "原型如何工作",
-      "layout": "flow",
+      "layout": "pipeline-compare",
       "eyebrow": "03 · 测试版本实际做什么",
-      "title": "四个步骤把新文件变成一项复核决定",
-      "steps": [
-        {"number": "1", "title": "读取", "detail": "打开表格、软件记录或文字说明"},
-        {"number": "2", "title": "整理", "detail": "把相同的 8 项信息放到统一位置"},
-        {"number": "3", "title": "检查", "detail": "找出缺失、错误或冲突"},
-        {"number": "4", "title": "处理", "detail": "继续（ACCEPT）· 交给人（HUMAN_REVIEW）· 停止（REJECT）"}
-      ],
-      "guardrail": "AI 提出数值建议；由我们编写的固定检查规则决定最终处理结果。",
+      "title": "同一份文件会走上两条完全不同的处理路线",
+      "lead": "两条路线都从承包商提交的一份材料开始。区别在于：由谁完成解释，以及不确定性是否会被清楚显示。",
+      "intake": ["表格", "软件记录", "文字说明"],
+      "manualLane": {
+        "label": "当前人工路线",
+        "title": "工作人员亲自准备数据条目",
+        "steps": [
+          {"number": "1", "title": "打开", "detail": "逐一阅读不同文件格式"},
+          {"number": "2", "title": "转换", "detail": "统一字段名称并换算单位"},
+          {"number": "3", "title": "调查", "detail": "解决缺失或相互矛盾的值"},
+          {"number": "4", "title": "准备", "detail": "形成后续报告使用的数据条目"}
+        ],
+        "burden": "全部解释与冲突仍由同一位工作人员承担",
+        "tasks": ["解释格式", "调查冲突", "记录理由"],
+        "outcome": "需要判断的材料会形成等待队列，而且选择某个值的原因可能难以追溯。"
+      },
+      "prototypeLane": {
+        "label": "我们的测试版本",
+        "title": "助手先准备一项复核决定",
+        "steps": [
+          {"number": "1", "title": "AI 读取", "detail": "打开三种支持的输入类型"},
+          {"number": "2", "title": "AI 整理", "detail": "把相同的 8 项信息放入统一位置"},
+          {"number": "3", "title": "规则检查", "detail": "找出缺失、错误或冲突"},
+          {"number": "4", "title": "系统分流", "detail": "继续 · 交给人 · 停止"}
+        ],
+        "conflict": "例如：已安装 8 个端口 · 当前启用 6 个端口",
+        "decisions": ["ACCEPT", "HUMAN_REVIEW", "REJECT"],
+        "outcome": "助手展示证据；遇到不确定条目时，最终决定权仍由人掌握。"
+      },
+      "guardrail": "AI 提出数值建议；由我们编写的固定检查规则作出继续、交给人或停止的最终决定。",
       "excluded": "8 项信息是：站点 ID（唯一标签）、地址、充电速度类别、端口数、功率、连接器类型、运行状态和原始条目 ID。"
     },
     {

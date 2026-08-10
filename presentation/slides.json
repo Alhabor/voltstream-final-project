@@ -85,16 +85,38 @@
     {
       "id": "prototype",
       "section": "Ideation process",
-      "layout": "flow",
+      "layout": "pipeline-compare",
       "eyebrow": "03 · What our test version actually does",
-      "title": "Four steps turn an incoming file into a review decision",
-      "steps": [
-        {"number": "1", "title": "Read", "detail": "Open a spreadsheet, software record, or written note"},
-        {"number": "2", "title": "Organize", "detail": "Place the same 8 facts into consistent positions"},
-        {"number": "3", "title": "Check", "detail": "Find missing, invalid, or conflicting values"},
-        {"number": "4", "title": "Decide", "detail": "Continue (ACCEPT) · ask a person (HUMAN_REVIEW) · stop (REJECT)"}
-      ],
-      "guardrail": "AI suggests values; fixed checking rules written by our team make the final decision.",
+      "title": "The same file takes two very different paths",
+      "lead": "Both routes begin with one contractor submission. The difference is where interpretation happens—and whether uncertainty stays visible.",
+      "intake": ["spreadsheet", "software record", "written note"],
+      "manualLane": {
+        "label": "CURRENT MANUAL PATH",
+        "title": "People prepare the record themselves",
+        "steps": [
+          {"number": "1", "title": "Open", "detail": "Read each file format"},
+          {"number": "2", "title": "Translate", "detail": "Rename fields and convert units"},
+          {"number": "3", "title": "Investigate", "detail": "Resolve missing or conflicting values"},
+          {"number": "4", "title": "Prepare", "detail": "Create the entry used for reporting"}
+        ],
+        "burden": "One employee still owns every interpretation and conflict",
+        "tasks": ["INTERPRET", "INVESTIGATE", "DOCUMENT"],
+        "outcome": "Judgment calls create a queue, and the reason for a choice can be hard to trace."
+      },
+      "prototypeLane": {
+        "label": "OUR TEST VERSION",
+        "title": "The assistant prepares a review decision",
+        "steps": [
+          {"number": "1", "title": "AI reads", "detail": "Open the three supported input types"},
+          {"number": "2", "title": "AI organizes", "detail": "Place the same 8 facts into consistent positions"},
+          {"number": "3", "title": "Rules check", "detail": "Find missing, invalid, or conflicting values"},
+          {"number": "4", "title": "System routes", "detail": "Continue · ask a person · stop"}
+        ],
+        "conflict": "Example: 8 installed ports · 6 active ports",
+        "decisions": ["ACCEPT", "HUMAN_REVIEW", "REJECT"],
+        "outcome": "The assistant shows its evidence; a person keeps authority over uncertain entries."
+      },
+      "guardrail": "AI suggests values. Fixed checking rules written by our team make the final continue, review, or stop decision.",
       "excluded": "The 8 facts are a site ID (unique label), address, charging-speed category, port count, power, connector type, operating status, and the original entry's ID."
     },
     {

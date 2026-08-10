@@ -64,15 +64,21 @@ check each incoming file before anyone relies on the new entry.
 
 [Sources] `docs/PROJECT_SCOPE.md`; `docs/ARCHITECTURE.md`.
 
-## Slide 6 · 2:15–2:45 — What the prototype does / 原型做什么
+## Slide 6 · 2:15–2:45 — Two paths for the same file / 同一文件的两条路线
 
-The prototype reads, organizes eight facts, checks them, and chooses one of
-three outcomes. ACCEPT means continue, HUMAN_REVIEW means ask a person, and
-REJECT means stop. AI suggests values; fixed rules written by us make the final
-decision.
+Follow the animation from left to right. Today, employees open each format,
+translate fields and units, investigate conflicts, and prepare the reporting
+entry themselves. They still have to interpret the material, investigate the
+conflict, and document why a value was chosen. Our prototype does not replace
+that judgment. It reads and organizes the same eight facts, then fixed rules
+expose missing or competing values and route the entry to continue, human
+review, or stop. In the example, 8 installed and 6 active are made visible and
+sent to review.
 
-**中文审阅：** 原型读取材料、整理八项信息、执行检查并给出三种结果：ACCEPT 是继续，
-HUMAN_REVIEW 是交给人，REJECT 是停止。AI 提建议，固定规则作最终决定。
+**中文审阅：** 跟随动画从左向右看。当前由工作人员打开材料、统一字段与单位、调查冲突，
+再准备报告条目；之后仍要亲自解释材料、调查冲突并记录选择某个值的理由。原型不取代
+这种判断：它先读取并整理八项信息，再由固定规则暴露缺失或相互竞争的数值，最终分流为
+继续、人工复核或停止。示例中的“安装 8、启用 6”会被明确展示并交给人工复核。
 
 [Sources] `docs/ARCHITECTURE.md`; `evaluation/canonical_record.schema.json`.
 
@@ -90,15 +96,17 @@ than blamed on AI.
 
 ## Slide 8 · 3:10–4:05 — Why neither 8 nor 6 is safe / 为什么不能直接选 8 或 6
 
-Eight answers “how many were installed”; six answers “how many are active now.”
-The output asks for only one unlabeled count. If it means active capacity, 8 is
-wrong; if it means installed equipment, 6 is wrong. The safe result is blank
-plus human review. Codex did that; four DeepSeek approaches entered 8 and let
-the entry continue, so they were disqualified from automatic use.
+Let the two source values appear before naming the answer. Eight means physical
+ports installed; six means ports reported active now. The destination offers
+only one unlabeled count, so neither source value is automatically correct.
+The safe result appears next: leave the field blank and ask a person. Finally,
+compare the three outcomes. Codex did that; four DeepSeek approaches entered 8
+and let the entry continue, so they were disqualified from automatic use.
 
-**中文审阅：** 8 回答安装数量，6 回答当前启用数量；输出却只有一个未说明含义的数字。
-如果问启用能力，8 错；如果问安装总量，6 错。安全做法是留空并交给人。Codex 做对了，
-四种 DeepSeek 方案填 8 并继续，因此失去自动使用资格。
+**中文审阅：** 先让两个原始值依次出现，再说明答案。8 回答安装数量，6 回答当前启用
+数量；输出却只有一个未说明含义的数字，所以两者都不能自动成为正确答案。接着出现安全
+结果：留空并交给人。最后比较三类结果：Codex 做对了，四种 DeepSeek 方案填 8 并继续，
+因此失去自动使用资格。
 
 [Sources] `data/cases.jsonl`; `data/answer_key.jsonl`;
 `evaluation/runs/2026-08-09-final-v4/*/predictions.jsonl`.
