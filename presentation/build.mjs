@@ -6,10 +6,10 @@
  * deck reviewable, reproducible, and safe to regenerate after content edits.
  */
 
-import { createHash } from "node:crypto";
 import { cp, mkdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { dirname, isAbsolute, join, normalize, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
+import { renderEvidenceDirectory, renderEvidenceViewer } from "./render_evidence.mjs";
 
 const directory = dirname(fileURLToPath(import.meta.url));
 const sourcePath = join(directory, "slides.json");
@@ -826,22 +826,6 @@ async function validateAndBuildEvidence(manifest, sourceDeck) {
     }
     await writeFile(join(destination, "index.html"), renderEvidenceDirectory(directoryPath, files));
   }
-}
-
-function renderEvidenceDirectory(directoryPath, files) {
-  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark light"><title>${escapeHtml(directoryPath)} — VoltStream evidence</title><style>:root{color-scheme:dark light;font-family:ui-sans-serif,system-ui,sans-serif;background:#10151b;color:#f4f7fa}body{max-width:800px;margin:auto;padding:3rem}a{color:#7ec8ff}li{margin:.8rem 0}@media(prefers-color-scheme:light){:root{background:#f4f7fa;color:#15212c}a{color:#006eaa}}</style></head><body><h1>${escapeHtml(directoryPath)}</h1><p>Read-only files published for presentation review.</p><ul>${files.map(file => `<li><a href="${escapeHtml(file)}.html">${escapeHtml(file)}</a> · <a href="${escapeHtml(file)}">raw</a></li>`).join("")}</ul></body></html>`;
-}
-
-function renderEvidenceViewer(source, content) {
-  const text = content.toString("utf8");
-  const sha256 = createHash("sha256").update(content).digest("hex");
-  const rawName = source.split("/").at(-1);
-  const returnPath = `${"../".repeat(source.split("/").length)}index.html`;
-  return `<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="color-scheme" content="dark light"><title>${escapeHtml(rawName)} — VoltStream evidence</title>
-<style>:root{color-scheme:dark light;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#10151b;color:#f4f7fa}body{max-width:1100px;margin:auto;padding:2rem}header{position:sticky;top:0;padding:1rem 0;background:#10151bee;border-bottom:1px solid #3b4a59}h1{margin:0 0 .6rem;font:700 1.25rem ui-sans-serif,system-ui,sans-serif}.meta{color:#aeb9c5;font-size:.82rem;overflow-wrap:anywhere}.actions{display:flex;gap:1rem;margin-top:.8rem}a{color:#7ec8ff}pre{margin:1.5rem 0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:.9rem;line-height:1.55}@media(prefers-color-scheme:light){:root{background:#f4f7fa;color:#15212c}header{background:#f4f7faee;border-color:#a8b8c7}a{color:#006eaa}.meta{color:#526272}}@media print{header{position:static}body{max-width:none;padding:0}}</style></head>
-<body><header><h1>${escapeHtml(source)}</h1><div class="meta">Read-only copy from the VoltStream source repository · SHA-256 ${sha256}</div><nav class="actions"><a href="${escapeHtml(rawName)}">Open raw file</a><a href="${returnPath}">Return to presentation</a></nav></header><pre>${escapeHtml(text)}</pre></body></html>`;
 }
 
 function escapeHtml(value) {

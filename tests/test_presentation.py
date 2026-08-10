@@ -299,6 +299,45 @@ class PresentationContractTests(unittest.TestCase):
                 self.assertIn(f'href="{file}.html"', index_html)
                 self.assertIn(f'href="{file}"', index_html)
 
+    def test_evidence_viewers_use_format_specific_readable_layouts(self):
+        samples = {
+            "docs/PROJECT_SCOPE.md.html": [
+                'data-viewer-kind="markdown"',
+                '<article class="document markdown-body">',
+                "<h2>Decision statement</h2>",
+            ],
+            "evaluation/runs/2026-08-09-final-v4/manifest.json.html": [
+                'data-viewer-kind="json"',
+                "Pretty JSON",
+                'class="json-key"',
+            ],
+            "data/cases.jsonl.html": [
+                'data-viewer-kind="jsonl"',
+                "10 records",
+                '<details class="record"',
+                'data-action="expand"',
+            ],
+            "evaluation/runs/2026-08-09-final-v4/summary.csv.html": [
+                'data-viewer-kind="csv"',
+                '<table class="data-table csv-table">',
+                "6 rows · 17 columns",
+            ],
+            "src/voltstream/gatekeeper.py.html": [
+                'data-viewer-kind="code"',
+                '<ol class="code-lines">',
+                "51 lines",
+            ],
+        }
+        for relative_path, markers in samples.items():
+            viewer = (PRESENTATION / "evidence" / relative_path).read_text(
+                encoding="utf-8"
+            )
+            for marker in markers:
+                self.assertIn(marker, viewer, relative_path)
+            self.assertIn("Open raw file", viewer, relative_path)
+            self.assertIn("Return to presentation", viewer, relative_path)
+            self.assertIn("SHA-256", viewer, relative_path)
+
     def test_build_receipt_matches_final_deck(self):
         receipt = json.loads((PRESENTATION / "BUILD_RECEIPT.json").read_text(encoding="utf-8"))
         self.assertTrue(receipt["ok"])

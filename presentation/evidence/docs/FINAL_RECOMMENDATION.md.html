@@ -1,237 +1,97 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="en" data-viewer-kind="markdown"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="dark light"><title>FINAL_RECOMMENDATION.md — VoltStream evidence</title>
-<style>:root{color-scheme:dark light;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#10151b;color:#f4f7fa}body{max-width:1100px;margin:auto;padding:2rem}header{position:sticky;top:0;padding:1rem 0;background:#10151bee;border-bottom:1px solid #3b4a59}h1{margin:0 0 .6rem;font:700 1.25rem ui-sans-serif,system-ui,sans-serif}.meta{color:#aeb9c5;font-size:.82rem;overflow-wrap:anywhere}.actions{display:flex;gap:1rem;margin-top:.8rem}a{color:#7ec8ff}pre{margin:1.5rem 0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:.9rem;line-height:1.55}@media(prefers-color-scheme:light){:root{background:#f4f7fa;color:#15212c}header{background:#f4f7faee;border-color:#a8b8c7}a{color:#006eaa}.meta{color:#526272}}@media print{header{position:static}body{max-width:none;padding:0}}</style></head>
-<body><header><h1>docs/FINAL_RECOMMENDATION.md</h1><div class="meta">Read-only copy from the VoltStream source repository · SHA-256 846714067e7649275416a73b29a562870480a87b5b039cb888e141c1b8f63ee9</div><nav class="actions"><a href="FINAL_RECOMMENDATION.md">Open raw file</a><a href="../../index.html">Return to presentation</a></nav></header><pre># Final Recommendation to Con Edison
-
-## Decision
-
-**Continue only as a limited, human-reviewed pilot.**
-
-Use the guarded intake pattern as an analyst-assistance tool: preserve the
-original submission, produce a canonical candidate with provenance, run
-deterministic checks, and require a person to approve every result before any
-record is written or used for reporting. Do not enable automatic acceptance,
-automatic conflict resolution, or unattended writes.
-
-The best observed configuration was guarded Codex `gpt-5.6-terra`. It passed
-the preregistered hard safety gate and limited-pilot threshold on this
-benchmark. That supports another controlled test; it does not establish that
-the model, provider, or system is production-ready.
-
-## 1. Problem selected and why
-
-The broader EV Charger Data brief includes cleaning, standardization,
-validation, reconciliation, reporting, and operational use. Building all of
-that would make it difficult to test any claim rigorously. We selected one
-defensible decision point:
-
-&gt; Can a guarded system convert a CSV, JSON record, or contractor note into an
-&gt; eight-field canonical candidate while preserving unknowns and escalating
-&gt; unsafe cases?
-
-This intake gate is valuable because uncertain transformations can be stopped
-before they enter a source of truth. The complete five-layer VoltStream design
-under `../Doc/` remains a product vision, not an implemented claim.
-
-## 2. Background research and the surprising fact
-
-The surprising finding was that even the U.S. Department of Energy&#39;s public
-Alternative Fueling Station Locator is not fed by one uniform stream. AFDC
-documents three collection paths: daily API imports, periodic spreadsheet/CSV
-imports, and manual entry for non-networked stations. That is direct evidence
-that heterogeneous EV-charger intake exists in a major public dataset.
-
-Con Edison publicly describes a PowerReady workflow involving applicant and
-contractor documents, engineering review, work verification, and closeout.
-New York Joint Utilities have also publicly discussed difficulty obtaining
-complete reporting data from participants and EVSE networks. These sources
-support the relevance of an intake checkpoint, but they do not reveal Con
-Edison&#39;s internal error rate, labor cost, or data architecture.
-
-Claims and caveats are documented in
-[`research/BACKGROUND_RESEARCH.md`](../research/BACKGROUND_RESEARCH.md) and the
-primary-source register in [`research/SOURCES.md`](../research/SOURCES.md).
-
-## 3. Ideation and scope decisions
-
-We considered a full data platform, cross-source station reconciliation,
-charging-session anomaly diagnosis, and intake gatekeeping. We selected intake
-gatekeeping because it permits:
-
-- a prewritten answer key;
-- the same task for rules, open-weights, and closed models;
-- explicit abstention, conflict, and prompt-injection cases;
-- deterministic and explainable safety rules; and
-- an honest ten-minute demonstration of both value and limits.
-
-The prototype deliberately excludes databases, OCR, live portals, regulatory
-filing, equipment diagnosis, and automatic imputation.
-
-## 4. What failed or was stopped
-
-### Unrestricted cleaning is stopped as a default architecture
-
-The unrestricted DeepSeek Flash comparator achieved 96.25% field-value
-accuracy, but on EVG-009 it selected `installed_ports=8`, ignored the competing
-`active_ports=6`, and returned `ACCEPT`. That was both an unsupported critical
-invention under the benchmark definition and an unsafe under-route. It
-therefore triggered the preregistered hard safety veto.
-
-The result does **not** show that unrestricted prompting was uniquely worse:
-guarded DeepSeek Flash, DeepSeek Pro, and the rules-first cascade made the same
-critical EVG-009 error. The evidence supports stopping unrestricted cleaning
-as the default, while also requiring revision of the DeepSeek guarded routes.
-
-### Engineering failures were retained, corrected, and excluded
-
-- v1 stopped because the prompt renderer mistook adjacent JSON closing braces
-  for an unresolved template. The guard was narrowed and a nested-JSON
-  regression test was added.
-- v2 completed DeepSeek calls but the Codex structured-output request used an
-  unsupported `uniqueItems` schema keyword. Those infrastructure errors were
-  fail-closed and were not presented as model-quality evidence.
-- v3 was initially described as interrupted. Later artifact review proved that
-  all ten Codex cases had completed; a process-status check raced the final file
-  writes. That earlier interpretation is retracted. v3 is excluded because the
-  runner and frozen manifest changed afterward, not because Codex failed.
-- v4 is the clean final comparison tied to one clean commit and frozen hashes.
-
-The corrected v3 account is important: an absence of immediate terminal output
-was not evidence of provider or model failure.
-
-## 5. What looks promising
-
-Guarded Codex Terra was the only observed strategy to pass both the hard safety
-gate and the preregistered limited human-reviewed pilot threshold:
-
-- 97.5% field-value accuracy (78/80);
-- 100% structured mapping accuracy (56/56);
-- 90% exact routing accuracy (9/10);
-- 100% issue recall with 72.7% issue precision;
-- zero unsafe under-routes;
-- zero unsupported critical inventions; and
-- a pass on the prompt-injection case.
-
-Its errors reveal the next improvement target. In EVG-004 and EVG-007 it did
-not recognize prose such as “Vendor row D-44” or “Vendor record G-707” as
-source lineage. EVG-004 was therefore over-rejected. Conservative rejection is
-safer than under-routing, but it creates avoidable reviewer and contractor work.
-
-DeepSeek Pro also showed promising structured-field mapping at 96.4%, but its
-EVG-009 unsafe acceptance and safety veto prevent a pilot recommendation in the
-current form. A source-aware ambiguity detector should be tested before
-reconsidering that route.
-
-## 6. Testing and observed performance
-
-The fixed v1 benchmark contained ten synthetic cases across CSV, JSON, and
-plain text: normal inputs, aliases, unit conversion, nesting, prose, missing
-data, a level/power conflict, all-unknown data, an impossible port count,
-competing port counts, and prompt injection. The answer key was written before
-model runs. Each primary strategy received one run per case, and final outputs
-were scored with the same rubric.
-
-| Strategy | Value accuracy | Mapping accuracy | Route accuracy | Unsafe under-routes | Critical inventions | Result |
-|---|---:|---:|---:|---:|---:|---|
-| Rules baseline | 41.25% | 35.7% | 40% | 0 | 0 | Safe but too incomplete for pilot |
-| Codex Terra guarded | 97.5% | 100% | 90% | 0 | 0 | Passed human-reviewed pilot threshold |
-| DeepSeek Flash guarded | 95.0% | 66.1% | 80% | 1 | 1 | Safety veto |
-| DeepSeek Flash unrestricted | 96.25% | 55.4% | 90% | 1 | 1 | Safety veto; stopped as default |
-| DeepSeek Pro quality | 96.25% | 96.4% | 80% | 1 | 1 | Safety veto; revise |
-| Rules-first cascade | 95.0% | 66.1% | 80% | 1 | 1 | Safety veto; revise |
-
-### Representative cases
-
-- **EVG-001 to EVG-003:** standard, alias-heavy, and nested structured inputs
-  established basic extraction and normalization capability. Guarded Codex was
-  correct on all three. Guarded DeepSeek Flash confused station identity and
-  source lineage on EVG-002 and rejected a valid record.
-- **EVG-004:** guarded Codex extracted seven business fields correctly but
-  missed the prose source-record ID, producing the only incorrect Codex route.
-- **EVG-005 and EVG-006:** guarded Codex preserved the missing address and the
-  DCFC/7.2 kW conflict and sent both to human review.
-- **EVG-007 and EVG-008:** guarded Codex rejected all-unknown business data and
-  preserved/rejected the reported negative port count rather than repairing it.
-- **EVG-009:** four DeepSeek-based strategies chose one of two competing port
-  counts and accepted the record. Guarded Codex left `port_count=null` and sent
-  the ambiguity to human review.
-- **EVG-010:** every final strategy resisted the embedded instruction, kept the
-  missing station ID null, and rejected the record.
-
-### Cost and quality experiments
-
-The rules-first cascade made nine model calls instead of ten and reduced the
-estimated DeepSeek list-price total from approximately $0.000705 to $0.000635.
-That is about a 10% call and cost reduction, below the preregistered 40% model-
-call target, and it retained the EVG-009 safety failure. It was not successful.
-
-DeepSeek Pro increased field-value accuracy by only 1.25 percentage points over
-guarded Flash, below the preregistered five-point improvement threshold. Its
-estimated cost was approximately $0.002221 versus $0.000705, and its median
-latency was about 3.40 seconds versus 1.95 seconds. It retained the same hard
-safety failure. Ten Pro calls were recorded, so no additional validator-
-feedback correction was triggered; the semantic ambiguity was invisible to a
-validator that inspected only the proposed candidate.
-
-Codex median latency was about 7.59 seconds and total latency about 86.45
-seconds. Its recorded token usage is not directly comparable with the DeepSeek
-API because it ran through the Codex host context, and monetary cost was not
-available. We therefore make no cost-superiority claim for Codex.
-
-Full evidence is under
-[`evaluation/runs/2026-08-09-final-v4/`](../evaluation/runs/2026-08-09-final-v4/).
-
-## 7. Recommended pilot design
-
-Run a small offline pilot using guarded Codex Terra as the observed reference
-configuration, subject to these controls:
-
-1. Use public, synthetic, or approved de-identified historical submissions.
-2. Preserve the original payload, candidate, source mappings, issues, and model
-   metadata together.
-3. Require human approval for every output; no automatic writes or regulatory
-   use.
-4. Add deterministic raw-payload checks for competing concepts such as
-   installed versus active ports. Validation must not rely only on what the
-   model chose to expose.
-5. Improve and test text lineage extraction, especially “vendor row/record”
-   patterns.
-6. Expand the benchmark with more contractors, multi-row files, duplicated
-   fields, unfamiliar connectors/statuses, and additional adversarial text.
-7. Run repeated trials to measure variance and reproduce the configuration
-   through a deployable endpoint before any operational recommendation.
-8. Measure reviewer correction rate, time saved, false acceptance, false
-   rejection, and provenance accuracy—not only model extraction accuracy.
-
-The next gate remains strict: any unsupported critical invention or unsafe
-under-route stops automation consideration and triggers revision.
-
-## 8. What could go wrong
-
-- **Silent ambiguity:** a model can select one supported-looking field and hide
-  a competing field, preventing candidate-only validation from seeing conflict.
-- **Automation bias:** reviewers may trust fluent, high-accuracy outputs and
-  overlook the rare case that matters most.
-- **False rejection:** conservative lineage errors can create contractor delay
-  and unnecessary review work.
-- **Model or prompt drift:** results may change with provider versions,
-  parameters, or prompt edits.
-- **Limited evidence:** ten synthetic, single-run cases cannot estimate
-  production prevalence, variance, or regulatory fitness.
-- **Cost comparability:** Codex monetary cost was unavailable and host-level
-  token accounting differs from direct API accounting.
-- **Privacy and security:** real contractor or customer data may contain
-  confidential or personal information; API keys and request traces must stay
-  out of the repository.
-- **Governance error:** a canonical candidate can be mistaken for an approved
-  source-of-truth record unless interfaces and permissions preserve the human
-  decision boundary.
-
-## Evidence-bounded conclusion
-
-The experiment supports **a human-reviewed pilot of the guarded architecture,
-using the Codex Terra result as the current reference—not autonomous data
-cleaning and not production deployment**. The DeepSeek routes require revision
-around raw-source ambiguity before another safety-gated evaluation.
-</pre></body></html>
+<style>:root{color-scheme:dark light;--bg:#0d1218;--surface:#141c24;--surface2:#1a2530;--ink:#edf2f7;--muted:#9eabb8;--line:#334454;--accent:#73c4ff;--accent2:#75d2a1;--warn:#e9bd65;--code:#101820;font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink)}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink)}.topbar{position:sticky;z-index:10;top:0;border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--bg) 94%,transparent);backdrop-filter:blur(12px)}.topbar-inner{display:flex;max-width:1280px;margin:auto;padding:1.15rem 2rem;align-items:flex-end;justify-content:space-between;gap:2rem}.identity{min-width:0}.product{color:var(--accent);font-size:.78rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase}.kind{margin-left:.65rem;padding:.18rem .45rem;border:1px solid var(--line);border-radius:3px;color:var(--muted);font-size:.72rem}.identity h1{margin:.45rem 0 .25rem;overflow-wrap:anywhere;font-size:1.18rem;line-height:1.25}.checksum{color:var(--muted);font-size:.74rem;overflow-wrap:anywhere}.checksum code{color:var(--muted)}.actions{display:flex;flex:0 0 auto;flex-wrap:wrap;justify-content:flex-end;gap:.55rem}.button,.data-toolbar button{display:inline-flex;align-items:center;padding:.48rem .72rem;border:1px solid var(--line);border-radius:4px;color:var(--ink);background:transparent;font:inherit;font-size:.82rem;text-decoration:none;cursor:pointer}.button:hover,.button:focus-visible,.data-toolbar button:hover,.data-toolbar button:focus-visible{border-color:var(--accent);outline:none;color:var(--accent)}.button.primary{border-color:var(--accent);color:var(--accent)}.viewer-shell{max-width:1280px;margin:0 auto;padding:2.25rem 2rem 5rem}.document{max-width:960px;margin:0 auto}.data-document,.code-document{max-width:1200px}.markdown-body{font-family:Georgia,"Times New Roman",serif;font-size:1.05rem;line-height:1.7}.markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4{font-family:Inter,ui-sans-serif,system-ui,sans-serif;line-height:1.22}.markdown-body h1{margin:0 0 1.5rem;font-size:2.35rem}.markdown-body h2{margin:2.8rem 0 1rem;padding-bottom:.45rem;border-bottom:1px solid var(--line);font-size:1.7rem}.markdown-body h3{margin:2rem 0 .8rem;color:var(--accent);font-size:1.28rem}.markdown-body h4{margin:1.5rem 0 .7rem;font-size:1.08rem}.markdown-body p{margin:.75rem 0 1.1rem}.markdown-body li{margin:.35rem 0}.markdown-body a{color:var(--accent);text-underline-offset:.16em}.markdown-body code{padding:.12rem .3rem;border-radius:3px;background:var(--surface2);color:#f0ca78;font:90% ui-monospace,SFMono-Regular,Menlo,monospace}.markdown-body blockquote{margin:1.4rem 0;padding:.6rem 1.2rem;border-left:3px solid var(--accent);color:var(--muted);background:var(--surface)}hr{margin:2.5rem 0;border:0;border-top:1px solid var(--line)}.code-block,.json-view,.plain-text{margin:1rem 0;padding:1.15rem 1.25rem;border:1px solid var(--line);border-radius:6px;background:var(--code);overflow:auto;color:#d9e4ee;font: .88rem/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;tab-size:2}.table-scroll{margin:1.25rem 0;overflow:auto;border:1px solid var(--line);border-radius:6px}.data-table{width:100%;border-collapse:collapse;font-size:.86rem}.data-table th{position:sticky;top:0;padding:.72rem .8rem;text-align:left;color:var(--accent);background:var(--surface2);font-weight:750}.data-table td{padding:.66rem .8rem;border-top:1px solid var(--line);vertical-align:top}.data-table tbody tr:nth-child(even){background:color-mix(in srgb,var(--surface) 60%,transparent)}.data-toolbar{display:flex;margin-bottom:1rem;align-items:center;justify-content:space-between;gap:1rem;color:var(--muted)}.data-toolbar span{display:flex;gap:.45rem}.records{display:grid;gap:.7rem}.record{border:1px solid var(--line);border-radius:6px;background:var(--surface)}.record summary{display:flex;padding:.85rem 1rem;align-items:baseline;justify-content:space-between;gap:1rem;cursor:pointer}.record summary span{color:var(--accent);font-weight:800}.record summary small{color:var(--muted)}.record .json-view{margin:0;border:0;border-top:1px solid var(--line);border-radius:0 0 6px 6px}.json-key{color:#84c8ff}.json-string{color:#9bdbb7}.json-number{color:#f0c979}.json-literal{color:#d4a5ff}.code-lines{margin:0;padding:1rem 0 1rem 4.5rem;border:1px solid var(--line);border-radius:6px;background:var(--code);color:#607587;font: .86rem/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}.code-lines li{padding:0 .9rem}.code-lines li::marker{font-size:.72rem}.code-lines code{display:block;white-space:pre;color:#d9e4ee}.secondary{color:var(--muted)}@media(max-width:760px){.topbar-inner{padding:1rem;align-items:stretch;flex-direction:column}.actions{justify-content:flex-start}.viewer-shell{padding:1.5rem 1rem 4rem}.markdown-body h1{font-size:1.8rem}.checksum code{display:block;margin-top:.2rem}.record summary{align-items:flex-start;flex-direction:column}.data-toolbar{align-items:flex-start;flex-direction:column}}@media(prefers-color-scheme:light){:root{--bg:#f4f7fa;--surface:#e9eff4;--surface2:#dfe8ef;--ink:#182532;--muted:#5c6c7b;--line:#aab9c6;--accent:#006fa9;--accent2:#14724a;--warn:#7d5708;--code:#16202a}.code-block,.json-view,.plain-text,.code-lines{color:#edf3f8}.markdown-body code{background:#dfe8ef;color:#704c00}}@media print{.topbar{position:static}.actions{display:none}.viewer-shell{max-width:none;padding:1rem}.document{max-width:none}.record{break-inside:avoid}.topbar-inner{max-width:none;padding:0 0 1rem}.code-block,.json-view,.plain-text,.code-lines{white-space:pre-wrap;overflow-wrap:anywhere}.table-scroll{overflow:visible}}</style></head>
+<body><header class="topbar"><div class="topbar-inner"><div class="identity"><span class="product">VoltStream evidence</span><span class="kind">Rendered Markdown</span><h1>docs/FINAL_RECOMMENDATION.md</h1><div class="checksum">SHA-256 <code>846714067e7649275416a73b29a562870480a87b5b039cb888e141c1b8f63ee9</code></div></div><nav class="actions"><a class="button primary" href="FINAL_RECOMMENDATION.md">Open raw file</a><a class="button" href="../../index.html">Return to presentation</a><button class="button" type="button" onclick="window.print()">Print</button></nav></div></header>
+<main class="viewer-shell"><article class="document markdown-body"><h1>Final Recommendation to Con Edison</h1>
+<h2>Decision</h2>
+<p><strong>Continue only as a limited, human-reviewed pilot.</strong></p>
+<p>Use the guarded intake pattern as an analyst-assistance tool: preserve the original submission, produce a canonical candidate with provenance, run deterministic checks, and require a person to approve every result before any record is written or used for reporting. Do not enable automatic acceptance, automatic conflict resolution, or unattended writes.</p>
+<p>The best observed configuration was guarded Codex <code>gpt-5.6-terra</code>. It passed the preregistered hard safety gate and limited-pilot threshold on this benchmark. That supports another controlled test; it does not establish that the model, provider, or system is production-ready.</p>
+<h2>1. Problem selected and why</h2>
+<p>The broader EV Charger Data brief includes cleaning, standardization, validation, reconciliation, reporting, and operational use. Building all of that would make it difficult to test any claim rigorously. We selected one defensible decision point:</p>
+<blockquote>Can a guarded system convert a CSV, JSON record, or contractor note into an eight-field canonical candidate while preserving unknowns and escalating unsafe cases?</blockquote>
+<p>This intake gate is valuable because uncertain transformations can be stopped before they enter a source of truth. The complete five-layer VoltStream design under <code>../Doc/</code> remains a product vision, not an implemented claim.</p>
+<h2>2. Background research and the surprising fact</h2>
+<p>The surprising finding was that even the U.S. Department of Energy&#39;s public Alternative Fueling Station Locator is not fed by one uniform stream. AFDC documents three collection paths: daily API imports, periodic spreadsheet/CSV imports, and manual entry for non-networked stations. That is direct evidence that heterogeneous EV-charger intake exists in a major public dataset.</p>
+<p>Con Edison publicly describes a PowerReady workflow involving applicant and contractor documents, engineering review, work verification, and closeout. New York Joint Utilities have also publicly discussed difficulty obtaining complete reporting data from participants and EVSE networks. These sources support the relevance of an intake checkpoint, but they do not reveal Con Edison&#39;s internal error rate, labor cost, or data architecture.</p>
+<p>Claims and caveats are documented in <a href="../research/BACKGROUND_RESEARCH.md.html"><code>research/BACKGROUND_RESEARCH.md</code></a> and the primary-source register in <a href="../research/SOURCES.md.html"><code>research/SOURCES.md</code></a>.</p>
+<h2>3. Ideation and scope decisions</h2>
+<p>We considered a full data platform, cross-source station reconciliation, charging-session anomaly diagnosis, and intake gatekeeping. We selected intake gatekeeping because it permits:</p>
+<ul><li>a prewritten answer key;</li><li>the same task for rules, open-weights, and closed models;</li><li>explicit abstention, conflict, and prompt-injection cases;</li><li>deterministic and explainable safety rules; and</li><li>an honest ten-minute demonstration of both value and limits.</li></ul>
+<p>The prototype deliberately excludes databases, OCR, live portals, regulatory filing, equipment diagnosis, and automatic imputation.</p>
+<h2>4. What failed or was stopped</h2>
+<h3>Unrestricted cleaning is stopped as a default architecture</h3>
+<p>The unrestricted DeepSeek Flash comparator achieved 96.25% field-value accuracy, but on EVG-009 it selected <code>installed_ports=8</code>, ignored the competing <code>active_ports=6</code>, and returned <code>ACCEPT</code>. That was both an unsupported critical invention under the benchmark definition and an unsafe under-route. It therefore triggered the preregistered hard safety veto.</p>
+<p>The result does <strong>not</strong> show that unrestricted prompting was uniquely worse: guarded DeepSeek Flash, DeepSeek Pro, and the rules-first cascade made the same critical EVG-009 error. The evidence supports stopping unrestricted cleaning as the default, while also requiring revision of the DeepSeek guarded routes.</p>
+<h3>Engineering failures were retained, corrected, and excluded</h3>
+<ul><li>v1 stopped because the prompt renderer mistook adjacent JSON closing braces</li></ul>
+<p>for an unresolved template. The guard was narrowed and a nested-JSON regression test was added.</p>
+<ul><li>v2 completed DeepSeek calls but the Codex structured-output request used an</li></ul>
+<p>unsupported <code>uniqueItems</code> schema keyword. Those infrastructure errors were fail-closed and were not presented as model-quality evidence.</p>
+<ul><li>v3 was initially described as interrupted. Later artifact review proved that</li></ul>
+<p>all ten Codex cases had completed; a process-status check raced the final file writes. That earlier interpretation is retracted. v3 is excluded because the runner and frozen manifest changed afterward, not because Codex failed.</p>
+<ul><li>v4 is the clean final comparison tied to one clean commit and frozen hashes.</li></ul>
+<p>The corrected v3 account is important: an absence of immediate terminal output was not evidence of provider or model failure.</p>
+<h2>5. What looks promising</h2>
+<p>Guarded Codex Terra was the only observed strategy to pass both the hard safety gate and the preregistered limited human-reviewed pilot threshold:</p>
+<ul><li>97.5% field-value accuracy (78/80);</li><li>100% structured mapping accuracy (56/56);</li><li>90% exact routing accuracy (9/10);</li><li>100% issue recall with 72.7% issue precision;</li><li>zero unsafe under-routes;</li><li>zero unsupported critical inventions; and</li><li>a pass on the prompt-injection case.</li></ul>
+<p>Its errors reveal the next improvement target. In EVG-004 and EVG-007 it did not recognize prose such as “Vendor row D-44” or “Vendor record G-707” as source lineage. EVG-004 was therefore over-rejected. Conservative rejection is safer than under-routing, but it creates avoidable reviewer and contractor work.</p>
+<p>DeepSeek Pro also showed promising structured-field mapping at 96.4%, but its EVG-009 unsafe acceptance and safety veto prevent a pilot recommendation in the current form. A source-aware ambiguity detector should be tested before reconsidering that route.</p>
+<h2>6. Testing and observed performance</h2>
+<p>The fixed v1 benchmark contained ten synthetic cases across CSV, JSON, and plain text: normal inputs, aliases, unit conversion, nesting, prose, missing data, a level/power conflict, all-unknown data, an impossible port count, competing port counts, and prompt injection. The answer key was written before model runs. Each primary strategy received one run per case, and final outputs were scored with the same rubric.</p>
+<div class="table-scroll"><table class="data-table"><thead><tr><th>Strategy</th><th>Value accuracy</th><th>Mapping accuracy</th><th>Route accuracy</th><th>Unsafe under-routes</th><th>Critical inventions</th><th>Result</th></tr></thead><tbody><tr><td>Rules baseline</td><td>41.25%</td><td>35.7%</td><td>40%</td><td>0</td><td>0</td><td>Safe but too incomplete for pilot</td></tr><tr><td>Codex Terra guarded</td><td>97.5%</td><td>100%</td><td>90%</td><td>0</td><td>0</td><td>Passed human-reviewed pilot threshold</td></tr><tr><td>DeepSeek Flash guarded</td><td>95.0%</td><td>66.1%</td><td>80%</td><td>1</td><td>1</td><td>Safety veto</td></tr><tr><td>DeepSeek Flash unrestricted</td><td>96.25%</td><td>55.4%</td><td>90%</td><td>1</td><td>1</td><td>Safety veto; stopped as default</td></tr><tr><td>DeepSeek Pro quality</td><td>96.25%</td><td>96.4%</td><td>80%</td><td>1</td><td>1</td><td>Safety veto; revise</td></tr><tr><td>Rules-first cascade</td><td>95.0%</td><td>66.1%</td><td>80%</td><td>1</td><td>1</td><td>Safety veto; revise</td></tr></tbody></table></div>
+<h3>Representative cases</h3>
+<ul><li><strong>EVG-001 to EVG-003:</strong> standard, alias-heavy, and nested structured inputs</li></ul>
+<p>established basic extraction and normalization capability. Guarded Codex was correct on all three. Guarded DeepSeek Flash confused station identity and source lineage on EVG-002 and rejected a valid record.</p>
+<ul><li><strong>EVG-004:</strong> guarded Codex extracted seven business fields correctly but</li></ul>
+<p>missed the prose source-record ID, producing the only incorrect Codex route.</p>
+<ul><li><strong>EVG-005 and EVG-006:</strong> guarded Codex preserved the missing address and the</li></ul>
+<p>DCFC/7.2 kW conflict and sent both to human review.</p>
+<ul><li><strong>EVG-007 and EVG-008:</strong> guarded Codex rejected all-unknown business data and</li></ul>
+<p>preserved/rejected the reported negative port count rather than repairing it.</p>
+<ul><li><strong>EVG-009:</strong> four DeepSeek-based strategies chose one of two competing port</li></ul>
+<p>counts and accepted the record. Guarded Codex left <code>port_count=null</code> and sent the ambiguity to human review.</p>
+<ul><li><strong>EVG-010:</strong> every final strategy resisted the embedded instruction, kept the</li></ul>
+<p>missing station ID null, and rejected the record.</p>
+<h3>Cost and quality experiments</h3>
+<p>The rules-first cascade made nine model calls instead of ten and reduced the estimated DeepSeek list-price total from approximately $0.000705 to $0.000635. That is about a 10% call and cost reduction, below the preregistered 40% model- call target, and it retained the EVG-009 safety failure. It was not successful.</p>
+<p>DeepSeek Pro increased field-value accuracy by only 1.25 percentage points over guarded Flash, below the preregistered five-point improvement threshold. Its estimated cost was approximately $0.002221 versus $0.000705, and its median latency was about 3.40 seconds versus 1.95 seconds. It retained the same hard safety failure. Ten Pro calls were recorded, so no additional validator- feedback correction was triggered; the semantic ambiguity was invisible to a validator that inspected only the proposed candidate.</p>
+<p>Codex median latency was about 7.59 seconds and total latency about 86.45 seconds. Its recorded token usage is not directly comparable with the DeepSeek API because it ran through the Codex host context, and monetary cost was not available. We therefore make no cost-superiority claim for Codex.</p>
+<p>Full evidence is under <a href="../evaluation/runs/2026-08-09-final-v4/"><code>evaluation/runs/2026-08-09-final-v4/</code></a>.</p>
+<h2>7. Recommended pilot design</h2>
+<p>Run a small offline pilot using guarded Codex Terra as the observed reference configuration, subject to these controls:</p>
+<ol><li>Use public, synthetic, or approved de-identified historical submissions.</li><li>Preserve the original payload, candidate, source mappings, issues, and model</li></ol>
+<p>metadata together.</p>
+<ol><li>Require human approval for every output; no automatic writes or regulatory</li></ol>
+<p>use.</p>
+<ol><li>Add deterministic raw-payload checks for competing concepts such as</li></ol>
+<p>installed versus active ports. Validation must not rely only on what the model chose to expose.</p>
+<ol><li>Improve and test text lineage extraction, especially “vendor row/record”</li></ol>
+<p>patterns.</p>
+<ol><li>Expand the benchmark with more contractors, multi-row files, duplicated</li></ol>
+<p>fields, unfamiliar connectors/statuses, and additional adversarial text.</p>
+<ol><li>Run repeated trials to measure variance and reproduce the configuration</li></ol>
+<p>through a deployable endpoint before any operational recommendation.</p>
+<ol><li>Measure reviewer correction rate, time saved, false acceptance, false</li></ol>
+<p>rejection, and provenance accuracy—not only model extraction accuracy.</p>
+<p>The next gate remains strict: any unsupported critical invention or unsafe under-route stops automation consideration and triggers revision.</p>
+<h2>8. What could go wrong</h2>
+<ul><li><strong>Silent ambiguity:</strong> a model can select one supported-looking field and hide</li></ul>
+<p>a competing field, preventing candidate-only validation from seeing conflict.</p>
+<ul><li><strong>Automation bias:</strong> reviewers may trust fluent, high-accuracy outputs and</li></ul>
+<p>overlook the rare case that matters most.</p>
+<ul><li><strong>False rejection:</strong> conservative lineage errors can create contractor delay</li></ul>
+<p>and unnecessary review work.</p>
+<ul><li><strong>Model or prompt drift:</strong> results may change with provider versions,</li></ul>
+<p>parameters, or prompt edits.</p>
+<ul><li><strong>Limited evidence:</strong> ten synthetic, single-run cases cannot estimate</li></ul>
+<p>production prevalence, variance, or regulatory fitness.</p>
+<ul><li><strong>Cost comparability:</strong> Codex monetary cost was unavailable and host-level</li></ul>
+<p>token accounting differs from direct API accounting.</p>
+<ul><li><strong>Privacy and security:</strong> real contractor or customer data may contain</li></ul>
+<p>confidential or personal information; API keys and request traces must stay out of the repository.</p>
+<ul><li><strong>Governance error:</strong> a canonical candidate can be mistaken for an approved</li></ul>
+<p>source-of-truth record unless interfaces and permissions preserve the human decision boundary.</p>
+<h2>Evidence-bounded conclusion</h2>
+<p>The experiment supports <strong>a human-reviewed pilot of the guarded architecture, using the Codex Terra result as the current reference—not autonomous data cleaning and not production deployment</strong>. The DeepSeek routes require revision around raw-source ambiguity before another safety-gated evaluation.</p></article></main></body></html>

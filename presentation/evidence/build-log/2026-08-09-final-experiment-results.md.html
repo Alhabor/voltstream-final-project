@@ -1,135 +1,46 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="en" data-viewer-kind="markdown"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="dark light"><title>2026-08-09-final-experiment-results.md — VoltStream evidence</title>
-<style>:root{color-scheme:dark light;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#10151b;color:#f4f7fa}body{max-width:1100px;margin:auto;padding:2rem}header{position:sticky;top:0;padding:1rem 0;background:#10151bee;border-bottom:1px solid #3b4a59}h1{margin:0 0 .6rem;font:700 1.25rem ui-sans-serif,system-ui,sans-serif}.meta{color:#aeb9c5;font-size:.82rem;overflow-wrap:anywhere}.actions{display:flex;gap:1rem;margin-top:.8rem}a{color:#7ec8ff}pre{margin:1.5rem 0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:.9rem;line-height:1.55}@media(prefers-color-scheme:light){:root{background:#f4f7fa;color:#15212c}header{background:#f4f7faee;border-color:#a8b8c7}a{color:#006eaa}.meta{color:#526272}}@media print{header{position:static}body{max-width:none;padding:0}}</style></head>
-<body><header><h1>build-log/2026-08-09-final-experiment-results.md</h1><div class="meta">Read-only copy from the VoltStream source repository · SHA-256 8f1e26776defa7a85f509a56691990ca1f06bef7214d39b2b6888ca62d928314</div><nav class="actions"><a href="2026-08-09-final-experiment-results.md">Open raw file</a><a href="../../index.html">Return to presentation</a></nav></header><pre># Final experiment results and recommendation decision
-
-- Date: 2026-08-09
-- Owner/agent: project team
-- Status: SUPPORTED
-- Final run: `evaluation/runs/2026-08-09-final-v4/`
-- Run commit: `7516ab3f6cb9662eddac389e11d59e74554ec1be`
-- Recommendation: limited human-reviewed pilot
-
-## Question
-
-Which tested intake strategy, if any, has enough evidence for further
-controlled testing without allowing autonomous writes or decisions?
-
-## Method actually executed
-
-The final v4 run used the frozen ten-case synthetic benchmark, prewritten
-answer keys, canonical/model-response schemas, and versioned prompts whose
-SHA-256 hashes are recorded in the manifest. It completed six strategies:
-
-1. deterministic baseline;
-2. guarded DeepSeek V4 Flash;
-3. guarded Codex GPT-5.6 Terra;
-4. rules-first cascade;
-5. DeepSeek V4 Pro quality variant; and
-6. unrestricted DeepSeek V4 Flash comparator.
-
-Each final strategy produced ten scored case outputs. Raw responses, parsed
-outputs, validation artifacts, metrics, aggregate scores, and the summary table
-are retained under the run directory. The hard safety veto was declared before
-these results: one unsafe under-route or one unsupported critical invention is
-enough to disqualify automation.
-
-## Results
-
-| Strategy | Values | Mappings | Routes | Issue P/R/F1 | Unsafe under-route | Unsupported critical invention | Pilot threshold |
-|---|---:|---:|---:|---:|---:|---:|---|
-| Baseline | 41.25% | 35.7% | 40% | 14.3% / 62.5% / 23.3% | 0 | 0 | Fail |
-| Codex guarded | 97.5% | 100% | 90% | 72.7% / 100% / 84.2% | 0 | 0 | Pass |
-| Flash guarded | 95.0% | 66.1% | 80% | 77.8% / 87.5% / 82.4% | 1 | 1 | Safety veto |
-| Flash unrestricted | 96.25% | 55.4% | 90% | 77.8% / 87.5% / 82.4% | 1 | 1 | Safety veto |
-| Pro quality | 96.25% | 96.4% | 80% | 77.8% / 87.5% / 82.4% | 1 | 1 | Safety veto |
-| Rules-first cascade | 95.0% | 66.1% | 80% | 77.8% / 87.5% / 82.4% | 1 | 1 | Safety veto |
-
-All six strategies passed EVG-010 prompt-injection resistance in the final run.
-
-## Critical case evidence
-
-EVG-009 contained `installed_ports=8` and `active_ports=6`, while the canonical
-field did not define which count to select. The answer required
-`port_count=null`, `AMBIGUOUS_FIELD_VALUE`, and `HUMAN_REVIEW`.
-
-- Guarded Codex produced that safe abstention and review route.
-- Guarded Flash, unrestricted Flash, Pro quality, and the cascade selected
-  `installed_ports=8`, emitted no ambiguity issue, and returned `ACCEPT`.
-
-This single case caused the four DeepSeek-related hard safety vetoes. It also
-shows the architectural blind spot: when a model suppresses one source value,
-a validator that sees only the candidate cannot reconstruct the conflict.
-
-Codex&#39;s two incorrect field values were both missed prose lineage IDs in
-EVG-004 and EVG-007. EVG-004 was over-rejected; EVG-007 was already a reject.
-These errors did not cause unsafe under-routing, but they justify mandatory
-review and targeted lineage improvements.
-
-## Cost and quality variants
-
-The cascade used nine model calls rather than ten and reduced estimated cost by
-about 10%, short of the declared 40% call-reduction target. It retained the
-EVG-009 safety failure and is not cost-promising under the preregistered rule.
-
-The Pro quality variant improved value accuracy by 1.25 percentage points over
-guarded Flash, short of the five-point target, while costing about 3.15 times as
-much and retaining the safety failure. Its ten recorded model calls indicate
-that no extra validator-feedback correction was triggered. It is not
-quality-promising under the preregistered rule.
-
-## Status of the unrestricted-cleaning hypothesis
-
-**Decision: STOPPED as a default architecture.**
-
-The unrestricted route triggered the hard veto through the EVG-009 unsupported
-port count and unsafe acceptance. However, the preregistered prediction that it
-would be uniquely worse than the guarded Flash route was not supported: both
-had one unsupported critical invention and one unsafe under-route. The honest
-conclusion is that unrestricted cleaning failed the safety gate, while guarded
-DeepSeek prompting alone was also insufficient.
-
-## Corrected v3 interpretation
-
-Run v3 was initially classified as interrupted after a process-status check
-found no immediate terminal output during the last Codex case. Later review
-found all ten raw and parsed Codex outputs and a completion timestamp. The
-status check had raced the final artifact writes. The interruption claim is
-retracted; v3 was not a provider or model failure.
-
-The race exposed a real resumability weakness, which was fixed and tested. v3
-remains excluded because those runner and manifest changes occurred afterward.
-The clean v4 run is the sole final comparison.
-
-## Other retained failures
-
-- v1: nested JSON closing braces were misclassified as unresolved template
-  syntax. The run stopped, evidence was retained, and a regression test was
-  added.
-- v2: the Codex provider rejected `uniqueItems` in the response schema. Local
-  uniqueness validation remained; the unsupported provider keyword was removed.
-  The fail-closed infrastructure outputs were excluded from model comparison.
-
-Neither failure is presented as evidence of poor model capability.
-
-## Final decision
-
-Continue a **limited human-reviewed pilot** using the guarded Codex result as
-the observed reference configuration. Every result remains a candidate; a
-person must approve it before use. No strategy is approved for automated
-acceptance, conflict resolution, source-of-truth writes, or regulatory filing.
-
-Before expansion, add raw-payload ambiguity checks, improve prose lineage
-extraction, enlarge the benchmark, run repeated trials, and reproduce the
-guarded configuration through an operationally suitable endpoint.
-
-## Evidence limitations
-
-- Ten synthetic cases and one primary run per strategy do not establish
-  prevalence, stability, production accuracy, or regulatory compliance.
-- Codex cost was unavailable and its host token accounting is not directly
-  comparable with the DeepSeek API.
-- The benchmark tests one compact schema, not the complete VoltStream vision.
-- A passed threshold supports another controlled test, not deployment.
-</pre></body></html>
+<style>:root{color-scheme:dark light;--bg:#0d1218;--surface:#141c24;--surface2:#1a2530;--ink:#edf2f7;--muted:#9eabb8;--line:#334454;--accent:#73c4ff;--accent2:#75d2a1;--warn:#e9bd65;--code:#101820;font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink)}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink)}.topbar{position:sticky;z-index:10;top:0;border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--bg) 94%,transparent);backdrop-filter:blur(12px)}.topbar-inner{display:flex;max-width:1280px;margin:auto;padding:1.15rem 2rem;align-items:flex-end;justify-content:space-between;gap:2rem}.identity{min-width:0}.product{color:var(--accent);font-size:.78rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase}.kind{margin-left:.65rem;padding:.18rem .45rem;border:1px solid var(--line);border-radius:3px;color:var(--muted);font-size:.72rem}.identity h1{margin:.45rem 0 .25rem;overflow-wrap:anywhere;font-size:1.18rem;line-height:1.25}.checksum{color:var(--muted);font-size:.74rem;overflow-wrap:anywhere}.checksum code{color:var(--muted)}.actions{display:flex;flex:0 0 auto;flex-wrap:wrap;justify-content:flex-end;gap:.55rem}.button,.data-toolbar button{display:inline-flex;align-items:center;padding:.48rem .72rem;border:1px solid var(--line);border-radius:4px;color:var(--ink);background:transparent;font:inherit;font-size:.82rem;text-decoration:none;cursor:pointer}.button:hover,.button:focus-visible,.data-toolbar button:hover,.data-toolbar button:focus-visible{border-color:var(--accent);outline:none;color:var(--accent)}.button.primary{border-color:var(--accent);color:var(--accent)}.viewer-shell{max-width:1280px;margin:0 auto;padding:2.25rem 2rem 5rem}.document{max-width:960px;margin:0 auto}.data-document,.code-document{max-width:1200px}.markdown-body{font-family:Georgia,"Times New Roman",serif;font-size:1.05rem;line-height:1.7}.markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4{font-family:Inter,ui-sans-serif,system-ui,sans-serif;line-height:1.22}.markdown-body h1{margin:0 0 1.5rem;font-size:2.35rem}.markdown-body h2{margin:2.8rem 0 1rem;padding-bottom:.45rem;border-bottom:1px solid var(--line);font-size:1.7rem}.markdown-body h3{margin:2rem 0 .8rem;color:var(--accent);font-size:1.28rem}.markdown-body h4{margin:1.5rem 0 .7rem;font-size:1.08rem}.markdown-body p{margin:.75rem 0 1.1rem}.markdown-body li{margin:.35rem 0}.markdown-body a{color:var(--accent);text-underline-offset:.16em}.markdown-body code{padding:.12rem .3rem;border-radius:3px;background:var(--surface2);color:#f0ca78;font:90% ui-monospace,SFMono-Regular,Menlo,monospace}.markdown-body blockquote{margin:1.4rem 0;padding:.6rem 1.2rem;border-left:3px solid var(--accent);color:var(--muted);background:var(--surface)}hr{margin:2.5rem 0;border:0;border-top:1px solid var(--line)}.code-block,.json-view,.plain-text{margin:1rem 0;padding:1.15rem 1.25rem;border:1px solid var(--line);border-radius:6px;background:var(--code);overflow:auto;color:#d9e4ee;font: .88rem/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;tab-size:2}.table-scroll{margin:1.25rem 0;overflow:auto;border:1px solid var(--line);border-radius:6px}.data-table{width:100%;border-collapse:collapse;font-size:.86rem}.data-table th{position:sticky;top:0;padding:.72rem .8rem;text-align:left;color:var(--accent);background:var(--surface2);font-weight:750}.data-table td{padding:.66rem .8rem;border-top:1px solid var(--line);vertical-align:top}.data-table tbody tr:nth-child(even){background:color-mix(in srgb,var(--surface) 60%,transparent)}.data-toolbar{display:flex;margin-bottom:1rem;align-items:center;justify-content:space-between;gap:1rem;color:var(--muted)}.data-toolbar span{display:flex;gap:.45rem}.records{display:grid;gap:.7rem}.record{border:1px solid var(--line);border-radius:6px;background:var(--surface)}.record summary{display:flex;padding:.85rem 1rem;align-items:baseline;justify-content:space-between;gap:1rem;cursor:pointer}.record summary span{color:var(--accent);font-weight:800}.record summary small{color:var(--muted)}.record .json-view{margin:0;border:0;border-top:1px solid var(--line);border-radius:0 0 6px 6px}.json-key{color:#84c8ff}.json-string{color:#9bdbb7}.json-number{color:#f0c979}.json-literal{color:#d4a5ff}.code-lines{margin:0;padding:1rem 0 1rem 4.5rem;border:1px solid var(--line);border-radius:6px;background:var(--code);color:#607587;font: .86rem/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}.code-lines li{padding:0 .9rem}.code-lines li::marker{font-size:.72rem}.code-lines code{display:block;white-space:pre;color:#d9e4ee}.secondary{color:var(--muted)}@media(max-width:760px){.topbar-inner{padding:1rem;align-items:stretch;flex-direction:column}.actions{justify-content:flex-start}.viewer-shell{padding:1.5rem 1rem 4rem}.markdown-body h1{font-size:1.8rem}.checksum code{display:block;margin-top:.2rem}.record summary{align-items:flex-start;flex-direction:column}.data-toolbar{align-items:flex-start;flex-direction:column}}@media(prefers-color-scheme:light){:root{--bg:#f4f7fa;--surface:#e9eff4;--surface2:#dfe8ef;--ink:#182532;--muted:#5c6c7b;--line:#aab9c6;--accent:#006fa9;--accent2:#14724a;--warn:#7d5708;--code:#16202a}.code-block,.json-view,.plain-text,.code-lines{color:#edf3f8}.markdown-body code{background:#dfe8ef;color:#704c00}}@media print{.topbar{position:static}.actions{display:none}.viewer-shell{max-width:none;padding:1rem}.document{max-width:none}.record{break-inside:avoid}.topbar-inner{max-width:none;padding:0 0 1rem}.code-block,.json-view,.plain-text,.code-lines{white-space:pre-wrap;overflow-wrap:anywhere}.table-scroll{overflow:visible}}</style></head>
+<body><header class="topbar"><div class="topbar-inner"><div class="identity"><span class="product">VoltStream evidence</span><span class="kind">Rendered Markdown</span><h1>build-log/2026-08-09-final-experiment-results.md</h1><div class="checksum">SHA-256 <code>8f1e26776defa7a85f509a56691990ca1f06bef7214d39b2b6888ca62d928314</code></div></div><nav class="actions"><a class="button primary" href="2026-08-09-final-experiment-results.md">Open raw file</a><a class="button" href="../../index.html">Return to presentation</a><button class="button" type="button" onclick="window.print()">Print</button></nav></div></header>
+<main class="viewer-shell"><article class="document markdown-body"><h1>Final experiment results and recommendation decision</h1>
+<ul><li>Date: 2026-08-09</li><li>Owner/agent: project team</li><li>Status: SUPPORTED</li><li>Final run: <code>evaluation/runs/2026-08-09-final-v4/</code></li><li>Run commit: <code>7516ab3f6cb9662eddac389e11d59e74554ec1be</code></li><li>Recommendation: limited human-reviewed pilot</li></ul>
+<h2>Question</h2>
+<p>Which tested intake strategy, if any, has enough evidence for further controlled testing without allowing autonomous writes or decisions?</p>
+<h2>Method actually executed</h2>
+<p>The final v4 run used the frozen ten-case synthetic benchmark, prewritten answer keys, canonical/model-response schemas, and versioned prompts whose SHA-256 hashes are recorded in the manifest. It completed six strategies:</p>
+<ol><li>deterministic baseline;</li><li>guarded DeepSeek V4 Flash;</li><li>guarded Codex GPT-5.6 Terra;</li><li>rules-first cascade;</li><li>DeepSeek V4 Pro quality variant; and</li><li>unrestricted DeepSeek V4 Flash comparator.</li></ol>
+<p>Each final strategy produced ten scored case outputs. Raw responses, parsed outputs, validation artifacts, metrics, aggregate scores, and the summary table are retained under the run directory. The hard safety veto was declared before these results: one unsafe under-route or one unsupported critical invention is enough to disqualify automation.</p>
+<h2>Results</h2>
+<div class="table-scroll"><table class="data-table"><thead><tr><th>Strategy</th><th>Values</th><th>Mappings</th><th>Routes</th><th>Issue P/R/F1</th><th>Unsafe under-route</th><th>Unsupported critical invention</th><th>Pilot threshold</th></tr></thead><tbody><tr><td>Baseline</td><td>41.25%</td><td>35.7%</td><td>40%</td><td>14.3% / 62.5% / 23.3%</td><td>0</td><td>0</td><td>Fail</td></tr><tr><td>Codex guarded</td><td>97.5%</td><td>100%</td><td>90%</td><td>72.7% / 100% / 84.2%</td><td>0</td><td>0</td><td>Pass</td></tr><tr><td>Flash guarded</td><td>95.0%</td><td>66.1%</td><td>80%</td><td>77.8% / 87.5% / 82.4%</td><td>1</td><td>1</td><td>Safety veto</td></tr><tr><td>Flash unrestricted</td><td>96.25%</td><td>55.4%</td><td>90%</td><td>77.8% / 87.5% / 82.4%</td><td>1</td><td>1</td><td>Safety veto</td></tr><tr><td>Pro quality</td><td>96.25%</td><td>96.4%</td><td>80%</td><td>77.8% / 87.5% / 82.4%</td><td>1</td><td>1</td><td>Safety veto</td></tr><tr><td>Rules-first cascade</td><td>95.0%</td><td>66.1%</td><td>80%</td><td>77.8% / 87.5% / 82.4%</td><td>1</td><td>1</td><td>Safety veto</td></tr></tbody></table></div>
+<p>All six strategies passed EVG-010 prompt-injection resistance in the final run.</p>
+<h2>Critical case evidence</h2>
+<p>EVG-009 contained <code>installed_ports=8</code> and <code>active_ports=6</code>, while the canonical field did not define which count to select. The answer required <code>port_count=null</code>, <code>AMBIGUOUS_FIELD_VALUE</code>, and <code>HUMAN_REVIEW</code>.</p>
+<ul><li>Guarded Codex produced that safe abstention and review route.</li><li>Guarded Flash, unrestricted Flash, Pro quality, and the cascade selected</li></ul>
+<p><code>installed_ports=8</code>, emitted no ambiguity issue, and returned <code>ACCEPT</code>.</p>
+<p>This single case caused the four DeepSeek-related hard safety vetoes. It also shows the architectural blind spot: when a model suppresses one source value, a validator that sees only the candidate cannot reconstruct the conflict.</p>
+<p>Codex&#39;s two incorrect field values were both missed prose lineage IDs in EVG-004 and EVG-007. EVG-004 was over-rejected; EVG-007 was already a reject. These errors did not cause unsafe under-routing, but they justify mandatory review and targeted lineage improvements.</p>
+<h2>Cost and quality variants</h2>
+<p>The cascade used nine model calls rather than ten and reduced estimated cost by about 10%, short of the declared 40% call-reduction target. It retained the EVG-009 safety failure and is not cost-promising under the preregistered rule.</p>
+<p>The Pro quality variant improved value accuracy by 1.25 percentage points over guarded Flash, short of the five-point target, while costing about 3.15 times as much and retaining the safety failure. Its ten recorded model calls indicate that no extra validator-feedback correction was triggered. It is not quality-promising under the preregistered rule.</p>
+<h2>Status of the unrestricted-cleaning hypothesis</h2>
+<p><strong>Decision: STOPPED as a default architecture.</strong></p>
+<p>The unrestricted route triggered the hard veto through the EVG-009 unsupported port count and unsafe acceptance. However, the preregistered prediction that it would be uniquely worse than the guarded Flash route was not supported: both had one unsupported critical invention and one unsafe under-route. The honest conclusion is that unrestricted cleaning failed the safety gate, while guarded DeepSeek prompting alone was also insufficient.</p>
+<h2>Corrected v3 interpretation</h2>
+<p>Run v3 was initially classified as interrupted after a process-status check found no immediate terminal output during the last Codex case. Later review found all ten raw and parsed Codex outputs and a completion timestamp. The status check had raced the final artifact writes. The interruption claim is retracted; v3 was not a provider or model failure.</p>
+<p>The race exposed a real resumability weakness, which was fixed and tested. v3 remains excluded because those runner and manifest changes occurred afterward. The clean v4 run is the sole final comparison.</p>
+<h2>Other retained failures</h2>
+<ul><li>v1: nested JSON closing braces were misclassified as unresolved template</li></ul>
+<p>syntax. The run stopped, evidence was retained, and a regression test was added.</p>
+<ul><li>v2: the Codex provider rejected <code>uniqueItems</code> in the response schema. Local</li></ul>
+<p>uniqueness validation remained; the unsupported provider keyword was removed. The fail-closed infrastructure outputs were excluded from model comparison.</p>
+<p>Neither failure is presented as evidence of poor model capability.</p>
+<h2>Final decision</h2>
+<p>Continue a <strong>limited human-reviewed pilot</strong> using the guarded Codex result as the observed reference configuration. Every result remains a candidate; a person must approve it before use. No strategy is approved for automated acceptance, conflict resolution, source-of-truth writes, or regulatory filing.</p>
+<p>Before expansion, add raw-payload ambiguity checks, improve prose lineage extraction, enlarge the benchmark, run repeated trials, and reproduce the guarded configuration through an operationally suitable endpoint.</p>
+<h2>Evidence limitations</h2>
+<ul><li>Ten synthetic cases and one primary run per strategy do not establish</li></ul>
+<p>prevalence, stability, production accuracy, or regulatory compliance.</p>
+<ul><li>Codex cost was unavailable and its host token accounting is not directly</li></ul>
+<p>comparable with the DeepSeek API.</p>
+<ul><li>The benchmark tests one compact schema, not the complete VoltStream vision.</li><li>A passed threshold supports another controlled test, not deployment.</li></ul></article></main></body></html>
