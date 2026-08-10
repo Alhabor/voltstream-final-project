@@ -1,0 +1,9 @@
+{
+  "model": "gpt-5.6-terra",
+  "latency_ms": 5718.786792000003,
+  "input_tokens": 15502,
+  "output_tokens": 134,
+  "cached_input_tokens": 13056,
+  "provider_request_id": null,
+  "estimated_cost_usd": null
+}

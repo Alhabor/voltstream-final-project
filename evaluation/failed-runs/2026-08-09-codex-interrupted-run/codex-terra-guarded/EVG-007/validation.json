@@ -1,0 +1,73 @@
+{
+  "candidate": {
+    "record": {
+      "station_id": null,
+      "address": null,
+      "charger_level": null,
+      "port_count": null,
+      "power_kw": null,
+      "connector_type": null,
+      "operational_status": "unknown",
+      "source_record_id": null
+    },
+    "source_mappings": {
+      "station_id": null,
+      "address": null,
+      "charger_level": null,
+      "port_count": null,
+      "power_kw": null,
+      "connector_type": null,
+      "operational_status": "operating status unknown",
+      "source_record_id": null
+    },
+    "issue_codes": [
+      "MISSING_REQUIRED_FIELD",
+      "MISSING_STABLE_IDENTITY",
+      "MISSING_SOURCE_LINEAGE"
+    ]
+  },
+  "decision": "REJECT",
+  "issues": [
+    {
+      "code": "MISSING_STABLE_IDENTITY",
+      "severity": "reject",
+      "message": "Station ID is required and must not be synthesized.",
+      "field": "station_id"
+    },
+    {
+      "code": "MISSING_SOURCE_LINEAGE",
+      "severity": "reject",
+      "message": "Source record ID is required for lineage and must not be synthesized.",
+      "field": "source_record_id"
+    },
+    {
+      "code": "MISSING_REQUIRED_FIELD",
+      "severity": "review",
+      "message": "Site address is missing and requires review.",
+      "field": "address"
+    },
+    {
+      "code": "MISSING_REQUIRED_FIELD",
+      "severity": "review",
+      "message": "Charger level is missing and requires review.",
+      "field": "charger_level"
+    },
+    {
+      "code": "MISSING_REQUIRED_FIELD",
+      "severity": "review",
+      "message": "Port count is missing and requires review.",
+      "field": "port_count"
+    },
+    {
+      "code": "MISSING_REQUIRED_FIELD",
+      "severity": "review",
+      "message": "Rated power is missing and requires review.",
+      "field": "power_kw"
+    }
+  ],
+  "issue_codes": [
+    "MISSING_STABLE_IDENTITY",
+    "MISSING_SOURCE_LINEAGE",
+    "MISSING_REQUIRED_FIELD"
+  ]
+}

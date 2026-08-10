@@ -1,5 +1,6 @@
 import tempfile
 import unittest
+import json
 from pathlib import Path
 from unittest.mock import patch
 
@@ -90,6 +91,35 @@ class ExperimentRunnerTests(unittest.TestCase):
                     case_dir,
                 )
             self.assertIs(result, failure)
+
+    def test_resume_reuses_completed_case_without_overwriting_it(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            strategy_dir = root / "evaluation" / "runs" / "run" / "baseline"
+            completed_dir = strategy_dir / "EVG-001"
+            completed_dir.mkdir(parents=True)
+            completed = {"case_id": "EVG-001", "decision": "ACCEPT"}
+            completed_path = completed_dir / "parsed-output.json"
+            completed_path.write_text(json.dumps(completed), encoding="utf-8")
+
+            runner = object.__new__(ExperimentRunner)
+            runner.root = root
+            runner.run_dir = root / "evaluation" / "runs" / "run"
+            runner.cases = [
+                {"case_id": "EVG-001"},
+                {"case_id": "EVG-002"},
+            ]
+            generated = {"case_id": "EVG-002", "decision": "REJECT"}
+            with patch.object(runner, "initialize_manifest"), patch.object(
+                runner, "_run_case", return_value=generated
+            ) as run_case, patch.object(runner, "_mark_complete"):
+                output_path = runner.run("baseline", resume=True)
+
+            self.assertEqual(completed_path.read_text(), json.dumps(completed))
+            self.assertEqual(run_case.call_count, 1)
+            self.assertEqual(run_case.call_args.args[1]["case_id"], "EVG-002")
+            rows = [json.loads(line) for line in output_path.read_text().splitlines()]
+            self.assertEqual(rows, [completed, generated])
 
 
 if __name__ == "__main__":

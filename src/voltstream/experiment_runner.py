@@ -205,7 +205,7 @@ class ExperimentRunner:
         }
         _write_json(manifest_path, manifest)
 
-    def run(self, strategy: str) -> Path:
+    def run(self, strategy: str, *, resume: bool = False) -> Path:
         if strategy not in STRATEGIES:
             raise ValueError(f"Unknown strategy: {strategy}")
         self.initialize_manifest()
@@ -213,22 +213,55 @@ class ExperimentRunner:
         predictions_path = strategy_dir / "predictions.jsonl"
         if predictions_path.exists():
             raise FileExistsError(f"Strategy evidence already exists: {predictions_path}")
-        strategy_dir.mkdir(parents=True, exist_ok=False)
+        if strategy_dir.exists() and not resume:
+            raise FileExistsError(
+                f"Incomplete strategy directory exists; use resume: {strategy_dir}"
+            )
+        strategy_dir.mkdir(parents=True, exist_ok=resume)
 
         if strategy == "rules-first-cascade":
             predictions = self._run_cascade(strategy_dir)
         else:
-            predictions = [self._run_case(strategy, case, strategy_dir) for case in self.cases]
+            predictions = []
+            for case in self.cases:
+                case_dir = strategy_dir / str(case["case_id"])
+                parsed_path = case_dir / "parsed-output.json"
+                if resume and parsed_path.exists():
+                    # Completed case evidence is immutable during recovery.
+                    predictions.append(json.loads(parsed_path.read_text(encoding="utf-8")))
+                    continue
+                predictions.append(
+                    self._run_case(
+                        strategy,
+                        case,
+                        strategy_dir,
+                        resume_incomplete=resume and case_dir.exists(),
+                    )
+                )
 
         _write_jsonl(predictions_path, predictions)
         self._mark_complete(strategy)
         return predictions_path
 
     def _run_case(
-        self, strategy: str, case: Mapping[str, Any], strategy_dir: Path
+        self,
+        strategy: str,
+        case: Mapping[str, Any],
+        strategy_dir: Path,
+        *,
+        resume_incomplete: bool = False,
     ) -> Dict[str, Any]:
         case_dir = strategy_dir / str(case["case_id"])
-        case_dir.mkdir(parents=True, exist_ok=False)
+        case_dir.mkdir(parents=True, exist_ok=resume_incomplete)
+        if resume_incomplete:
+            _write_json(
+                case_dir / "resume.json",
+                {
+                    "resumed_at_utc": _utc_now(),
+                    "reason": "Previous process ended before parsed-output.json was persisted.",
+                    "completed_case_artifacts_were_not_overwritten": True,
+                },
+            )
         if strategy == "baseline":
             prediction = baseline_prediction(case)
             _write_json(case_dir / "parsed-output.json", prediction)
@@ -449,6 +482,7 @@ class ExperimentRunner:
             self.root / "data" / "mapping_answer_key.jsonl",
             self.root / "evaluation" / "EVALUATION_SPEC.md",
             self.root / "evaluation" / "canonical_record.schema.json",
+            self.root / "evaluation" / "model_response.schema.json",
         ]
         paths.extend(sorted((self.root / "prompts").glob("*.md")))
         return paths

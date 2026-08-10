@@ -1,0 +1,9 @@
+{
+  "status": "INTERRUPTED_COMPARISON_RUN",
+  "failed_strategy": "codex-terra-guarded",
+  "completed_model_responses_before_interruption": 9,
+  "incomplete_case_id": "EVG-010",
+  "observed_state": "The request metadata existed, but no raw response, validation, metrics, parsed output, or strategy-level predictions file was written.",
+  "root_cause": "The outer orchestration process ended without a Python traceback; the exact external termination cause is unavailable.",
+  "disposition": "Preserved without final scoring. Add tested case-level resume support and include the provider response schema in frozen hashes before starting a new run."
+}
