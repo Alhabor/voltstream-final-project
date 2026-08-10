@@ -145,20 +145,22 @@ browser offers that option.
 ## Verification / 验证
 
 `BUILD_RECEIPT.json` records the generated artifact and the current browser QA.
-The animated build passed 153 real-Chrome checks at 1920×1080 and 1280×800
+The animated build passed 169 real-Chrome checks at 1920×1080 and 1280×800
 across English/dark, English/light, Chinese/dark, and Chinese/light. The 136
 full-deck checks verified every slide and found no text outside the 16:9 stage.
 Additional checks covered keyboard and button navigation, rapid switching, hash
-recovery, fullscreen, pointer and wheel gestures, one-time animation playback,
-strict step 3 → step 4 → example ordering, return-to-slide replay, reduced
-motion, and printing. Slides 6 and 8 were also
+recovery, fullscreen, pointer and wheel gestures, finite shared motion on all
+15 additional slides, one-time teaching sequences, strict step 3 → step 4 →
+example ordering, meaningful use of the manual lane, return-to-slide replay,
+reduced motion, and printing. Slides 6 and 8 were also
 visually inspected in both presentation and review modes. The print output was
 confirmed as 17 independent 960×540-point pages.
 
 `BUILD_RECEIPT.json` 记录生成产物与当前浏览器 QA。动画版本在 1920×1080 和
-1280×800 视口下，对英文深色、英文浅色、中文深色、中文浅色四种组合完成 153 项真实
+1280×800 视口下，对英文深色、英文浅色、中文深色、中文浅色四种组合完成 169 项真实
 Chrome 检查。其中 136 项逐页检查覆盖全部 17 页，没有发现文字超出 16:9 舞台。其余
-检查覆盖键盘和按钮导航、快速切页、hash 恢复、全屏、指针与滚轮手势、单次动画播放、
-严格的“第 3 步 → 第 4 步 → 底部示例”顺序、返回页面后重播、减少动态效果和打印；
+检查覆盖键盘和按钮导航、快速切页、hash 恢复、全屏、指针与滚轮手势、其余 15 页的
+有限统一动效、单次教学动画、严格的“第 3 步 → 第 4 步 → 底部示例”顺序、人工路线空间
+利用、返回页面后重播、减少动态效果和打印；
 第 6 页与第 8 页还完成了演示模式和审阅模式下的
 人工视觉检查。打印稿验证为 17 个独立的 960×540 点页面。

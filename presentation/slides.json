@@ -99,6 +99,8 @@
           {"number": "3", "title": "Investigate", "detail": "Resolve missing or conflicting values"},
           {"number": "4", "title": "Prepare", "detail": "Create the entry used for reporting"}
         ],
+        "burden": "One employee still owns every interpretation and conflict",
+        "tasks": ["INTERPRET", "INVESTIGATE", "DOCUMENT"],
         "outcome": "Judgment calls create a queue, and the reason for a choice can be hard to trace."
       },
       "prototypeLane": {

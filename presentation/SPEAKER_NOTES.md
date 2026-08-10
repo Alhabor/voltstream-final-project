@@ -68,15 +68,17 @@ check each incoming file before anyone relies on the new entry.
 
 Follow the animation from left to right. Today, employees open each format,
 translate fields and units, investigate conflicts, and prepare the reporting
-entry themselves. Our prototype does not replace that judgment. It reads and
-organizes the same eight facts, then fixed rules expose missing or competing
-values and route the entry to continue, human review, or stop. In the example,
-8 installed and 6 active are made visible and sent to review.
+entry themselves. They still have to interpret the material, investigate the
+conflict, and document why a value was chosen. Our prototype does not replace
+that judgment. It reads and organizes the same eight facts, then fixed rules
+expose missing or competing values and route the entry to continue, human
+review, or stop. In the example, 8 installed and 6 active are made visible and
+sent to review.
 
 **中文审阅：** 跟随动画从左向右看。当前由工作人员打开材料、统一字段与单位、调查冲突，
-再准备报告条目。原型不取代这种判断：它先读取并整理八项信息，再由固定规则暴露缺失或
-相互竞争的数值，最终分流为继续、人工复核或停止。示例中的“安装 8、启用 6”会被明确
-展示并交给人工复核。
+再准备报告条目；之后仍要亲自解释材料、调查冲突并记录选择某个值的理由。原型不取代
+这种判断：它先读取并整理八项信息，再由固定规则暴露缺失或相互竞争的数值，最终分流为
+继续、人工复核或停止。示例中的“安装 8、启用 6”会被明确展示并交给人工复核。
 
 [Sources] `docs/ARCHITECTURE.md`; `evaluation/canonical_record.schema.json`.
 

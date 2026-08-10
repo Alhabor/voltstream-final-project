@@ -354,9 +354,12 @@ const html = `<!doctype html>
     .pipeline-step strong { font-size: calc(var(--u) * .96); }
     .pipeline-step span:last-child { color: var(--muted); font-size: calc(var(--u) * .86); line-height: 1.2; }
     .pipeline-conflict { margin: calc(var(--u) * .5) 0; padding: calc(var(--u) * .38) calc(var(--u) * .55); border-left: 3px solid var(--red); color: var(--ink); background: var(--bad-tint); font-size: calc(var(--u) * .9); font-weight: 760; }
+    .pipeline-burden { margin: calc(var(--u) * .5) 0; padding: calc(var(--u) * .38) calc(var(--u) * .55); border-left: 3px solid var(--amber); color: var(--ink); background: color-mix(in srgb, var(--amber) 8%, transparent); font-size: calc(var(--u) * .9); font-weight: 760; }
     .pipeline-decisions { display: grid; grid-template-columns: repeat(3, 1fr); gap: calc(var(--u) * .35); margin-top: calc(var(--u) * .48); }
     .decision-chip { padding: calc(var(--u) * .32); border: 1px solid var(--line); color: var(--muted); text-align: center; font-size: calc(var(--u) * .72); font-weight: 850; }
     .decision-chip.review { border-color: var(--amber); color: var(--amber); background: var(--bad-tint); }
+    .pipeline-manual-tasks { display: grid; grid-template-columns: repeat(3, 1fr); gap: calc(var(--u) * .35); margin-top: calc(var(--u) * .48); }
+    .manual-task { padding: calc(var(--u) * .32); border: 1px solid color-mix(in srgb, var(--amber) 55%, var(--line)); color: var(--amber); text-align: center; font-size: calc(var(--u) * .72); font-weight: 850; }
     .lane-outcome { margin: calc(var(--u) * .55) 0 0; color: var(--muted); font-size: calc(var(--u) * .86); line-height: 1.23; }
     .pipeline-guardrail { margin-top: calc(var(--u) * .65); padding-left: calc(var(--u) * .75); border-left: 3px solid var(--green); color: var(--ink); font-size: calc(var(--u) * .97); font-weight: 720; }
     .pipeline-facts { margin-top: calc(var(--u) * .4); color: var(--subtle); font-size: calc(var(--u) * .74); line-height: 1.24; }
@@ -368,16 +371,18 @@ const html = `<!doctype html>
     .slide.active .manual .pipeline-step:nth-child(2) { animation: pipeline-rise .45s ease-out both 1.1s; }
     .slide.active .manual .pipeline-step:nth-child(3) { animation: pipeline-rise .45s ease-out both 1.55s; }
     .slide.active .manual .pipeline-step:nth-child(4) { animation: pipeline-rise .45s ease-out both 2s; }
-    .slide.active .manual .lane-outcome { animation: pipeline-rise .45s ease-out both 2.45s; }
-    .slide.active .prototype .pipeline-step:nth-child(1) { animation: pipeline-rise .45s ease-out both 2.9s; }
-    .slide.active .prototype .pipeline-step:nth-child(2) { animation: pipeline-rise .45s ease-out both 3.35s; }
-    .slide.active .prototype .pipeline-step:nth-child(3) { animation: pipeline-rise .45s ease-out both 3.8s; }
-    .slide.active .prototype .pipeline-step:nth-child(4) { animation: pipeline-rise .45s ease-out both 4.25s; }
-    .slide.active .pipeline-conflict { animation: conflict-arrives .7s ease-out both 4.8s; }
-    .slide.active .pipeline-decisions { animation: pipeline-rise .45s ease-out both 5.45s; }
+    .slide.active .pipeline-burden { animation: pipeline-rise .45s ease-out both 2.45s; }
+    .slide.active .pipeline-manual-tasks { animation: pipeline-rise .45s ease-out both 2.9s; }
+    .slide.active .manual .lane-outcome { animation: pipeline-rise .45s ease-out both 3.35s; }
+    .slide.active .prototype .pipeline-step:nth-child(1) { animation: pipeline-rise .45s ease-out both 3.8s; }
+    .slide.active .prototype .pipeline-step:nth-child(2) { animation: pipeline-rise .45s ease-out both 4.25s; }
+    .slide.active .prototype .pipeline-step:nth-child(3) { animation: pipeline-rise .45s ease-out both 4.7s; }
+    .slide.active .prototype .pipeline-step:nth-child(4) { animation: pipeline-rise .45s ease-out both 5.15s; }
+    .slide.active .pipeline-conflict { animation: conflict-arrives .7s ease-out both 5.7s; }
+    .slide.active .pipeline-decisions { animation: pipeline-rise .45s ease-out both 6.35s; }
     .slide.active .prototype .lane-outcome,
     .slide.active .pipeline-guardrail,
-    .slide.active .pipeline-facts { animation: pipeline-rise .45s ease-out both 5.95s; }
+    .slide.active .pipeline-facts { animation: pipeline-rise .45s ease-out both 6.85s; }
     @keyframes pipeline-rise { from { opacity: 0; transform: translateY(calc(var(--u) * .5)); } }
     @keyframes conflict-arrives {
       from { opacity: 0; transform: scale(.96); }
@@ -540,7 +545,8 @@ const html = `<!doctype html>
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
       .pipeline-intake, .pipeline-step, .lane-outcome, .pipeline-conflict,
-      .pipeline-decisions, .pipeline-guardrail, .pipeline-facts,
+      .pipeline-burden, .pipeline-manual-tasks, .pipeline-decisions,
+      .pipeline-guardrail, .pipeline-facts,
       .case-context, .source-value, .versus, .canonical-answer,
       .outcome-table tr, .case-takeaway {
         opacity: 1 !important;
@@ -584,7 +590,8 @@ const html = `<!doctype html>
       html[data-language="zh"] .slide-copy[data-copy="en"] { display: none !important; }
       .controls, .preferences, .progress { display: none !important; }
       .pipeline-intake, .pipeline-step, .lane-outcome, .pipeline-conflict,
-      .pipeline-decisions, .pipeline-guardrail, .pipeline-facts,
+      .pipeline-burden, .pipeline-manual-tasks, .pipeline-decisions,
+      .pipeline-guardrail, .pipeline-facts,
       .case-context, .source-value, .versus, .canonical-answer,
       .outcome-table tr, .case-takeaway { opacity: 1 !important; transform: none !important; animation: none !important; }
       .slide .body > *, .slide .hero-body > * { opacity: 1 !important; transform: none !important; animation: none !important; }
@@ -871,9 +878,11 @@ function list(items) {
 }
 
 function renderPipelineLane(lane, laneClass) {
+  const burden = lane.burden ? `<div class="pipeline-burden">${escapeHtml(lane.burden)}</div>` : "";
+  const tasks = lane.tasks ? `<div class="pipeline-manual-tasks">${lane.tasks.map(task => `<span class="manual-task">${escapeHtml(task)}</span>`).join("")}</div>` : "";
   const conflict = lane.conflict ? `<div class="pipeline-conflict">${escapeHtml(lane.conflict)}</div>` : "";
   const decisions = lane.decisions ? `<div class="pipeline-decisions">${lane.decisions.map(decision => `<span class="decision-chip ${decision === "HUMAN_REVIEW" ? "review" : ""}">${escapeHtml(decision)}</span>`).join("")}</div>` : "";
-  return `<article class="pipeline-lane ${laneClass}"><span class="lane-label">${escapeHtml(lane.label)}</span><h3 class="lane-title">${escapeHtml(lane.title)}</h3><div class="pipeline-steps">${lane.steps.map(step => `<div class="pipeline-step"><span class="pipeline-step-number">${escapeHtml(step.number)}</span><strong>${escapeHtml(step.title)}</strong><span>${escapeHtml(step.detail)}</span></div>`).join("")}</div>${conflict}${decisions}<p class="lane-outcome">${escapeHtml(lane.outcome)}</p></article>`;
+  return `<article class="pipeline-lane ${laneClass}"><span class="lane-label">${escapeHtml(lane.label)}</span><h3 class="lane-title">${escapeHtml(lane.title)}</h3><div class="pipeline-steps">${lane.steps.map(step => `<div class="pipeline-step"><span class="pipeline-step-number">${escapeHtml(step.number)}</span><strong>${escapeHtml(step.title)}</strong><span>${escapeHtml(step.detail)}</span></div>`).join("")}</div>${burden}${tasks}${conflict}${decisions}<p class="lane-outcome">${escapeHtml(lane.outcome)}</p></article>`;
 }
 
 function renderEvidenceLinks(slideId, language) {

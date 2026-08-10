@@ -238,6 +238,8 @@ class PresentationContractTests(unittest.TestCase):
             self.assertEqual(pipeline["layout"], "pipeline-compare")
             self.assertEqual(len(pipeline["manualLane"]["steps"]), 4)
             self.assertEqual(len(pipeline["prototypeLane"]["steps"]), 4)
+            self.assertEqual(len(pipeline["manualLane"]["tasks"]), 3)
+            self.assertTrue(pipeline["manualLane"]["burden"])
             self.assertEqual(
                 pipeline["prototypeLane"]["decisions"],
                 ["ACCEPT", "HUMAN_REVIEW", "REJECT"],
@@ -259,10 +261,10 @@ class PresentationContractTests(unittest.TestCase):
         # Preserve the visible top-to-bottom teaching order on the prototype
         # lane: step 3, step 4, then the conflict example and route chips.
         ordered_timing = [
-            (".prototype .pipeline-step:nth-child(3)", 3.8),
-            (".prototype .pipeline-step:nth-child(4)", 4.25),
-            (".pipeline-conflict", 4.8),
-            (".pipeline-decisions", 5.45),
+            (".prototype .pipeline-step:nth-child(3)", 4.7),
+            (".prototype .pipeline-step:nth-child(4)", 5.15),
+            (".pipeline-conflict", 5.7),
+            (".pipeline-decisions", 6.35),
         ]
         for selector, delay in ordered_timing:
             self.assertIn(
