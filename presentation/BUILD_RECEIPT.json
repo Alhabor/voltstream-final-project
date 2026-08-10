@@ -3,20 +3,20 @@
   "output": "presentation/index.html",
   "sources": ["presentation/slides.json", "presentation/slides.zh.json"],
   "generator": "presentation/build.mjs",
-  "slides": 16,
+  "slides": 17,
   "languages": ["en", "zh-CN"],
   "themes": ["dark", "light"],
   "self_contained": true,
-  "audience_context": "passed: business situation, prototype process, test construction, model families, decision terms, and safety-veto meaning are explained in the visible slides",
+  "audience_context": "passed: English is the primary zero-background narrative; charging site/charger/port, installed versus active status, decision codes, model families, test construction, measures, safety veto, pilot, and live-use boundary are explained before or on first use",
   "browser": {
     "name": "Google Chrome",
     "version": "151.0.7922.77",
     "automation": "Playwright 1.62.0",
-    "checks_passed": 387,
+    "checks_passed": 403,
     "checks_breakdown": {
       "viewport_language_theme_and_clipping": 104,
       "navigation_preferences_fullscreen_gestures_and_reduced_motion": 21,
-      "per_slide_typography": 256,
+      "per_slide_typography": 272,
       "print_visibility_and_language_selection": 6
     },
     "viewports": ["1920x1080", "1280x800"],
@@ -34,14 +34,14 @@
     "reduced_motion": "passed",
     "contrast": "passed in all four language/theme combinations",
     "content_clipping": "none detected",
-    "content_clipping_coverage": "all 16 slides and four combinations",
-    "typography": "all 16 slides in both languages at both viewports; minimum laptop audience text 13.312 px; minimum multiline title balance 0.713",
+    "content_clipping_coverage": "all 17 slides and four combinations",
+    "typography": "all 17 slides in both languages at both viewports; minimum laptop audience text 13.312 px; minimum multiline title balance 0.769",
     "control_overlap": "none detected",
     "external_requests": 0,
     "browser_errors": 0
   },
   "print": {
-    "pages": 16,
+    "pages": 17,
     "page_size_points": "960x540",
     "one_slide_per_page": true,
     "outputs_checked": ["en/dark", "zh-CN/light"]

@@ -1,22 +1,25 @@
 # Final HTML Presentation / 最终 HTML 演示
 
-`index.html` is a self-contained, 16-slide, 16:9 presentation for the final
+`index.html` is a self-contained, 17-slide, 16:9 presentation for the final
 10-minute briefing. The same file contains complete English and Chinese
 versions plus dark and light themes. It displays one full-viewport slide at a
 time and needs no server, network connection, external font, or sibling runtime
 asset.
 
-The narrative is written for a first-time audience. It introduces the Con
-Edison business situation before the prototype, defines each decision and test
-term on the slide where it first matters, and does not rely on the repository,
-speaker notes, or assignment brief to supply missing context.
+English is the live presentation language and is written for a first-time,
+English-speaking audience. Chinese is a structurally matched review mirror for
+the project owner. The deck introduces the physical charging-site context and
+defines each business object, decision, model family, test measure, and safety
+term before or on first use. It does not rely on the repository, speaker notes,
+or assignment brief to supply missing context.
 
-`index.html` 是一份自包含的 16 页、16:9、10 分钟汇报演示。同一个文件内置完整的
+`index.html` 是一份自包含的 17 页、16:9、10 分钟汇报演示。同一个文件内置完整的
 中英文版本与深浅色主题，每次只显示一张完整幻灯片；直接打开即可，不依赖服务器、
 网络、外部字体或同目录运行资源。
 
-演示按“完全不了解项目的观众”设计：先解释 Con Edison 的业务情境，再介绍原型；每个
-处理结果和测试概念都会在首次需要时解释，不依赖代码仓库、讲稿或作业说明补齐关键背景。
+英文是现场主版本，面向完全不了解项目的英文观众；中文仅作为结构一致的审阅镜像。
+演示先解释真实充电设施，再介绍业务问题和原型；每个业务对象、处理结果、模型类别、
+测试指标和安全术语都会在首次出现前或当页解释，不依赖代码仓库、讲稿或作业说明补背景。
 
 ## Review modes / 审阅模式
 
@@ -82,26 +85,26 @@ The deck honors `prefers-reduced-motion`. / 所有导航方式都会同步更新
 
 Select the desired language and theme first, then use the browser's Print
 command. Only the current language is printed. The stylesheet places each of
-the 16 slides on its own 16:9 landscape page. Enable background graphics if the
+the 17 slides on its own 16:9 landscape page. Enable background graphics if the
 browser offers that option.
 
 先选择需要的语言和主题，再使用浏览器的“打印”功能；打印稿只包含当前语言。打印
-样式会将 16 张幻灯片分别放在独立的 16:9 横向页面上。如浏览器提供选项，请启用
+样式会将 17 张幻灯片分别放在独立的 16:9 横向页面上。如浏览器提供选项，请启用
 “背景图形”。
 
 ## Verification / 验证
 
 `BUILD_RECEIPT.json` records the generated artifact and browser QA. The deck
-passed 387 real-Chrome checks at 1920×1080 and 1280×800 across English/dark,
+passed 403 real-Chrome checks at 1920×1080 and 1280×800 across English/dark,
 English/light, Chinese/dark, and Chinese/light. Coverage includes navigation,
 rapid switching, hash recovery, language/theme persistence, fullscreen,
 reduced motion, contrast, external requests, browser errors, control overlap,
 and content clipping. The checks include a dedicated typography gate for every
 slide in both languages. English/dark and Chinese/light print outputs were each
-confirmed as 16 independent 960×540-point pages.
+confirmed as 17 independent 960×540-point pages.
 
 `BUILD_RECEIPT.json` 记录生成产物与浏览器 QA。演示在 1920×1080 和 1280×800
-视口下，对英文深色、英文浅色、中文深色、中文浅色四种组合完成 387 项真实 Chrome
+视口下，对英文深色、英文浅色、中文深色、中文浅色四种组合完成 403 项真实 Chrome
 检查，覆盖导航、快速切页、hash 恢复、语言与主题持久化、全屏、减少动态效果、对比度、
 外部请求、浏览器错误、控件遮挡和内容裁切，并逐页检查中英文标题平衡与最小正文
-字号。英文深色与中文浅色打印稿均验证为 16 个独立的 960×540 点页面。
+字号。英文深色与中文浅色打印稿均验证为 17 个独立的 960×540 点页面。

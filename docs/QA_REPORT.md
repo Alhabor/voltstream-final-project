@@ -9,7 +9,7 @@ fixture, result, or Git changes were made during this review
 ## Executive verdict
 
 **The v4 experiment evidence is internally complete and reproducible. The
-required HTML presentation was subsequently rebuilt as a 16-slide deck and
+required HTML presentation was subsequently rebuilt as a 17-slide deck and
 verified in a real browser. Team-level Git contribution evidence remains the
 only known external submission blocker.**
 
@@ -24,7 +24,7 @@ The v4 run passed the integrity checks performed in this review:
   aggregate scores;
 - fixture validation passed with 10 cases, 10 answers, and 7 structured mapping
   answer rows;
-- all 76 automated tests passed under Python 3.9.6;
+- all 77 automated tests passed under Python 3.9.6;
 - the current repository and Git history produced no high-signal secret-pattern
   matches; and
 - the result commit `627830a` is on `main`, is synchronized with `origin/main`,
@@ -38,36 +38,37 @@ No defect was found that invalidates or requires rerunning v4.
 
 #### H1 — Required HTML presentation (resolved after independent QA)
 
-`presentation/index.html` is now a self-contained 16-slide presentation built
+`presentation/index.html` is now a self-contained 17-slide presentation built
 from structurally matched English and Chinese sources (`slides.json` and
 `slides.zh.json`) by `presentation/build.mjs`. It contains dark and light
 themes, persists both preferences locally, and preserves the current slide
 while switching. The builder checks slide count, unique IDs, required section
 order, and bilingual structural parity. Real-browser QA in Google Chrome passed
-387 checks across 1920×1080 and 1280×800 viewports in all four language/theme
+403 checks across 1920×1080 and 1280×800 viewports in all four language/theme
 combinations. Coverage included navigation, rapid switching, hash recovery,
 preference persistence, fullscreen, reduced motion, contrast, zero external
 requests, zero browser errors, no control overlap, and no detected content
 clipping. A separate per-slide typography gate verified legible text and
 balanced multiline titles in both languages. English/dark and Chinese/light
-print outputs each contain 16 independent 16:9 pages.
+print outputs each contain 17 independent 16:9 pages.
 
-The 387 checks comprise 104 viewport/language/theme assertions, 21 interaction
-and reduced-motion assertions, 256 per-slide typography assertions, and 6 print
+The 403 checks comprise 104 viewport/language/theme assertions, 21 interaction
+and reduced-motion assertions, 272 per-slide typography assertions, and 6 print
 visibility assertions. The smallest measured audience text at the 1280×800
 viewport was 13.312 px after 16:9 scaling; the least-balanced multiline title
-still had a 0.713 shortest-to-longest line-width ratio.
+still had a 0.769 shortest-to-longest line-width ratio.
 
 The final narrative was then rewritten for an audience with no prior project
-context. Visible slides now introduce the Con Edison situation before the
-prototype; enumerate the eight output fields; explain the three possible
-decisions; and then devote separate slides to test cases, six compared
-strategies, six measurement groups, and the preregistered pass/fail/veto rules.
-EVG-009 connects the abstract safety rule to the concrete `installed_ports=8`
-versus `active_ports=6` conflict. The recommendation no longer relies on the
-repository or speaker notes for essential context. Contract tests protect both
-those explanations and all frozen final-v4 quality, cost, latency, and EVG-009
-values.
+context. English is the live, zero-background narrative; Chinese is a review
+mirror. Visible slides define Con Edison, charging site, charger, charging port,
+installed versus active status, the three decision codes, both AI families,
+each comparison strategy, every measurement group, pass/fail/veto, and pilot
+before or on first use. Unnecessary technical terms such as CSV, JSON, API,
+prompt guardrail, deterministic post-processing, and production deployment
+were removed from audience copy. EVG-009 now explains why both 8 and 6 can be
+true, why the single output column is ambiguous, and what each choice would
+misstate. Contract tests protect this first-use contract and all frozen final-v4
+quality, cost, latency, and EVG-009 values.
 
 #### H2 — Team-level Git contribution requirement is not yet evidenced
 
@@ -235,7 +236,7 @@ python3 scripts/validate_fixtures.py
 
 PYTHONPATH=src PYTHONPYCACHEPREFIX=/tmp/voltstream-pycache \
   python3 -m unittest discover -s tests -v
-  PASS — 76 tests
+  PASS — 77 tests
 
 PYTHONPATH=src python3 scripts/verify_run.py \
   --run-id 2026-08-09-final-v4

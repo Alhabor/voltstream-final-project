@@ -250,6 +250,19 @@ const html = `<!doctype html>
     .metric strong { display: block; color: var(--blue); font-size: calc(var(--u) * 2.35); line-height: 1; }
     .metric span { color: var(--muted); font-size: calc(var(--u) * 1.08); line-height: 1.25; }
 
+    .definition-lead { max-width: 65ch; margin-bottom: calc(var(--u) * 1.15); color: var(--muted); font-size: calc(var(--u) * 1.28); }
+    .definition-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: calc(var(--u) * 1.2); }
+    .definition-term { padding: calc(var(--u) * 1.15); border-top: 2px solid var(--blue-strong); background: var(--panel); }
+    .definition-term strong { display: block; margin-bottom: calc(var(--u) * .45); color: var(--blue); font-size: calc(var(--u) * 1.45); }
+    .definition-term span { color: var(--muted); font-size: calc(var(--u) * 1.12); line-height: 1.32; }
+    .status-heading { margin: calc(var(--u) * 1.2) 0 calc(var(--u) * .65); font-size: calc(var(--u) * 1.28); }
+    .status-contrast { display: grid; grid-template-columns: 1fr 1fr; gap: calc(var(--u) * 1.2); }
+    .status-count { display: grid; grid-template-columns: calc(var(--u) * 4.2) 1fr; align-items: center; gap: calc(var(--u) * .8); padding: calc(var(--u) * .8) calc(var(--u) * 1); border-left: 3px solid var(--green); background: var(--good-tint); }
+    .status-count strong { color: var(--blue); font-size: calc(var(--u) * 2.5); line-height: 1; }
+    .status-count b { display: block; margin-bottom: calc(var(--u) * .18); font-size: calc(var(--u) * 1.14); }
+    .status-count span { color: var(--muted); font-size: calc(var(--u) * 1.04); line-height: 1.25; }
+    .definition-consequence { margin-top: calc(var(--u) * .85); color: var(--ink); font-size: calc(var(--u) * 1.18); font-weight: 700; }
+
     .fact-box {
       display: grid;
       grid-template-columns: .42fr 1fr;
@@ -291,6 +304,7 @@ const html = `<!doctype html>
     .event strong { color: var(--blue); font-size: calc(var(--u) * 1.04); }
     .event span { color: var(--muted); font-size: calc(var(--u) * 1.08); line-height: 1.3; }
 
+    .case-context { margin-bottom: calc(var(--u) * .75); color: var(--muted); font-size: calc(var(--u) * 1.08); line-height: 1.3; }
     .conflict { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: calc(var(--u) * 1.2); }
     .source-value { padding: calc(var(--u) * 1.1); text-align: center; border: 1px solid var(--line); background: var(--panel); }
     .source-value strong { display: block; margin-top: calc(var(--u) * .35); color: var(--blue); font-size: calc(var(--u) * 3); line-height: 1; }
@@ -662,6 +676,8 @@ function renderBody(slide, language) {
       return `<div class="hero-body"><p class="lead">${escapeHtml(slide.lead)}</p><p class="decision-band">${escapeHtml(slide.boundary)}</p><div class="metric-row">${slide.metrics.map(metric => `<div class="metric"><strong>${escapeHtml(metric.value)}</strong><span>${escapeHtml(metric.label)}</span></div>`).join("")}</div></div>`;
     case "split":
       return `<p class="lead">${escapeHtml(slide.lead)}</p><div class="two-col"><div class="panel"><h3>${escapeHtml(slide.leftTitle)}</h3>${list(slide.leftItems)}</div><div class="panel selected"><h3>${escapeHtml(slide.rightTitle)}</h3>${list(slide.rightItems)}</div></div><p class="note-line">${escapeHtml(slide.note)}</p>`;
+    case "definitions":
+      return `<p class="definition-lead">${escapeHtml(slide.lead)}</p><div class="definition-grid">${slide.terms.map(term => `<div class="definition-term"><strong>${escapeHtml(term.name)}</strong><span>${escapeHtml(term.definition)}</span></div>`).join("")}</div><h3 class="status-heading">${escapeHtml(slide.statusTitle)}</h3><div class="status-contrast">${slide.statuses.map(status => `<div class="status-count"><strong>${escapeHtml(status.value)}</strong><div><b>${escapeHtml(status.label)}</b><span>${escapeHtml(status.meaning)}</span></div></div>`).join("")}</div><p class="definition-consequence">${escapeHtml(slide.consequence)}</p>`;
     case "fact":
       return `<div class="fact-box"><div class="fact-label">${isChinese ? "我们查到的事实" : "What we found"}</div><div><p class="fact-copy">${escapeHtml(slide.fact)}</p><p class="implication large-claim"><span class="accent">${isChinese ? "这意味着：" : "What this means:"}</span> ${escapeHtml(slide.implication)}</p><p class="source-line">${escapeHtml(slide.sources)}</p></div></div>`;
     case "choices":
@@ -673,13 +689,13 @@ function renderBody(slide, language) {
     case "failure":
       return `<div class="failure-grid"><div><p class="primary-failure">${escapeHtml(slide.primary)}</p><p class="note-line">${escapeHtml(slide.boundary)}</p></div><div>${slide.events.map(event => `<div class="event"><strong>${escapeHtml(event.label)}</strong><span>${escapeHtml(event.detail)}</span></div>`).join("")}</div></div>`;
     case "case":
-      return `<div class="conflict"><div class="source-value"><span>${escapeHtml(slide.sourceValues[0].label)}</span><strong>${escapeHtml(slide.sourceValues[0].value)}</strong></div><div class="versus">≠</div><div class="source-value"><span>${escapeHtml(slide.sourceValues[1].label)}</span><strong>${escapeHtml(slide.sourceValues[1].value)}</strong></div></div><div class="canonical-answer"><span>${isChinese ? "系统需要填写：" : "The system has to fill:"} <strong>${escapeHtml(slide.canonical)}</strong></span><br><span>${isChinese ? "安全做法：" : "The safe choice:"} <strong>${escapeHtml(slide.safeAnswer)}</strong></span></div><table class="outcome-table"><tbody>${slide.outcomes.map(outcome => `<tr><td>${escapeHtml(outcome.strategy)}</td><td>${escapeHtml(outcome.result)}</td><td class="${outcome.status.includes("unsafe") ? "bad" : outcome.status === "correct" ? "good" : "warn"}">${escapeHtml(outcome.statusLabel || outcome.status)}</td></tr>`).join("")}</tbody></table><p class="note-line">${escapeHtml(slide.takeaway)}</p>`;
+      return `<p class="case-context">${escapeHtml(slide.context)}</p><div class="conflict"><div class="source-value"><span>${escapeHtml(slide.sourceValues[0].label)}</span><strong>${escapeHtml(slide.sourceValues[0].value)}</strong></div><div class="versus">≠</div><div class="source-value"><span>${escapeHtml(slide.sourceValues[1].label)}</span><strong>${escapeHtml(slide.sourceValues[1].value)}</strong></div></div><div class="canonical-answer"><span>${isChinese ? "输出表格只提供：" : "The output table offers only:"} <strong>${escapeHtml(slide.canonical)}</strong></span><br><span>${isChinese ? "安全回答：" : "Safe response:"} <strong>${escapeHtml(slide.safeAnswer)}</strong></span></div><table class="outcome-table"><tbody>${slide.outcomes.map(outcome => `<tr><td>${escapeHtml(outcome.strategy)}</td><td>${escapeHtml(outcome.result)}</td><td class="${outcome.status.includes("unsafe") ? "bad" : outcome.status === "correct" ? "good" : "warn"}">${escapeHtml(outcome.statusLabel || outcome.status)}</td></tr>`).join("")}</tbody></table><p class="note-line">${escapeHtml(slide.takeaway)}</p>`;
     case "signal":
       return `<div class="signal-grid">${slide.signals.map(signal => `<article class="signal"><h3>${escapeHtml(signal.title)}</h3><p class="signal-value">${escapeHtml(signal.value)}</p><p class="muted">${escapeHtml(signal.description)}</p></article>`).join("")}</div><p class="next-step"><span class="accent">${isChinese ? "下一步：" : "Next step:"}</span> ${escapeHtml(slide.next)}</p>`;
     case "testing":
       return `<div class="number-row">${slide.numbers.map(number => `<div class="number"><strong>${escapeHtml(number.value)}</strong><span>${escapeHtml(number.label)}</span></div>`).join("")}</div><div class="tag-row">${slide.coverage.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join("")}</div><p class="note-line">${escapeHtml(slide.method)}</p><p class="guardrail">${escapeHtml(slide.gate)}</p>`;
     case "strategies":
-      return `<div class="strategy-grid">${slide.strategies.map(strategy => `<article class="strategy-card"><div class="strategy-head"><span class="strategy-code">${escapeHtml(strategy.code)}</span><span class="strategy-role">${escapeHtml(strategy.role)}</span></div><h3>${escapeHtml(strategy.name)}</h3><p>${escapeHtml(strategy.detail)}</p></article>`).join("")}</div><p class="note-line">${escapeHtml(slide.note)}</p>`;
+      return `<div class="strategy-grid">${slide.strategies.map(strategy => `<article class="strategy-card"><div class="strategy-head"><span class="strategy-role">${escapeHtml(strategy.role)}</span></div><h3>${escapeHtml(strategy.name)}</h3><p>${escapeHtml(strategy.detail)}</p></article>`).join("")}</div><p class="note-line">${escapeHtml(slide.note)}</p>`;
     case "metrics":
       return `<div class="metric-detail-grid">${slide.metricsDetail.map(metric => `<article class="metric-detail"><strong>${escapeHtml(metric.value)}</strong><h3>${escapeHtml(metric.name)}</h3><p>${escapeHtml(metric.detail)}</p></article>`).join("")}</div><p class="note-line">${escapeHtml(slide.note)}</p>`;
     case "judgement":

@@ -76,8 +76,8 @@ class PresentationContractTests(unittest.TestCase):
             "active_ports",
             "null + HUMAN_REVIEW",
             "97.5%",
-            "limited, fully human-reviewed pilot",
-            "does not support production deployment",
+            "small trial—a pilot",
+            "not ready for live company use",
         ]
         for text in required_evidence:
             self.assertIn(text, self.document)
@@ -85,25 +85,61 @@ class PresentationContractTests(unittest.TestCase):
     def test_audience_can_follow_without_repository_context(self):
         """The visible deck must define its situation, process, and test language."""
         english_explanations = [
-            "Con Edison receives charger information through outside contractors",
-            "One clear decision before anyone relies on a new record",
-            "The 8 boxes are station ID",
+            "Con Edison is a company that delivers electricity",
+            "One connection that can charge one vehicle at a time",
+            "8 is not automatically the number working now",
+            "The 8 facts are a site ID (unique label)",
             "no company records were used",
-            "Codex and DeepSeek are two families of generative AI models",
-            "leave it blank: null + HUMAN_REVIEW",
-            "Veto” means one unsafe result disqualified the approach",
+            "Codex and DeepSeek are two kinds of AI systems",
+            "leave it blank and send it to a person (saved as null + HUMAN_REVIEW)",
+            "One such event caused a veto",
         ]
         chinese_explanations = [
-            "Con Edison 通过外部承包商和数据公司收集充电桩信息",
-            "在任何人依赖新记录之前，先作出一次清晰判断",
-            "8 项信息分别是",
+            "Con Edison 是一家向用户输送电力的公司",
+            "一次能够连接并为一辆车充电的接口",
+            "8 不一定是现在可用的数量",
+            "8 项信息是：站点 ID（唯一标签）",
             "没有使用公司记录",
-            "Codex 和 DeepSeek 是两类生成式 AI 模型",
-            "先留空：null + HUMAN_REVIEW（交给人检查）",
-            "只要有一次不安全结果就不合格",
+            "Codex 和 DeepSeek 是本项目比较的两种 AI 系统",
+            "留空并交给人（保存结果写作 null + HUMAN_REVIEW）",
+            "出现一次就会导致否决",
         ]
         for text in english_explanations + chinese_explanations:
             self.assertIn(html.escape(text), self.document)
+
+    def test_first_use_of_audience_terms_is_explained_or_removed(self):
+        """Protect the zero-background English narrative from unexplained jargon."""
+        slides = {slide["id"]: slide for slide in self.source["slides"]}
+        slide_ids = [slide["id"] for slide in self.source["slides"]]
+        self.assertLess(slide_ids.index("charger-basics"), slide_ids.index("evg009"))
+        self.assertEqual(
+            [term["name"] for term in slides["charger-basics"]["terms"]],
+            ["Charging site", "Charger", "Charging port"],
+        )
+        prototype_text = json.dumps(slides["prototype"], ensure_ascii=False)
+        for term in ["ACCEPT", "HUMAN_REVIEW", "REJECT"]:
+            self.assertIn(term, prototype_text)
+        case_text = json.dumps(slides["evg009"], ensure_ascii=False)
+        for explanation in [
+            "installed_ports means all physical ports installed",
+            "active_ports means ports active now",
+            "Codex and DeepSeek are two kinds of AI systems",
+            "saved as null + HUMAN_REVIEW",
+        ]:
+            self.assertIn(explanation, case_text)
+        audience_source = json.dumps(self.source["slides"], ensure_ascii=False)
+        for unexplained_term in [
+            "CSV",
+            "JSON",
+            "API record",
+            "Simple baseline",
+            "Open-weight path",
+            "Closed-model path",
+            "prompt guardrails",
+            "deterministic post-processing",
+            "production deployment",
+        ]:
+            self.assertNotIn(unexplained_term, audience_source)
 
     def test_visible_decision_rules_match_preregistered_thresholds(self):
         judgement = next(
@@ -115,9 +151,9 @@ class PresentationContractTests(unittest.TestCase):
         )
         self.assertEqual(len(judgement["vetoRules"]), 3)
         for phrase in [
-            "unsafe approval",
-            "critical value not supported",
-            "malicious instruction",
+            "should have gone to a person or stopped",
+            "important number that did not appear",
+            "hidden in the submitted data",
             "There is no single average score",
         ]:
             self.assertIn(phrase, self.document)
