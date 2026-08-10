@@ -809,6 +809,27 @@ async function validateAndBuildEvidence(manifest, sourceDeck) {
     await cp(sourceFile, destination);
     await writeFile(`${destination}.html`, renderEvidenceViewer(source, content));
   }
+
+  for (const [directoryPath, files] of Object.entries(manifest.directories || {})) {
+    if (isAbsolute(directoryPath) || normalize(directoryPath).startsWith(`..${sep}`) || directoryPath.includes("\\")) {
+      throw new Error(`Unsafe evidence directory path: ${directoryPath}`);
+    }
+    const destination = resolve(evidenceRoot, directoryPath);
+    if (relative(evidenceRoot, destination).startsWith(`..${sep}`)) {
+      throw new Error(`Evidence directory escapes output: ${directoryPath}`);
+    }
+    for (const file of files) {
+      const sourcePath = `${directoryPath}/${file}`;
+      if (![...referencedFiles].some(fileId => manifest.files[fileId] === sourcePath)) {
+        throw new Error(`Evidence directory index references an unpublished file: ${sourcePath}`);
+      }
+    }
+    await writeFile(join(destination, "index.html"), renderEvidenceDirectory(directoryPath, files));
+  }
+}
+
+function renderEvidenceDirectory(directoryPath, files) {
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark light"><title>${escapeHtml(directoryPath)} — VoltStream evidence</title><style>:root{color-scheme:dark light;font-family:ui-sans-serif,system-ui,sans-serif;background:#10151b;color:#f4f7fa}body{max-width:800px;margin:auto;padding:3rem}a{color:#7ec8ff}li{margin:.8rem 0}@media(prefers-color-scheme:light){:root{background:#f4f7fa;color:#15212c}a{color:#006eaa}}</style></head><body><h1>${escapeHtml(directoryPath)}</h1><p>Read-only files published for presentation review.</p><ul>${files.map(file => `<li><a href="${escapeHtml(file)}.html">${escapeHtml(file)}</a> · <a href="${escapeHtml(file)}">raw</a></li>`).join("")}</ul></body></html>`;
 }
 
 function renderEvidenceViewer(source, content) {

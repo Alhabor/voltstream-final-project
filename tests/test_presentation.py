@@ -292,6 +292,13 @@ class PresentationContractTests(unittest.TestCase):
             self.assertIn(digest, viewer_html)
             self.assertIn("Open raw file", viewer_html)
 
+        for directory, files in self.evidence.get("directories", {}).items():
+            index = PRESENTATION / "evidence" / directory / "index.html"
+            index_html = index.read_text(encoding="utf-8")
+            for file in files:
+                self.assertIn(f'href="{file}.html"', index_html)
+                self.assertIn(f'href="{file}"', index_html)
+
     def test_build_receipt_matches_final_deck(self):
         receipt = json.loads((PRESENTATION / "BUILD_RECEIPT.json").read_text(encoding="utf-8"))
         self.assertTrue(receipt["ok"])
