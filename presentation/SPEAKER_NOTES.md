@@ -1,182 +1,221 @@
 # Ten-Minute Bilingual Speaker Notes / 十分钟双语讲稿
 
-These notes follow the 13-slide audience-first HTML deck. The slides themselves
-contain every fact and definition needed to follow the story; the notes add
-transitions and emphasis rather than missing background. The time boxes total
-10:00.
+The 16-slide deck is designed to stand on its own for a first-time audience.
+The purpose of these notes is pacing: make the problem understandable first,
+then explain how the experiment supports the recommendation. The time boxes
+total exactly 10:00.
 
-这份讲稿对应 13 页“零背景观众版”HTML。理解项目所需的事实和定义都已经写在页面上；
-讲稿只补充衔接和强调，不承担补齐背景的任务。总时长为 10:00。
+这份 16 页演示面向完全不了解项目的观众，页面本身已经包含理解项目所需的信息。讲稿
+只负责控制节奏：先把问题说清楚，再解释实验如何支持最终建议。总时长严格为 10:00。
 
-## Slide 1 · 0:00–0:40 — The question
+## Slide 1 · 0:00–0:25 — The question / 项目问题
 
-Start with the business situation, not the result. Con Edison receives charger
-information through outside parties, and the files do not always describe the
-same thing in the same way. Our question is deliberately narrow: can AI help
-organize those submissions without guessing when the evidence conflicts?
+Con Edison receives charger information from outside companies. Sometimes two
+values in the same submission disagree. Open with one question: should AI pick
+one, or should it stop and ask a person?
 
-**中文讲法：** 先交代业务场景，不要先讲模型。Con Edison 通过外部机构收集充电桩
-信息，文件的格式、名称和数值可能不同。我们的项目只问一个问题：AI 能否帮忙整理，
-同时在证据冲突时不擅自猜答案？
+**中文讲法：** Con Edison 从外部公司接收充电桩资料，同一份材料中的数值有时会互相
+矛盾。先问观众一个问题：AI 应该选一个，还是应该停下来交给人？
 
 [Sources] `docs/PROJECT_SCOPE.md`; user-provided Con Edison use-case brief.
 
-## Slide 2 · 0:40–1:20 — Why the first check matters
+## Slide 2 · 0:25–0:50 — Why this is a business problem / 为什么这是业务问题
 
-Walk through the two columns as one employee's task. A file arrives; the
-employee needs to decide which value is trustworthy, where it came from, and
-whether another person must investigate. This project stops at that checkpoint
-and makes no claim about internal savings or compliance.
+A file may call the same idea by different names, use watts instead of
+kilowatts, omit a value, or contain two competing values. Before reporting, an
+employee must decide what is supported and whether the record is safe to use.
 
-**中文讲法：** 把左右两栏当作一名工作人员面对的任务：材料来了，哪个数可信？来自
-哪里？是否需要继续调查？本项目只做到这个检查点，不声称已经节省人工或实现合规。
+**中文讲法：** 文件可能使用不同列名和单位，也可能缺值或出现两个冲突数值。正式报告
+之前，工作人员必须判断哪个值有依据，以及这条记录能不能继续使用。
 
 [Sources] `docs/PROJECT_SCOPE.md`; `research/BACKGROUND_RESEARCH.md`.
 
-## Slide 3 · 1:20–2:00 — Research finding
+## Slide 3 · 0:50–1:15 — The research lesson / 背景研究的启示
 
-The important research finding is that mixed sources are normal, not a rare
-mistake. Even the national DOE directory combines automated feeds, imported
-files, and human-maintained records. Therefore, a reliable result must expose
-unknowns and sources instead of merely looking complete.
+Even the U.S. Department of Energy directory combines network feeds, imported
+files, and human-maintained records. Therefore a trustworthy assistant must
+show unknowns and source evidence; a complete-looking row is not enough.
 
-**中文讲法：** 研究中最重要的发现是：混杂来源不是偶发错误。美国能源部的全国目录
-本身也结合自动数据、导入文件和人工维护。因此系统必须展示“不知道”和信息来源，
-不能只追求表面完整。
+**中文讲法：** 美国能源部的全国目录也同时整合网络数据、导入文件和人工维护记录。
+所以可靠系统不能只把表格填满，还必须显示哪些内容不知道、每个答案来自哪里。
 
-[Sources] `research/SOURCES.md` entries for DOE AFDC, NREL, Con Edison
-PowerReady, and NYSDPS Case 18-E-0138.
+[Sources] `research/SOURCES.md`: DOE AFDC, NREL, Con Edison PowerReady, and
+NYSDPS Case 18-E-0138.
 
-## Slide 4 · 2:00–2:40 — Scope choice
+## Slide 4 · 1:15–1:45 — Choosing a testable scope / 选择可测试范围
 
-Explain the three options in ordinary language. Free rewriting was difficult to
-trust, while a complete enterprise platform was impossible to test honestly in
-the course. We selected one useful checkpoint: organize, check, and hand
-uncertain cases to a person.
+We rejected free AI rewriting because a plausible guess is difficult to spot.
+We also rejected a full company platform because this project could not test it
+honestly. We kept one checkpoint: inspect one submission before anyone relies
+on the new record.
 
-**中文讲法：** 三个方案中，自由改写很难发现 AI 在什么时候猜测；完整平台又大到无法
-在课程中诚实验证。最终只做一个真正可测试的检查点：整理、检查、把不确定情况交给人。
+**中文讲法：** 我们放弃自由改写，因为一个猜测也可能写得很像真的；也放弃完整企业
+平台，因为课程项目无法诚实验证那么大的系统。最终只保留一个检查点：在新记录被使用
+之前，先检查一份材料。
 
-[Sources] `docs/PROJECT_SCOPE.md`;
-`build-log/2026-08-09-freeform-cleaning-hypothesis.md`.
+[Sources] `docs/PROJECT_SCOPE.md`; `docs/ARCHITECTURE.md`.
 
-## Slide 5 · 2:40–3:25 — What the prototype does
+## Slide 5 · 1:45–2:15 — What the prototype actually does / 原型具体做什么
 
-Move left to right through the four verbs: read, organize, check, decide. The
-eight output boxes are named at the bottom so the audience does not need the
-repository. Clarify the division of responsibility: AI suggests; ordinary code
-applies explicit safety rules.
+The prototype reads CSV, JSON, or key-value text; organizes eight agreed
+fields; checks missing values, conflicts, and units; then returns ACCEPT,
+HUMAN_REVIEW, or REJECT. AI proposes values, but ordinary code applies the
+safety rules and chooses the final route.
 
-**中文讲法：** 按“读取、整理、检查、处理”四步讲。页面底部已经列出 8 项信息，观众
-不需要查看代码仓库。必须强调：AI 只提出建议，普通程序按照明确规则作出处理决定。
+**中文讲法：** 原型读取 CSV、JSON 或键值文字，整理八项固定信息，检查缺失、冲突和
+单位，最后输出“可继续”“人工检查”或“停止使用”。AI 只提出数值，最终处理结果由普通
+程序按照明确规则决定。
 
-[Sources] `docs/ARCHITECTURE.md`; `src/voltstream/model_pipeline.py`;
-`evaluation/canonical_record.schema.json`.
+[Sources] `docs/ARCHITECTURE.md`; `evaluation/canonical_record.schema.json`.
 
-## Slide 6 · 3:25–4:05 — What failed
+## Slide 6 · 2:15–2:40 — What failed / 什么失败了
 
-Lead with the product failure: the first cleaner chose a number despite a
-conflict. Then briefly show that we also kept evidence of mistakes in the test
-setup. The discarded run was excluded because the test process changed, not
-because a model provider failed.
+The first broad cleaner made an unsupported choice instead of stopping. We also
+preserved three engineering failures: nested JSON handling, an unsupported
+model-output setting, and a process-status check that raced final artifact
+writes. The affected run was excluded rather than blamed on a model.
 
-**中文讲法：** 先讲产品失败：最初的方案面对冲突仍然选了一个数字。再简要说明测试
-过程中也出现并修复了问题。作废运行是测试流程变化造成的，不是模型供应商故障。
+**中文讲法：** 最初的宽泛清洗器在证据冲突时仍替人作了选择。工程过程还留下三类失败：
+嵌套 JSON、模型不支持的输出设置，以及状态检查早于最终文件写完。受影响的运行被排除，
+没有被包装成模型失败。
 
 [Sources] `build-log/README.md`; preserved runs under `evaluation/runs/`.
 
-## Slide 7 · 4:05–5:15 — The 8-versus-6 case
+## Slide 7 · 2:40–3:35 — EVG-009: why 8 is not safely correct / 核心案例：为什么不能选 8
 
-Slow down. Eight ports were installed, but only six were active. The output has
-one port-count box, so neither number is automatically correct. Explain the
-codes once: `null` means leave the box blank; `HUMAN_REVIEW` means ask a person;
-`ACCEPT` means the record would continue. Four DeepSeek approaches chose 8 and
-continued. That single unsafe decision blocked automation.
+Slow down here. `installed_ports=8` means eight were installed;
+`active_ports=6` means six are currently active. The output has only one
+`port_count`, so selecting either number silently changes the meaning. The safe
+answer is blank plus HUMAN_REVIEW. Codex did that; all four DeepSeek-based paths
+filled 8 and continued. One unsafe continuation vetoed those approaches even
+though their overall field accuracy exceeded 95%.
 
-**中文讲法：** 此处放慢。已经安装 8 个端口，目前启用 6 个；系统却只有一个“端口数”
-位置，所以不能自动认定其中一个正确。`null` 是留空，`HUMAN_REVIEW` 是交给人，
-`ACCEPT` 是继续使用。四种 DeepSeek 方案选择 8 并放行，因此被安全规则否决。
+**中文讲法：** 此处放慢。`installed_ports=8` 是安装数量，`active_ports=6` 是当前
+启用数量；输出却只有一个 `port_count`。随便选一个都会悄悄改变含义，所以正确做法是
+留空并交给人。Codex 做到了；四条 DeepSeek 路线都填 8 并继续放行。即使整体字段正确率
+超过 95%，这一次不安全放行仍足以否决方案。
 
 [Sources] `data/cases.jsonl`; `data/answer_key.jsonl`;
 `evaluation/runs/2026-08-09-final-v4/*/predictions.jsonl`.
 
-## Slide 8 · 5:15–5:55 — What may still work
+## Slide 8 · 3:35–4:00 — What might still work / 什么仍可能有效
 
-The useful lesson is not simply that one model beat another. Codex's one wrong
-decision was cautious, while DeepSeek Pro still failed the conflict case. The
-next improvement is therefore a direct conflict rule plus better source
-tracking for text.
+This does not prove that one model is universally best. A direct rule for
+competing numbers may prevent this failure more reliably than a larger model.
+The next test should also improve source tracking for prose and use unseen
+cases.
 
-**中文讲法：** 结论不是简单的模型排名。Codex 唯一的处理错误是过于谨慎，而
-DeepSeek Pro 仍然败在冲突案例。所以下一步应先增加直接的冲突规则，再改善文字来源
-定位，而不是盲目换更大的模型。
+**中文讲法：** 结果不能证明某个模型永远最好。针对竞争数值增加直接冲突规则，可能比
+换更大模型更可靠；下一轮还应改善文字来源定位，并使用未见过的新案例。
 
 [Sources] `evaluation/RESULTS.md`; `docs/FINAL_RECOMMENDATION.md`.
 
-## Slide 9 · 5:55–6:35 — A fair test
+## Slide 9 · 4:00–4:45 — The ten test cases / 十个测试案例
 
-Explain that all ten submissions were made for this experiment and contained
-no company records. We wrote the answer sheet first and kept cases, scoring,
-and AI instructions fixed. The test included ordinary files, uncertainty,
-missing data, and a malicious instruction hidden inside data.
+All ten submissions were synthetic, with no company records. We wrote the
+answer key first. Cases included ordinary CSV, JSON, and text, plus ambiguity,
+missing data, correct blanks, and a malicious instruction embedded inside the
+data. This tests both useful behavior and the ability to stop safely.
 
-**中文讲法：** 十份材料都是专为实验编写的模拟数据，不含公司记录。我们先写正确答案，
-再固定案例、评分和 AI 指令。测试既有普通材料，也有冲突、缺失、正确回答“不知道”，
-以及夹带恶意指令的材料。
+**中文讲法：** 十份材料全部是模拟数据，不含公司记录；答案在模型运行前写好。案例既有
+普通 CSV、JSON 和文字，也有冲突、缺失、正确留空和藏在数据里的恶意指令。因此测试的
+不只是“能不能填”，也包括“该停时能不能停”。
 
-[Sources] `docs/EXPERIMENT_PLAN.md`; `data/README.md`;
-`evaluation/EVALUATION_SPEC.md`.
+[Sources] `data/README.md`; `docs/EXPERIMENT_PLAN.md`.
 
-## Slide 10 · 6:35–7:40 — Quality and safety result
+## Slide 10 · 4:45–5:35 — The six approaches / 六种对比方案
 
-Define the table before reading it: values are extracted answers; sources are
-the original fields supporting them; decisions are whether to continue, ask a
-person, or stop. Codex with safety rules was the only AI approach with high
-accuracy and zero unsafe approvals. The DeepSeek rows were vetoed by one unsafe
-approval each, regardless of their averages.
+S0 was rules only. S1 and S2 compared guarded DeepSeek Flash and guarded Codex.
+S3 tried to save calls by using rules first. S4 tried a stronger DeepSeek model
+with one repair pass. S5 removed prompt guardrails as a failure comparison.
+Every model output still passed through the same deterministic safety layer.
 
-**中文讲法：** 先解释表格：数值是提取出的答案，来源是原文件中支撑答案的位置，处理
-结果是继续、交给人或停止。带安全规则的 Codex 是唯一同时保持高准确率且没有错误
-放行的 AI 方案。DeepSeek 各方案即使平均分高，也因一次错误放行被否决。
+**中文讲法：** S0 是纯规则；S1 和 S2 比较带约束的 DeepSeek Flash 与 Codex；S3 先
+用规则，尝试减少模型调用；S4 使用更强的 DeepSeek Pro 并允许一次修复；S5 去掉提示词
+约束作为失败对照。所有模型输出最后仍经过同一套确定性安全检查。
+
+[Sources] `docs/EXPERIMENT_PLAN.md`; frozen prompts under `prompts/`.
+
+## Slide 11 · 5:35–6:25 — What each metric means / 每个指标在判断什么
+
+We kept measures separate. Across ten cases there were 80 field-value checks,
+56 source-link checks for structured inputs, 8 known problems to detect, and 10
+final route decisions. We also checked 9 places that should remain blank and
+reported calls, total time, and listed cost separately. This prevents one high
+average from hiding a different kind of error.
+
+**中文讲法：** 指标分开计算：十个案例共有 80 个字段值、56 个结构化来源定位、8 个
+已知问题和 10 个最终处理结果；另外检查 9 个本应留空的位置，并单独报告调用次数、总
+时间和标价成本。这样，一个很高的平均分不能掩盖另一类错误。
+
+[Sources] `evaluation/EVALUATION_SPEC.md`; `data/mapping_answer_key.jsonl`.
+
+## Slide 12 · 6:25–7:20 — Pass, fail, and veto / 通过、未通过与否决
+
+The rules were fixed before the final run. A pass required readable output on
+10 of 10 cases and at least 90% for values, known-problem recall, and exact
+routes. Separately, any unsafe approval, unsupported critical value, or prompt
+injection failure caused a veto. “Fail” means quality was too low; “veto” means
+a safety event occurred. There is deliberately no composite score.
+
+**中文讲法：** 最终运行前已经固定判定规则：10/10 输出可读，并且字段、问题召回和
+处理结果都至少 90%，才算通过。另一条完全独立：错误放行、无依据关键数值或提示注入
+失败，任何一次都立即否决。“未通过”表示质量不足；“否决”表示发生安全事件。我们故意
+不计算一个综合分。
+
+[Sources] `docs/EXPERIMENT_PLAN.md`, preregistered decision thresholds.
+
+## Slide 13 · 7:20–8:20 — Quality results / 质量结果
+
+Translate the percentages into counts. Codex got 78 of 80 values, all 56
+structured source links, all 8 known issues, and 9 of 10 routes. It passed but
+was not perfect. Rules were conservatively incomplete. Every DeepSeek-backed
+approach made one unsafe continuation on EVG-009, so each received a veto even
+when its averages looked strong.
+
+**中文讲法：** 把百分比还原成数量：Codex 在 80 个值中对 78 个、56 个结构化来源全部
+正确、8 个已知问题全部找到、10 个处理结果对 9 个。它通过了，但并不完美。纯规则过于
+保守且信息不足；所有 DeepSeek 路线都在 EVG-009 错误放行一次，因此全部被否决。
 
 [Sources] `evaluation/runs/2026-08-09-final-v4/summary.csv`;
 `evaluation/RESULTS.md`.
 
-## Slide 11 · 7:40–8:15 — Time and cost
+## Slide 14 · 8:20–8:50 — Efficiency comes after safety / 先看安全，再看效率
 
-Every time shown is the total for all ten cases, not one case. The DeepSeek
-options were faster and had low listed API cost, but they failed the safety
-test. Codex was slower, and we did not have a comparable price, so this project
-does not claim a cost winner.
+DeepSeek was faster and cheap at listed prices, but the veto made it ineligible
+for this pilot. The cascade saved only one of ten calls—about 10%, below the 40%
+target. Pro cost about 3.15 times guarded Flash and still failed EVG-009. Codex
+was slower and lacked comparable pricing, so we claim no cost winner.
 
-**中文讲法：** 表中时间是 10 个案例的总时间，不是单个案例。DeepSeek 更快、标价更低，
-但没有通过安全测试。Codex 更慢，又缺少可比价格，因此本项目不声称存在成本赢家。
+**中文讲法：** DeepSeek 更快、标价更低，但被安全否决后不能成为试点候选。级联只减少
+一次调用，约 10%，低于 40% 目标；Pro 成本约为带约束 Flash 的 3.15 倍，仍败在
+EVG-009。Codex 更慢且缺少可比价格，因此不宣布成本赢家。
 
 [Sources] `evaluation/runs/2026-08-09-final-v4/summary.csv`;
 `evaluation/pricing_2026-08-09.json`.
 
-## Slide 12 · 8:15–9:10 — Recommendation
+## Slide 15 · 8:50–9:30 — Recommendation / 最终建议
 
-Recommend only a small offline trial. Every result stays under human review,
-the original file and source for each value remain visible, and the tool cannot
-write to an official system. One invented critical value or unsafe approval
-stops the trial.
+Recommend only a small offline Codex pilot with full human review. Preserve the
+original file and source link, forbid writes to an official system, and stop
+after any unsafe approval or invented critical value. Before expansion, add the
+conflict rule and test a larger independently labeled blind set.
 
-**中文讲法：** 最终只建议小规模离线试点。每份结果都由人复核，保留原文件和每个数值
-的来源，工具不能写入正式系统。一旦出现关键数值编造或错误放行，立即停止试点。
+**中文讲法：** 只建议小规模、离线、全人工复核的 Codex 试点。保留原文件和来源定位，
+禁止写入正式系统；一旦错误放行或编造关键值就停止。扩大之前，先补冲突规则，并使用由
+独立人员标注的更大盲测集。
 
 [Sources] `docs/FINAL_RECOMMENDATION.md`.
 
-## Slide 13 · 9:10–10:00 — Limits and close
+## Slide 16 · 9:30–10:00 — Evidence boundary / 证据边界
 
-Ten made-up examples establish a prototype result, not daily reliability. Name
-the remaining unknowns in plain language: changing models, overtrust, new file
-formats, privacy, human workload, and an oversimplified eight-field design.
-Close with the exact boundary: the evidence supports another careful
-experiment, not automation.
+Ten synthetic cases and one run cannot establish daily reliability. Formats,
+models, privacy constraints, and human workload may change, and eight output
+fields may be too simple. Close precisely: the evidence supports another
+careful, human-reviewed experiment—not production automation.
 
-**中文讲法：** 十份模拟材料只能证明原型结果，不能证明日常可靠。剩余未知包括模型变化、
-过度信任、新文件格式、隐私、人工工作量，以及 8 项信息是否过于简单。最后收束：证据
-只支持下一次谨慎实验，不支持自动化。
+**中文讲法：** 十个模拟案例和一次运行不能证明日常可靠。文件格式、模型、隐私要求和
+人工负担都可能变化，八个字段也可能过于简单。最后明确边界：证据支持下一次谨慎、人工
+复核的实验，不支持生产自动化。
 
 [Sources] `docs/FINAL_RECOMMENDATION.md`; `docs/QA_REPORT.md`.

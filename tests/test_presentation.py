@@ -23,7 +23,6 @@ class PresentationContractTests(unittest.TestCase):
     def test_slide_count_ids_and_required_order(self):
         slides = self.source["slides"]
         self.assertGreaterEqual(len(slides), 11)
-        self.assertLessEqual(len(slides), 13)
         self.assertEqual(len({slide["id"] for slide in slides}), len(slides))
         required = [
             "Problem area and why",
@@ -87,7 +86,7 @@ class PresentationContractTests(unittest.TestCase):
         """The visible deck must define its situation, process, and test language."""
         english_explanations = [
             "Con Edison receives charger information through outside contractors",
-            "The prototype does four simple things",
+            "One clear decision before anyone relies on a new record",
             "The 8 boxes are station ID",
             "no company records were used",
             "Codex and DeepSeek are two families of generative AI models",
@@ -96,7 +95,7 @@ class PresentationContractTests(unittest.TestCase):
         ]
         chinese_explanations = [
             "Con Edison 通过外部承包商和数据公司收集充电桩信息",
-            "这个原型只做四件容易理解的事情",
+            "在任何人依赖新记录之前，先作出一次清晰判断",
             "8 项信息分别是",
             "没有使用公司记录",
             "Codex 和 DeepSeek 是两类生成式 AI 模型",
@@ -105,6 +104,39 @@ class PresentationContractTests(unittest.TestCase):
         ]
         for text in english_explanations + chinese_explanations:
             self.assertIn(html.escape(text), self.document)
+
+    def test_visible_decision_rules_match_preregistered_thresholds(self):
+        judgement = next(
+            slide for slide in self.source["slides"] if slide["layout"] == "judgement"
+        )
+        self.assertEqual(
+            [rule["threshold"] for rule in judgement["qualityRules"]],
+            ["10 of 10 cases", "at least 90%", "at least 90%", "at least 90%"],
+        )
+        self.assertEqual(len(judgement["vetoRules"]), 3)
+        for phrase in [
+            "unsafe approval",
+            "critical value not supported",
+            "malicious instruction",
+            "There is no single average score",
+        ]:
+            self.assertIn(phrase, self.document)
+
+    def test_experiment_components_are_explained_before_results(self):
+        """A first-time audience must see what was compared and what was measured."""
+        slides = {slide["id"]: slide for slide in self.source["slides"]}
+        self.assertEqual(
+            [strategy["code"] for strategy in slides["strategies"]["strategies"]],
+            ["S0", "S1", "S2", "S3", "S4", "S5"],
+        )
+        self.assertEqual(
+            [metric["value"] for metric in slides["metrics"]["metricsDetail"]],
+            ["80", "56", "8", "10", "9", "3"],
+        )
+        slide_ids = [slide["id"] for slide in self.source["slides"]]
+        self.assertLess(slide_ids.index("strategies"), slide_ids.index("metrics"))
+        self.assertLess(slide_ids.index("metrics"), slide_ids.index("system"))
+        self.assertLess(slide_ids.index("system"), slide_ids.index("quality"))
 
     def test_frozen_experiment_values_survive_plain_language_rewrite(self):
         """Changing the narrative must not change the final-v4 evidence."""

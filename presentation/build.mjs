@@ -156,6 +156,8 @@ const html = `<!doctype html>
     }
     .slide-copy[data-copy="zh"] h1,
     .slide-copy[data-copy="zh"] h2 { letter-spacing: -.02em; }
+    .slide-copy[data-copy="zh"] h1 { max-width: 15ch; }
+    .slide-copy[data-copy="zh"] h2 { max-width: 24ch; }
     .slide-copy[data-copy="zh"] .eyebrow { letter-spacing: .08em; }
     @keyframes reveal { from { opacity: 0; transform: translateX(calc(var(--u) * .7)); } }
     .slide::after {
@@ -179,27 +181,29 @@ const html = `<!doctype html>
     }
     h1, h2, h3, p { margin-top: 0; }
     h1 {
-      max-width: 13ch;
+      max-width: 16ch;
       margin-bottom: calc(var(--u) * 1.1);
-      font-size: calc(var(--u) * 5.15);
-      line-height: .98;
+      font-size: calc(var(--u) * 4.8);
+      line-height: 1.01;
       letter-spacing: -.045em;
+      text-wrap: balance;
     }
     h2 {
-      max-width: 29ch;
+      max-width: 34ch;
       margin-bottom: 0;
-      font-size: calc(var(--u) * 2.75);
+      font-size: calc(var(--u) * 3.05);
       line-height: 1.08;
       letter-spacing: -.028em;
+      text-wrap: balance;
     }
     h3 {
       margin-bottom: calc(var(--u) * .7);
       color: var(--blue);
-      font-size: calc(var(--u) * 1.35);
+      font-size: calc(var(--u) * 1.48);
       line-height: 1.15;
     }
-    p, li, td, th { font-size: calc(var(--u) * 1.2); line-height: 1.4; }
-    .lead { max-width: 50ch; color: var(--ink); font-size: calc(var(--u) * 1.55); line-height: 1.35; }
+    p, li, td, th { font-size: calc(var(--u) * 1.32); line-height: 1.38; }
+    .lead { max-width: 54ch; color: var(--ink); font-size: calc(var(--u) * 1.65); line-height: 1.34; }
     .large-claim { max-width: 41ch; font-size: calc(var(--u) * 1.78); line-height: 1.3; }
     .accent { color: var(--blue); }
     .good { color: var(--green); }
@@ -231,7 +235,7 @@ const html = `<!doctype html>
     ul { margin: 0; padding-left: calc(var(--u) * 1.35); }
     li { margin: 0 0 calc(var(--u) * .55); }
     li::marker { color: var(--blue); }
-    .note-line { margin-top: calc(var(--u) * 1.15); color: var(--muted); font-size: calc(var(--u) * 1.02); }
+    .note-line { margin-top: calc(var(--u) * 1.15); color: var(--muted); font-size: calc(var(--u) * 1.12); line-height: 1.34; }
 
     .hero-body { align-content: end; gap: calc(var(--u) * 1.45); }
     .decision-band {
@@ -244,7 +248,7 @@ const html = `<!doctype html>
     .metric-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: calc(var(--u) * 1.2); }
     .metric { padding-top: calc(var(--u) * .85); border-top: 1px solid var(--line); }
     .metric strong { display: block; color: var(--blue); font-size: calc(var(--u) * 2.35); line-height: 1; }
-    .metric span { color: var(--muted); font-size: calc(var(--u) * .9); }
+    .metric span { color: var(--muted); font-size: calc(var(--u) * 1.08); line-height: 1.25; }
 
     .fact-box {
       display: grid;
@@ -263,6 +267,17 @@ const html = `<!doctype html>
     .choice[data-status="Stopped"] { border-color: var(--red); }
     .status { display: inline-block; margin-bottom: calc(var(--u) * 1.2); color: var(--muted); font-size: calc(var(--u) * .9); font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
 
+    .scope-top { display: grid; grid-template-columns: 1fr 1fr 1.3fr; gap: calc(var(--u) * 1.15); margin-bottom: calc(var(--u) * 1.45); }
+    .scope-option { padding: calc(var(--u) * 1.05); border-top: 3px solid var(--red); background: var(--panel); }
+    .scope-option strong, .scope-selected strong { display: block; margin-bottom: calc(var(--u) * .35); font-size: calc(var(--u) * 1.26); }
+    .scope-option span { color: var(--muted); font-size: calc(var(--u) * 1.06); line-height: 1.28; }
+    .scope-selected { padding: calc(var(--u) * 1.05); border-top: 3px solid var(--green); background: var(--good-tint); }
+    .scope-selected span { color: var(--green); font-size: calc(var(--u) * 1.08); font-weight: 800; }
+    .scope-flow .flow-number { width: calc(var(--u) * 3.25); height: calc(var(--u) * 3.25); font-size: calc(var(--u) * 1.35); }
+    .scope-flow .flow::before { top: calc(var(--u) * 1.62); }
+    .scope-flow .flow-step h3 { margin-bottom: calc(var(--u) * .35); }
+    .scope-flow .flow-step p { margin-bottom: 0; font-size: calc(var(--u) * 1.08); }
+
     .flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: calc(var(--u) * 1.55); position: relative; }
     .flow::before { content: ""; position: absolute; top: calc(var(--u) * 2); left: 9%; right: 9%; height: 2px; background: var(--line); }
     .flow-step { position: relative; text-align: center; }
@@ -270,11 +285,11 @@ const html = `<!doctype html>
     .flow-step p { color: var(--muted); }
     .guardrail { margin-top: calc(var(--u) * 1.35); padding: calc(var(--u) * 1.05) calc(var(--u) * 1.35); border-left: 3px solid var(--green); background: var(--good-tint); font-size: calc(var(--u) * 1.25); }
 
-    .failure-grid { display: grid; grid-template-columns: .85fr 1.15fr; gap: calc(var(--u) * 2.3); }
+    .failure-grid { display: grid; grid-template-columns: .85fr 1.15fr; gap: calc(var(--u) * 2.3); min-height: calc(var(--u) * 15.5); }
     .primary-failure { padding: calc(var(--u) * 1.5); border-left: 3px solid var(--red); background: var(--bad-tint); font-size: calc(var(--u) * 1.42); line-height: 1.35; }
     .event { display: grid; grid-template-columns: calc(var(--u) * 6.2) 1fr; gap: calc(var(--u) * 1); margin-bottom: calc(var(--u) * .85); padding-bottom: calc(var(--u) * .85); border-bottom: 1px solid var(--line); }
     .event strong { color: var(--blue); font-size: calc(var(--u) * 1.04); }
-    .event span { color: var(--muted); font-size: calc(var(--u) * 1.02); line-height: 1.3; }
+    .event span { color: var(--muted); font-size: calc(var(--u) * 1.08); line-height: 1.3; }
 
     .conflict { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: calc(var(--u) * 1.2); }
     .source-value { padding: calc(var(--u) * 1.1); text-align: center; border: 1px solid var(--line); background: var(--panel); }
@@ -283,11 +298,11 @@ const html = `<!doctype html>
     .canonical-answer { margin: calc(var(--u) * 1.1) auto; text-align: center; }
     .canonical-answer strong { color: var(--green); font-size: calc(var(--u) * 1.65); }
     .outcome-table { width: 100%; border-collapse: collapse; }
-    .outcome-table td { padding: calc(var(--u) * .62) calc(var(--u) * .8); border-bottom: 1px solid var(--line); font-size: calc(var(--u) * 1.02); }
+    .outcome-table td { padding: calc(var(--u) * .7) calc(var(--u) * .8); border-bottom: 1px solid var(--line); font-size: calc(var(--u) * 1.12); }
     .outcome-table td:last-child { text-align: right; font-weight: 800; }
 
     .signal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: calc(var(--u) * 1.6); }
-    .signal { padding: calc(var(--u) * 1.5); border-top: 3px solid var(--line); background: var(--panel); }
+    .signal { min-height: calc(var(--u) * 10.5); padding: calc(var(--u) * 1.5); border-top: 3px solid var(--line); background: var(--panel); }
     .signal:first-child { border-top-color: var(--green); }
     .signal-value { color: var(--blue); font-size: calc(var(--u) * 1.65); font-weight: 850; }
     .next-step { margin-top: calc(var(--u) * 1.2); padding-top: calc(var(--u) * 1.05); border-top: 1px solid var(--line); color: var(--muted); font-size: calc(var(--u) * 1.18); }
@@ -295,15 +310,41 @@ const html = `<!doctype html>
     .number-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: calc(var(--u) * 1.1); }
     .number { padding: calc(var(--u) * 1.05); border-top: 2px solid var(--blue-strong); background: var(--panel); }
     .number strong { display: block; color: var(--blue); font-size: calc(var(--u) * 2.4); line-height: 1; }
-    .number span { color: var(--muted); font-size: calc(var(--u) * .92); }
+    .number span { color: var(--muted); font-size: calc(var(--u) * 1.08); }
     .tag-row { display: flex; flex-wrap: wrap; gap: calc(var(--u) * .6); margin-top: calc(var(--u) * 1.2); }
-    .tag { padding: calc(var(--u) * .42) calc(var(--u) * .7); border: 1px solid var(--line); color: var(--muted); font-size: calc(var(--u) * .9); }
+    .tag { padding: calc(var(--u) * .48) calc(var(--u) * .76); border: 1px solid var(--line); color: var(--muted); font-size: calc(var(--u) * 1.08); }
+
+    .strategy-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: calc(var(--u) * .9); }
+    .strategy-card { min-height: calc(var(--u) * 8.2); padding: calc(var(--u) * 1); border-top: 2px solid var(--line); background: var(--panel); }
+    .strategy-head { display: flex; align-items: baseline; gap: calc(var(--u) * .6); margin-bottom: calc(var(--u) * .45); }
+    .strategy-code { color: var(--blue); font-size: calc(var(--u) * 1.22); font-weight: 900; }
+    .strategy-role { color: var(--green); font-size: calc(var(--u) * 1.04); font-weight: 800; }
+    .strategy-card h3 { margin-bottom: calc(var(--u) * .4); font-size: calc(var(--u) * 1.24); }
+    .strategy-card p { margin-bottom: 0; color: var(--muted); font-size: calc(var(--u) * 1.08); line-height: 1.28; }
+
+    .metric-detail-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: calc(var(--u) * .9); }
+    .metric-detail { min-height: calc(var(--u) * 7.7); padding: calc(var(--u) * 1.05); border-top: 2px solid var(--blue-strong); background: var(--panel); }
+    .metric-detail strong { display: block; color: var(--blue); font-size: calc(var(--u) * 2.05); line-height: 1; }
+    .metric-detail h3 { margin: calc(var(--u) * .42) 0; font-size: calc(var(--u) * 1.24); }
+    .metric-detail p { margin-bottom: 0; color: var(--muted); font-size: calc(var(--u) * 1.08); line-height: 1.28; }
+
+    .judgement-grid { display: grid; grid-template-columns: 1.08fr .92fr; gap: calc(var(--u) * 1.7); }
+    .rule-list { display: grid; gap: calc(var(--u) * .55); }
+    .quality-rule { display: flex; justify-content: space-between; gap: calc(var(--u) * 1); padding: calc(var(--u) * .72) calc(var(--u) * .9); border-bottom: 1px solid var(--line); background: var(--panel); }
+    .quality-rule span { font-size: calc(var(--u) * 1.1); }
+    .quality-rule strong { color: var(--green); font-size: calc(var(--u) * 1.1); white-space: nowrap; }
+    .veto-box { padding: calc(var(--u) * 1.1); border-left: 4px solid var(--red); background: var(--bad-tint); }
+    .veto-box li { margin-bottom: calc(var(--u) * .7); font-size: calc(var(--u) * 1.1); }
+    .result-key { display: grid; grid-template-columns: repeat(3, 1fr); gap: calc(var(--u) * .75); margin-top: calc(var(--u) * 1.05); }
+    .result-item { padding: calc(var(--u) * .72); border-top: 2px solid var(--line); }
+    .result-item strong { display: block; color: var(--blue); font-size: calc(var(--u) * 1.12); }
+    .result-item span { color: var(--muted); font-size: calc(var(--u) * 1.08); line-height: 1.25; }
 
     .score-wrap { align-content: start; }
     .score-table, .efficiency-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
     .score-table th, .score-table td, .efficiency-table th, .efficiency-table td { padding: calc(var(--u) * .5) calc(var(--u) * .52); border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
-    .score-table th, .efficiency-table th { color: var(--blue); font-size: calc(var(--u) * .86); letter-spacing: .04em; }
-    .score-table td, .efficiency-table td { font-size: calc(var(--u) * .88); }
+    .score-table th, .efficiency-table th { color: var(--blue); font-size: calc(var(--u) * 1.08); letter-spacing: .025em; }
+    .score-table td, .efficiency-table td { font-size: calc(var(--u) * 1.08); }
     .score-table th:first-child, .score-table td:first-child, .efficiency-table th:first-child, .efficiency-table td:first-child { width: 25%; text-align: left; }
     .score-table tr.winner { background: var(--good-tint); }
     .score-table tr.winner td:first-child { color: var(--green); font-weight: 850; }
@@ -312,7 +353,7 @@ const html = `<!doctype html>
     .efficiency-table th:first-child, .efficiency-table td:first-child { width: 29%; }
     .efficiency-table td:last-child { font-weight: 800; }
     .findings { display: grid; grid-template-columns: repeat(3, 1fr); gap: calc(var(--u) * .9); margin-top: calc(var(--u) * 1); }
-    .finding { padding: calc(var(--u) * .8); border-top: 1px solid var(--line); color: var(--muted); font-size: calc(var(--u) * .86); line-height: 1.3; }
+    .finding { padding: calc(var(--u) * .82); border-top: 1px solid var(--line); color: var(--muted); font-size: calc(var(--u) * 1.08); line-height: 1.3; }
 
     .recommendation-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: calc(var(--u) * 2); }
     .decision { padding: calc(var(--u) * 1.45); border-left: 4px solid var(--green); background: var(--good-tint); font-size: calc(var(--u) * 1.42); line-height: 1.35; }
@@ -323,10 +364,10 @@ const html = `<!doctype html>
     .gate-list li { counter-increment: gate; position: relative; padding-left: calc(var(--u) * 1.7); }
     .gate-list li::before { content: counter(gate); position: absolute; left: 0; color: var(--blue); font-weight: 900; }
 
-    .risk-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: calc(var(--u) * .85) calc(var(--u) * 1.2); }
+    .risk-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: calc(var(--u) * .85) calc(var(--u) * 1.2); min-height: calc(var(--u) * 10.5); }
     .risk { padding-top: calc(var(--u) * .65); border-top: 1px solid var(--line); }
-    .risk strong { display: block; margin-bottom: calc(var(--u) * .2); color: var(--amber); font-size: calc(var(--u) * 1.02); }
-    .risk span { color: var(--muted); font-size: calc(var(--u) * .88); line-height: 1.25; }
+    .risk strong { display: block; margin-bottom: calc(var(--u) * .25); color: var(--amber); font-size: calc(var(--u) * 1.12); }
+    .risk span { color: var(--muted); font-size: calc(var(--u) * 1.08); line-height: 1.28; }
     .close-line { margin-top: calc(var(--u) * .9); color: var(--blue); font-size: calc(var(--u) * 1.45); font-weight: 800; }
 
     .controls {
@@ -566,7 +607,7 @@ console.log(`Built ${deck.slides.length} slides: ${outputPath}`);
 
 function validateDeck(value) {
   if (!value || !Array.isArray(value.slides)) throw new Error("slides.json must contain a slides array");
-  if (value.slides.length < 11 || value.slides.length > 13) throw new Error("Deck must contain 11–13 slides");
+  if (value.slides.length < 11) throw new Error("Deck must contain at least 11 slides");
   const ids = value.slides.map((slide) => slide.id);
   if (new Set(ids).size !== ids.length) throw new Error("Slide IDs must be unique");
   const required = [
@@ -625,6 +666,8 @@ function renderBody(slide, language) {
       return `<div class="fact-box"><div class="fact-label">${isChinese ? "我们查到的事实" : "What we found"}</div><div><p class="fact-copy">${escapeHtml(slide.fact)}</p><p class="implication large-claim"><span class="accent">${isChinese ? "这意味着：" : "What this means:"}</span> ${escapeHtml(slide.implication)}</p><p class="source-line">${escapeHtml(slide.sources)}</p></div></div>`;
     case "choices":
       return `<div class="choices">${slide.choices.map(choice => `<article class="choice" data-status="${escapeHtml(choice.status)}"><span class="status">${escapeHtml(choice.statusLabel || choice.status)}</span><h3>${escapeHtml(choice.name)}</h3><p class="muted">${escapeHtml(choice.description)}</p></article>`).join("")}</div><p class="note-line">${escapeHtml(slide.note)}</p>`;
+    case "scope-flow":
+      return `<div class="scope-flow"><div class="scope-top">${slide.rejected.map(item => `<div class="scope-option"><strong>${escapeHtml(item.name)}</strong><span>${escapeHtml(item.reason)}</span></div>`).join("")}<div class="scope-selected"><span>${isChinese ? "最终选择" : "SELECTED"}</span><strong>${escapeHtml(slide.selected)}</strong></div></div><div class="flow">${slide.steps.map(step => `<article class="flow-step"><div class="flow-number">${escapeHtml(step.number)}</div><h3>${escapeHtml(step.title)}</h3><p>${escapeHtml(step.detail)}</p></article>`).join("")}</div><p class="guardrail">${escapeHtml(slide.note)}</p></div>`;
     case "flow":
       return `<div class="flow">${slide.steps.map(step => `<article class="flow-step"><div class="flow-number">${escapeHtml(step.number)}</div><h3>${escapeHtml(step.title)}</h3><p>${escapeHtml(step.detail)}</p></article>`).join("")}</div><p class="guardrail">${escapeHtml(slide.guardrail)}</p><p class="note-line">${escapeHtml(slide.excluded)}</p>`;
     case "failure":
@@ -635,6 +678,12 @@ function renderBody(slide, language) {
       return `<div class="signal-grid">${slide.signals.map(signal => `<article class="signal"><h3>${escapeHtml(signal.title)}</h3><p class="signal-value">${escapeHtml(signal.value)}</p><p class="muted">${escapeHtml(signal.description)}</p></article>`).join("")}</div><p class="next-step"><span class="accent">${isChinese ? "下一步：" : "Next step:"}</span> ${escapeHtml(slide.next)}</p>`;
     case "testing":
       return `<div class="number-row">${slide.numbers.map(number => `<div class="number"><strong>${escapeHtml(number.value)}</strong><span>${escapeHtml(number.label)}</span></div>`).join("")}</div><div class="tag-row">${slide.coverage.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join("")}</div><p class="note-line">${escapeHtml(slide.method)}</p><p class="guardrail">${escapeHtml(slide.gate)}</p>`;
+    case "strategies":
+      return `<div class="strategy-grid">${slide.strategies.map(strategy => `<article class="strategy-card"><div class="strategy-head"><span class="strategy-code">${escapeHtml(strategy.code)}</span><span class="strategy-role">${escapeHtml(strategy.role)}</span></div><h3>${escapeHtml(strategy.name)}</h3><p>${escapeHtml(strategy.detail)}</p></article>`).join("")}</div><p class="note-line">${escapeHtml(slide.note)}</p>`;
+    case "metrics":
+      return `<div class="metric-detail-grid">${slide.metricsDetail.map(metric => `<article class="metric-detail"><strong>${escapeHtml(metric.value)}</strong><h3>${escapeHtml(metric.name)}</h3><p>${escapeHtml(metric.detail)}</p></article>`).join("")}</div><p class="note-line">${escapeHtml(slide.note)}</p>`;
+    case "judgement":
+      return `<div class="judgement-grid"><div><h3>${escapeHtml(slide.qualityTitle)}</h3><div class="rule-list">${slide.qualityRules.map(rule => `<div class="quality-rule"><span>${escapeHtml(rule.measure)}</span><strong>${escapeHtml(rule.threshold)}</strong></div>`).join("")}</div></div><div><div class="veto-box"><h3>${escapeHtml(slide.vetoTitle)}</h3>${list(slide.vetoRules)}</div><div class="result-key">${slide.resultKey.map(result => `<div class="result-item"><strong>${escapeHtml(result.label)}</strong><span>${escapeHtml(result.meaning)}</span></div>`).join("")}</div></div></div><p class="note-line">${escapeHtml(slide.note)}</p>`;
     case "score-table":
       return `<table class="score-table"><thead><tr>${slide.columns.map(column => `<th>${escapeHtml(column)}</th>`).join("")}</tr></thead><tbody>${slide.rows.map((row, rowIndex) => `<tr class="${rowIndex === 1 ? "winner" : ""}">${row.map((cell, index) => `<td class="${index === row.length - 1 ? (["Pass", "通过"].includes(cell) ? "pass" : ["Veto", "否决"].includes(cell) ? "veto" : "") : ""}">${escapeHtml(cell)}</td>`).join("")}</tr>`).join("")}</tbody></table><p class="note-line">${escapeHtml(slide.note)}</p>`;
     case "efficiency":

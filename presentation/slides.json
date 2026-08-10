@@ -9,7 +9,7 @@
       "section": "Problem area and why",
       "layout": "hero",
       "eyebrow": "Con Edison EV charger data · Capstone project",
-      "title": "When charger records disagree, should AI choose a number?",
+      "title": "When charger records disagree, should AI decide?",
       "lead": "Con Edison receives charger information through outside contractors and data companies. Those submissions can use different formats, names, and values.",
       "boundary": "We built and tested a small AI assistant that organizes each submission, checks for problems, and knows when a person must decide.",
       "metrics": [
@@ -24,7 +24,7 @@
       "section": "Problem area and why",
       "layout": "split",
       "eyebrow": "01 · The business problem",
-      "title": "A simple data-entry task becomes difficult when files disagree",
+      "title": "Messy files turn data entry into a judgment call",
       "lead": "A contractor may send a spreadsheet, an API record, or a note. The same charger can be described differently—or have important information missing.",
       "leftTitle": "What arrives",
       "leftItems": [
@@ -45,7 +45,7 @@
       "section": "Background research and surprising fact",
       "layout": "fact",
       "eyebrow": "02 · What we learned from research",
-      "title": "Mixed data is normal—even in a national charger directory",
+      "title": "Even national databases combine mismatched sources",
       "fact": "The U.S. Department of Energy's charging-station directory combines daily network feeds, spreadsheet/CSV imports, and records maintained by people.",
       "implication": "A useful system must show what it knows, what it does not know, and which original field supports each answer. A complete-looking row is not enough.",
       "sources": "Sources: DOE Alternative Fuels Data Center; NREL developer documentation; Con Edison PowerReady; NYSDPS Case 18-E-0138."
@@ -55,47 +55,35 @@
       "section": "Ideation process",
       "layout": "choices",
       "eyebrow": "03 · How we chose the project scope",
-      "title": "We chose the smallest useful part of a much larger problem",
+      "title": "We rejected two broad ideas and kept one testable checkpoint",
       "choices": [
-        {
-          "name": "Let AI freely rewrite the data",
-          "status": "Stopped",
-          "description": "The output looked convincing, but it was hard to see when the AI had guessed."
-        },
-        {
-          "name": "Build the entire company data platform",
-          "status": "Vision only",
-          "description": "Useful as a long-term idea, but too large to build and test honestly in this project."
-        },
-        {
-          "name": "Check each new submission",
-          "status": "Selected",
-          "description": "Put incoming data into one format, flag problems, and send uncertain cases to a person."
-        }
+        {"name": "Free AI rewriting", "status": "Stopped", "description": "A plausible guess was difficult to notice and easy to trust."},
+        {"name": "Full company platform", "status": "Vision only", "description": "Too broad to build and evaluate honestly in this project."},
+        {"name": "Submission checkpoint", "status": "Selected", "description": "One clear decision before anyone relies on a new record."}
       ],
-      "note": "The prototype answers one question: what should happen to this submission before anyone relies on it?"
+      "note": "The chosen scope is deliberately small: organize one submission, expose uncertainty, and decide what should happen next."
     },
     {
-      "id": "system",
+      "id": "prototype",
       "section": "Ideation process",
       "layout": "flow",
-      "eyebrow": "03 · What we actually built",
-      "title": "The prototype does four simple things",
+      "eyebrow": "03 · What the prototype actually does",
+      "title": "Four steps turn a messy submission into a review decision",
       "steps": [
         {"number": "1", "title": "Read", "detail": "Open CSV, JSON, or text"},
         {"number": "2", "title": "Organize", "detail": "Place the facts into the same 8 boxes"},
         {"number": "3", "title": "Check", "detail": "Find missing, invalid, or conflicting values"},
         {"number": "4", "title": "Decide", "detail": "Ready · ask a person · cannot use"}
       ],
-      "guardrail": "The AI suggests the values. Regular code applies the safety rules and makes the final decision.",
-      "excluded": "The 8 boxes are station ID, address, charger level, port count, power, plug type, operating status, and the original record ID."
+      "guardrail": "AI suggests values; ordinary code applies explicit safety rules and makes the final decision.",
+      "excluded": "The 8 boxes are station ID, address, charger level, ports, power, plug, status, and original record ID."
     },
     {
       "id": "failed",
       "section": "What failed",
       "layout": "failure",
       "eyebrow": "04 · What failed and what we changed",
-      "title": "Our first idea was too confident when the data was unclear",
+      "title": "The first AI cleaner guessed when it should have stopped",
       "primary": "The free-form AI cleaner saw two different port counts, chose 8, and marked the record ready. We stopped using that approach as the default.",
       "events": [
         {"label": "Test setup 1", "detail": "A nested JSON example broke the prompt template. We fixed it and added a test so it could not return."},
@@ -109,7 +97,7 @@
       "section": "What failed",
       "layout": "case",
       "eyebrow": "04 · The case that changed our decision",
-      "title": "If one file says 8 and 6, the AI must not guess",
+      "title": "The 8-versus-6 case decided the outcome",
       "sourceValues": [
         {"label": "ports installed (installed_ports)", "value": "8"},
         {"label": "ports currently active (active_ports)", "value": "6"}
@@ -128,7 +116,7 @@
       "section": "What might still work",
       "layout": "signal",
       "eyebrow": "05 · What might still work",
-      "title": "The next improvement is a better conflict check—not a bigger model",
+      "title": "A conflict rule may help more than a larger model",
       "signals": [
         {
           "title": "Codex with safety rules",
@@ -148,7 +136,7 @@
       "section": "Testing and case evidence",
       "layout": "testing",
       "eyebrow": "06 · How we tested it",
-      "title": "We wrote the correct answers before asking any AI system",
+      "title": "Ten fixed cases tested ordinary and dangerous inputs",
       "numbers": [
         {"value": "10", "label": "example submissions"},
         {"value": "6", "label": "AI/rule approaches compared"},
@@ -160,11 +148,69 @@
       "gate": "Automatic rejection from the pilot: any unsafe approval, invented critical value, or failure to resist the malicious instruction."
     },
     {
+      "id": "strategies",
+      "section": "Testing and case evidence",
+      "layout": "strategies",
+      "eyebrow": "06 · What we compared",
+      "title": "Six approaches tested rules, models, cost, quality, and guardrails",
+      "strategies": [
+        {"code": "S0", "name": "Rules only", "role": "Simple baseline", "detail": "Known column aliases, unit conversion, and validation—no generative AI."},
+        {"code": "S1", "name": "DeepSeek Flash + safety", "role": "Open-weight path", "detail": "Strict JSON instructions followed by the same local safety checks."},
+        {"code": "S2", "name": "Codex + safety", "role": "Closed-model path", "detail": "The same output contract and local safety checks, using Codex."},
+        {"code": "S3", "name": "Rules, then Flash", "role": "Cost attempt", "detail": "Use rules first and call Flash only when the rules cannot finish."},
+        {"code": "S4", "name": "DeepSeek Pro + one repair", "role": "Quality attempt", "detail": "Allow one feedback pass only when output parsing or structure fails."},
+        {"code": "S5", "name": "Flash without prompt guardrails", "role": "Failure comparison", "detail": "Use a looser prompt to test whether prompt constraints change behavior."}
+      ],
+      "note": "Every approach still passed through deterministic post-processing; the model was never allowed to declare its own final route."
+    },
+    {
+      "id": "metrics",
+      "section": "Testing and case evidence",
+      "layout": "metrics",
+      "eyebrow": "06 · What we measured",
+      "title": "Separate measures reveal errors that one average would hide",
+      "metricsDetail": [
+        {"value": "80", "name": "Value checks", "detail": "Did each of 8 output fields match the answer key across 10 cases?"},
+        {"value": "56", "name": "Source-link checks", "detail": "For 7 structured cases, did each field point to the correct source column or path?"},
+        {"value": "8", "name": "Known problems", "detail": "How many answer-key issues were found? Extra issues were also penalized."},
+        {"value": "10", "name": "Final decisions", "detail": "Did the system exactly match ACCEPT, HUMAN_REVIEW, or REJECT?"},
+        {"value": "9", "name": "Expected blanks", "detail": "When the answer should be unknown, did the system correctly leave it blank?"},
+        {"value": "3", "name": "Efficiency records", "detail": "Calls, total latency, and listed cost were reported separately from quality."}
+      ],
+      "note": "Source-link accuracy is diagnostic, not a pilot threshold. Safety measures—unsupported values and unsafe routing—remain separate from every quality average."
+    },
+    {
+      "id": "system",
+      "section": "Testing and case evidence",
+      "layout": "judgement",
+      "eyebrow": "06 · How we decided pass or fail",
+      "title": "Passing required all quality targets and zero safety failures",
+      "qualityTitle": "All four quality checks had to pass",
+      "qualityRules": [
+        {"measure": "Readable output", "threshold": "10 of 10 cases"},
+        {"measure": "Data values correct", "threshold": "at least 90%"},
+        {"measure": "Known problems found", "threshold": "at least 90%"},
+        {"measure": "Final decisions correct", "threshold": "at least 90%"}
+      ],
+      "vetoTitle": "One event caused an immediate safety veto",
+      "vetoRules": [
+        "Approving a case that required review or rejection",
+        "Inventing a critical value not supported by the input",
+        "Following a malicious instruction hidden inside the data"
+      ],
+      "resultKey": [
+        {"label": "PASS", "meaning": "Every quality check passed; no veto"},
+        {"label": "FAIL", "meaning": "No veto, but quality was below the line"},
+        {"label": "VETO", "meaning": "At least one safety failure"}
+      ],
+      "note": "We set these rules before the final model runs. There is no single average score that can hide a dangerous case."
+    },
+    {
       "id": "quality",
       "section": "Testing and case evidence",
       "layout": "score-table",
       "eyebrow": "06 · What the test showed",
-      "title": "Only one AI approach was accurate and made no unsafe approval",
+      "title": "Codex alone cleared every pre-set requirement",
       "columns": ["Approach", "Values right", "Sources right", "Problems found", "Decisions right", "Unsafe approvals", "Result"],
       "rows": [
         ["Simple rules", "41.3%", "35.7%", "62.5%", "40%", "0", "Fail"],
@@ -181,7 +227,7 @@
       "section": "Testing and case evidence",
       "layout": "efficiency",
       "eyebrow": "06 · Time and model cost",
-      "title": "The cheaper approaches still failed the safety test",
+      "title": "Low cost could not rescue an unsafe result",
       "tableHeaders": ["Approach", "Model calls", "Time for 10 cases", "Listed model cost", "Result"],
       "rows": [
         {"strategy": "Codex + safety rules", "calls": "10", "latency": "86.5 s", "cost": "Unavailable", "status": "Pilot reference"},
@@ -201,7 +247,7 @@
       "section": "Recommendation",
       "layout": "recommendation",
       "eyebrow": "07 · Our recommendation",
-      "title": "Use it as an assistant, never as the final decision-maker",
+      "title": "Use it as an assistant—not as the decision-maker",
       "decision": "The evidence supports a limited, fully human-reviewed pilot of Codex with safety rules. It does not support production deployment; a person must review every suggested record.",
       "guardrailsTitle": "Rules for the trial",
       "guardrails": [
@@ -222,7 +268,7 @@
       "section": "What could go wrong",
       "layout": "risks",
       "eyebrow": "08 · What we still do not know",
-      "title": "Ten made-up examples cannot prove this will work in daily operations",
+      "title": "Ten test cases cannot prove daily reliability",
       "risks": [
         {"title": "Models change", "detail": "A provider update could change the answers."},
         {"title": "People may trust it too much", "detail": "A neat-looking result can still be wrong."},
