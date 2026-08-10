@@ -6,9 +6,17 @@ versions plus dark and light themes. It displays one full-viewport slide at a
 time and needs no server, network connection, external font, or sibling runtime
 asset.
 
+The narrative is written for a first-time audience. It introduces the Con
+Edison business situation before the prototype, defines each decision and test
+term on the slide where it first matters, and does not rely on the repository,
+speaker notes, or assignment brief to supply missing context.
+
 `index.html` 是一份自包含的 13 页、16:9、10 分钟汇报演示。同一个文件内置完整的
 中英文版本与深浅色主题，每次只显示一张完整幻灯片；直接打开即可，不依赖服务器、
 网络、外部字体或同目录运行资源。
+
+演示按“完全不了解项目的观众”设计：先解释 Con Edison 的业务情境，再介绍原型；每个
+处理结果和测试概念都会在首次需要时解释，不依赖代码仓库、讲稿或作业说明补齐关键背景。
 
 ## Review modes / 审阅模式
 

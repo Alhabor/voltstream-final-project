@@ -83,6 +83,56 @@ class PresentationContractTests(unittest.TestCase):
         for text in required_evidence:
             self.assertIn(text, self.document)
 
+    def test_audience_can_follow_without_repository_context(self):
+        """The visible deck must define its situation, process, and test language."""
+        english_explanations = [
+            "Con Edison receives charger information through outside contractors",
+            "The prototype does four simple things",
+            "The 8 boxes are station ID",
+            "no company records were used",
+            "Codex and DeepSeek are two families of generative AI models",
+            "leave it blank: null + HUMAN_REVIEW",
+            "Veto” means one unsafe result disqualified the approach",
+        ]
+        chinese_explanations = [
+            "Con Edison 通过外部承包商和数据公司收集充电桩信息",
+            "这个原型只做四件容易理解的事情",
+            "8 项信息分别是",
+            "没有使用公司记录",
+            "Codex 和 DeepSeek 是两类生成式 AI 模型",
+            "先留空：null + HUMAN_REVIEW（交给人检查）",
+            "只要有一次不安全结果就不合格",
+        ]
+        for text in english_explanations + chinese_explanations:
+            self.assertIn(html.escape(text), self.document)
+
+    def test_frozen_experiment_values_survive_plain_language_rewrite(self):
+        """Changing the narrative must not change the final-v4 evidence."""
+        slides = {slide["id"]: slide for slide in self.source["slides"]}
+        self.assertEqual(
+            [row[1:] for row in slides["quality"]["rows"]],
+            [
+                ["41.3%", "35.7%", "62.5%", "40%", "0", "Fail"],
+                ["97.5%", "100%", "100%", "90%", "0", "Pass"],
+                ["95.0%", "66.1%", "87.5%", "80%", "1", "Veto"],
+                ["96.3%", "55.4%", "87.5%", "90%", "1", "Veto"],
+                ["96.3%", "96.4%", "87.5%", "80%", "1", "Veto"],
+                ["95.0%", "66.1%", "87.5%", "80%", "1", "Veto"],
+            ],
+        )
+        self.assertEqual(
+            [(row["calls"], row["latency"], row["cost"]) for row in slides["efficiency"]["rows"]],
+            [
+                ("10", "86.5 s", "Unavailable"),
+                ("10", "19.2 s", "$0.000705"),
+                ("10", "18.8 s", "$0.000713"),
+                ("10", "31.9 s", "$0.002221"),
+                ("9", "17.2 s", "$0.000635"),
+            ],
+        )
+        self.assertEqual([value["value"] for value in slides["evg009"]["sourceValues"]], ["8", "6"])
+        self.assertIn("null + HUMAN_REVIEW", slides["evg009"]["safeAnswer"])
+
     def test_navigation_hash_and_fullscreen_contract_is_embedded(self):
         for key in [
             "ArrowRight",

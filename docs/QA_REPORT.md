@@ -24,7 +24,7 @@ The v4 run passed the integrity checks performed in this review:
   aggregate scores;
 - fixture validation passed with 10 cases, 10 answers, and 7 structured mapping
   answer rows;
-- all 72 automated tests passed under Python 3.9.6;
+- all 74 automated tests passed under Python 3.9.6;
 - the current repository and Git history produced no high-signal secret-pattern
   matches; and
 - the result commit `627830a` is on `main`, is synchronized with `origin/main`,
@@ -50,6 +50,14 @@ preference persistence, fullscreen, reduced motion, contrast, zero external
 requests, zero browser errors, no control overlap, and no detected content
 clipping. English/dark and Chinese/light print outputs each contain 13
 independent 16:9 pages.
+
+The final narrative was then rewritten for an audience with no prior project
+context. Visible slides now introduce the Con Edison situation before the
+prototype; enumerate the eight output fields; explain the three possible
+decisions, synthetic test construction, Codex/DeepSeek model families, and the
+safety-veto rule; and state the recommendation without relying on the
+repository or speaker notes. Contract tests protect both those explanations and
+all frozen final-v4 quality, cost, latency, and EVG-009 values.
 
 #### H2 — Team-level Git contribution requirement is not yet evidenced
 
@@ -217,7 +225,7 @@ python3 scripts/validate_fixtures.py
 
 PYTHONPATH=src PYTHONPYCACHEPREFIX=/tmp/voltstream-pycache \
   python3 -m unittest discover -s tests -v
-  PASS — 72 tests
+  PASS — 74 tests
 
 PYTHONPATH=src python3 scripts/verify_run.py \
   --run-id 2026-08-09-final-v4

@@ -7,6 +7,7 @@
   "languages": ["en", "zh-CN"],
   "themes": ["dark", "light"],
   "self_contained": true,
+  "audience_context": "passed: business situation, prototype process, test construction, model families, decision terms, and safety-veto meaning are explained in the visible slides",
   "browser": {
     "name": "Google Chrome",
     "version": "151.0.7922.77",
