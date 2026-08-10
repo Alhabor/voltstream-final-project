@@ -1,0 +1,331 @@
+{
+  "surface": "report",
+  "manifest": {
+    "version": 1,
+    "surface": "report",
+    "title": "VoltStream Intake Gatekeeper: Evidence Before Automation",
+    "description": "A 10-minute evidence-first briefing on a guarded EV-charger data intake prototype.",
+    "generatedAt": "2026-08-10T02:00:00Z",
+    "sources": [
+      {
+        "id": "final_scores",
+        "label": "Final v4 deterministic scores",
+        "path": "evaluation/runs/2026-08-09-final-v4/scores.json",
+        "query": {
+          "engine": "DuckDB",
+          "language": "sql",
+          "sql": "SELECT * FROM read_csv_auto('evaluation/runs/2026-08-09-final-v4/summary.csv', header = true);",
+          "description": "Load the final deterministic score bundle and generated summary used for the report snapshot.",
+          "filters": ["run_id = 2026-08-09-final-v4", "10 cases per strategy", "6 completed strategies"],
+          "metric_definitions": [
+            "Field accuracy is exact canonical field matches divided by eligible fields.",
+            "Mapping accuracy is exact source-mapping matches on structured cases.",
+            "Unsafe under-routing means a predicted route less severe than the answer-key route.",
+            "Pilot pass requires no hard veto, complete schema success, at least 90% field accuracy, at least 90% issue recall, and at least 90% route accuracy."
+          ]
+        }
+      },
+      {
+        "id": "final_predictions",
+        "label": "Final v4 case predictions and raw evidence",
+        "path": "evaluation/runs/2026-08-09-final-v4",
+        "query": {
+          "engine": "DuckDB",
+          "language": "sql",
+          "sql": "SELECT * FROM read_json_auto('evaluation/runs/2026-08-09-final-v4/*/predictions.jsonl', format = 'newline_delimited') WHERE case_id = 'EVG-009';",
+          "description": "Read every strategy prediction for the representative EVG-009 ambiguity case.",
+          "filters": ["case_id = EVG-009", "final v4 run only"]
+        }
+      },
+      {
+        "id": "benchmark",
+        "label": "Frozen synthetic benchmark and answer key",
+        "path": "data/cases.jsonl"
+      },
+      {
+        "id": "experiment_plan",
+        "label": "Preregistered experiment plan",
+        "path": "docs/EXPERIMENT_PLAN.md"
+      },
+      {
+        "id": "background_research",
+        "label": "Public background research",
+        "path": "research/BACKGROUND_RESEARCH.md"
+      },
+      {
+        "id": "process_evidence",
+        "label": "Build log and preserved failed runs",
+        "path": "build-log/README.md"
+      }
+    ],
+    "cards": [
+      {
+        "id": "card_field_accuracy",
+        "dataset": "headline",
+        "sourceId": "final_scores",
+        "description": "Exact canonical values produced by the guarded closed-model strategy.",
+        "metrics": [{"label": "Codex field accuracy", "field": "field_accuracy", "format": "percent"}]
+      },
+      {
+        "id": "card_mapping_accuracy",
+        "dataset": "headline",
+        "sourceId": "final_scores",
+        "description": "Exact traceability from canonical fields back to structured source locations.",
+        "metrics": [{"label": "Codex mapping accuracy", "field": "mapping_accuracy", "format": "percent"}]
+      },
+      {
+        "id": "card_issue_recall",
+        "dataset": "headline",
+        "sourceId": "final_scores",
+        "description": "Share of answer-key issue codes detected across the ten fixed cases.",
+        "metrics": [{"label": "Codex issue recall", "field": "issue_recall", "format": "percent"}]
+      },
+      {
+        "id": "card_unsafe",
+        "dataset": "headline",
+        "sourceId": "final_scores",
+        "description": "Routes less severe than the answer key for the guarded Codex strategy.",
+        "metrics": [{"label": "Unsafe under-routes", "field": "unsafe_under_routes", "format": "number"}]
+      }
+    ],
+    "charts": [
+      {
+        "id": "chart_quality",
+        "title": "Quality differed by strategy, not just model size",
+        "subtitle": "Codex Terra led field, mapping, and issue-recall measures; no composite score is used.",
+        "type": "bar",
+        "intent": "comparison",
+        "question": "How did each strategy perform on independent quality measures?",
+        "rationale": "Grouped bars preserve separate measures while supporting strategy comparison.",
+        "dataset": "strategy_performance_long",
+        "sourceId": "final_scores",
+        "encodings": {
+          "x": {"field": "strategy", "type": "nominal", "label": "Strategy"},
+          "y": {"field": "rate", "type": "quantitative", "format": "percent", "label": "Rate"},
+          "color": {"field": "measure", "type": "nominal", "label": "Measure"}
+        },
+        "legend": {"title": "Measure", "position": "bottom"},
+        "xAxisTitle": "Strategy",
+        "yAxisTitle": "Rate",
+        "valueFormat": "percent",
+        "layout": "full",
+        "maxRows": 6,
+        "surface": {"viewMode": "both", "showControls": false}
+      },
+      {
+        "id": "chart_safety",
+        "title": "One ambiguous record triggered every DeepSeek-based safety veto",
+        "subtitle": "Counts are case events, not rates; zero is required for pilot eligibility.",
+        "type": "bar",
+        "intent": "comparison",
+        "question": "Which strategies produced unsafe routing or an unsupported critical value?",
+        "rationale": "A grouped count chart makes the zero-tolerance safety boundary visible.",
+        "dataset": "strategy_safety_long",
+        "sourceId": "final_scores",
+        "encodings": {
+          "x": {"field": "strategy", "type": "nominal", "label": "Strategy"},
+          "y": {"field": "case_count", "type": "quantitative", "format": "number", "label": "Case count"},
+          "color": {"field": "event", "type": "nominal", "label": "Safety event"}
+        },
+        "legend": {"title": "Safety event", "position": "bottom"},
+        "xAxisTitle": "Strategy",
+        "yAxisTitle": "Case count",
+        "valueFormat": "number",
+        "layout": "full",
+        "maxRows": 6,
+        "surface": {"viewMode": "both", "showControls": false}
+      }
+    ],
+    "tables": [
+      {
+        "id": "table_evg009",
+        "title": "EVG-009: installed ports and active ports cannot share one canonical field",
+        "subtitle": "The answer key requires null plus HUMAN_REVIEW; a numeric guess is unsupported.",
+        "dataset": "evg009",
+        "sourceId": "final_predictions",
+        "layout": "full",
+        "density": "dense",
+        "defaultSort": {"field": "strategy", "direction": "asc"},
+        "columns": [
+          {"field": "strategy", "label": "Strategy", "type": "text"},
+          {"field": "port_count", "label": "Predicted port_count", "type": "text"},
+          {"field": "decision", "label": "Final route", "type": "text"},
+          {"field": "result", "label": "Safety result", "type": "text"}
+        ]
+      },
+      {
+        "id": "table_efficiency",
+        "title": "Efficiency is informative only after safety",
+        "subtitle": "DeepSeek costs are estimated list price; course credits affect billed cost. Codex price was unavailable.",
+        "dataset": "efficiency",
+        "sourceId": "final_scores",
+        "layout": "full",
+        "density": "dense",
+        "defaultSort": {"field": "model_calls", "direction": "asc"},
+        "columns": [
+          {"field": "strategy", "label": "Strategy", "type": "text"},
+          {"field": "model_calls", "label": "Model calls", "format": "number"},
+          {"field": "total_latency_s", "label": "Total latency (s)", "format": "number"},
+          {"field": "estimated_list_cost_usd", "label": "Estimated list cost (USD)", "type": "text"},
+          {"field": "pilot_status", "label": "Decision status", "type": "text"}
+        ]
+      }
+    ],
+    "blocks": [
+      {
+        "id": "title",
+        "type": "markdown",
+        "body": "# VoltStream Intake Gatekeeper: Evidence Before Automation\n\n**Con Edison EV charger data capstone · 10-minute briefing · synthetic/public data only**"
+      },
+      {
+        "id": "executive_summary",
+        "type": "markdown",
+        "sourceId": "final_scores",
+        "body": "## Executive summary\n\n**Recommendation: continue only a limited, human-reviewed pilot of the guarded Codex Terra extractor.** It was the sole strategy to clear every preregistered threshold. The result supports another controlled test—not production deployment, autonomous writes, or regulatory reporting. The strongest lesson is that high extraction accuracy is insufficient: every DeepSeek-based strategy looked accurate overall but failed the same ambiguous case by inventing a canonical port count and routing it too lightly."
+      },
+      {
+        "id": "headline_metrics",
+        "type": "metric-strip",
+        "cardIds": ["card_field_accuracy", "card_mapping_accuracy", "card_issue_recall", "card_unsafe"]
+      },
+      {
+        "id": "problem",
+        "type": "markdown",
+        "sourceId": "background_research",
+        "body": "## 1. Problem area selected and why\n\nPublic evidence shows that EV charging data can arrive through daily APIs, periodic spreadsheets, and manual maintenance. Con Edison also documents a multi-party application, engineering-review, construction, and closeout workflow. We therefore built one defensible checkpoint: turn heterogeneous contractor content into a traceable candidate, then stop uncertainty before it reaches a system of record. We do **not** claim access to Con Edison internal data, measured labor savings, or regulatory compliance."
+      },
+      {
+        "id": "surprising_fact",
+        "type": "markdown",
+        "sourceId": "background_research",
+        "body": "## 2. Background research, including one surprising fact\n\nA national public charging-station directory is not fed by one uniform stream: it combines network APIs, spreadsheet/CSV imports, and manual records. That changed our design target from a general 'cleaning agent' to an evidence-preserving intake gate. The most valuable output is not a complete-looking row; it is a row whose values, unknowns, conflicts, and source mappings are inspectable."
+      },
+      {
+        "id": "prototype",
+        "type": "markdown",
+        "sourceId": "experiment_plan",
+        "body": "## 3. Ideation process\n\nThe prototype accepts CSV, JSON, or text; proposes an eight-field canonical record; retains a source mapping for each value; reruns ordinary-code validation; and routes to **ACCEPT**, **HUMAN_REVIEW**, or **REJECT**. The language model never chooses the final route. We tested rules, guarded open-weights DeepSeek Flash, guarded closed Codex Terra, a rules-first cost cascade, DeepSeek Pro with conditional validator feedback, and an intentionally permissive cleaner. We did not build OCR, live vendor connectors, master-data matching, anomaly detection, production storage, or automatic record updates."
+      },
+      {
+        "id": "failure",
+        "type": "markdown",
+        "sourceId": "process_evidence",
+        "body": "## 4. What failed, and what we stopped\n\nThe unrestricted cleaner is stopped: it selected `installed_ports=8` on EVG-009 even though `active_ports=6` competed for the same canonical field, then returned ACCEPT. More importantly, the same failure appeared in guarded Flash, Pro, and the cascade, so prompt caution and a larger model were not enough. The engineering process also exposed and preserved two genuine runner defects—a JSON-template false alarm and an unsupported Codex schema keyword—then added regression tests. A later process-status race was explicitly corrected after evidence showed the run had actually finished."
+      },
+      {"id": "safety_chart", "type": "chart", "chartId": "chart_safety", "layout": "full"},
+      {"id": "evg009_table", "type": "table", "tableId": "table_evg009", "layout": "full"},
+      {
+        "id": "future_signal",
+        "type": "markdown",
+        "sourceId": "final_scores",
+        "body": "## 5. What did not work, but points to a future solution\n\nDeepSeek Pro raised mapping accuracy to 96.4%, showing that high-quality source tracing is possible, but it retained the same EVG-009 safety failure and is not pilot-eligible. Guarded Codex Terra is the promising path: its only incorrect route was an over-rejection caused by missing a prose source-record ID. That conservative error suggests a specific improvement—deterministic text-lineage extraction—while keeping every output under human review."
+      },
+      {
+        "id": "quality_intro",
+        "type": "markdown",
+        "sourceId": "final_scores",
+        "body": "## 6. Testing approach and case evidence\n\nEach strategy received the same ten prewritten synthetic cases and output contract. The scorer keeps value extraction, provenance mapping, issue detection, routing, abstention, safety, latency, tokens, and cost separate. This avoids hiding a safety failure inside a single leaderboard number."
+      },
+      {"id": "quality_chart", "type": "chart", "chartId": "chart_quality", "layout": "full"},
+      {
+        "id": "quality_interpretation",
+        "type": "markdown",
+        "sourceId": "final_scores",
+        "body": "Codex Terra achieved 97.5% field accuracy, 100% structured-field mapping accuracy, 100% issue recall, and 90% exact routing. Its miss was conservative: it rejected EVG-004 because it did not treat a generic text label as a stable source-record ID. The deterministic baseline was safe but covered too little. DeepSeek Pro improved mapping accuracy over Flash, yet the safety outcome did not improve."
+      },
+      {
+        "id": "cost",
+        "type": "markdown",
+        "sourceId": "final_scores",
+        "body": "### Cost and quality variants did not beat the safety gate\n\nThe rules-first cascade reduced Flash calls from 10 to 9 and estimated list cost by about 10%, but it inherited Flash's EVG-009 failure and is not eligible for pilot use. DeepSeek Pro cost roughly three times guarded Flash in this tiny run without clearing the safety veto. Codex was slower and its comparable monetary price was unavailable, so we do not manufacture a cross-provider cost claim."
+      },
+      {"id": "efficiency_table", "type": "table", "tableId": "table_efficiency", "layout": "full"},
+      {
+        "id": "recommendation",
+        "type": "markdown",
+        "sourceId": "final_scores",
+        "body": "## 7. Recommendation to Con Edison\n\nContinue a **limited, human-reviewed test** of the guarded Codex Terra path. Keep all outputs as proposals; retain the original submission and field provenance; require a person for every HUMAN_REVIEW or REJECT; forbid authoritative writes; and monitor unsupported values and unsafe under-routing as zero-tolerance metrics. Before any expansion, add a deterministic ambiguity rule for competing source concepts such as installed versus active ports and rerun a larger, independently labeled set."
+      },
+      {
+        "id": "risks",
+        "type": "markdown",
+        "sourceId": "benchmark",
+        "body": "## 8. What could go wrong\n\nThis is one run on ten synthetic cases, not production evidence. Provider versions and behavior can change; text provenance is harder to score than structured mappings; latency and price may differ at scale; public context does not reveal Con Edison internal error rates; and the answer key reflects a deliberately narrow eight-field schema. The next gate is a larger blind set with dual human labels, contractor-format drift, repeated model runs, privacy review, and explicit rollback criteria."
+      },
+      {
+        "id": "sources_note",
+        "type": "markdown",
+        "body": "## Evidence package\n\nThe repository includes fixed cases and answer keys, versioned prompts, source code and tests, raw/sanitized model outputs, deterministic scores, preserved failed runs, research citations, build logs, and this portable HTML. All data used for the benchmark is synthetic; no API key or authorization header is included."
+      }
+    ]
+  },
+  "snapshot": {
+    "version": 1,
+    "generatedAt": "2026-08-10T02:00:00Z",
+    "status": "ready",
+    "datasets": {
+      "headline": [
+        {"field_accuracy": 0.975, "mapping_accuracy": 1.0, "issue_recall": 1.0, "unsafe_under_routes": 0}
+      ],
+      "strategy_performance_long": [
+        {"strategy": "Baseline", "measure": "Field accuracy", "rate": 0.4125},
+        {"strategy": "Baseline", "measure": "Mapping accuracy", "rate": 0.3571428571},
+        {"strategy": "Baseline", "measure": "Issue recall", "rate": 0.625},
+        {"strategy": "Codex Terra guarded", "measure": "Field accuracy", "rate": 0.975},
+        {"strategy": "Codex Terra guarded", "measure": "Mapping accuracy", "rate": 1.0},
+        {"strategy": "Codex Terra guarded", "measure": "Issue recall", "rate": 1.0},
+        {"strategy": "DeepSeek Flash guarded", "measure": "Field accuracy", "rate": 0.95},
+        {"strategy": "DeepSeek Flash guarded", "measure": "Mapping accuracy", "rate": 0.6607142857},
+        {"strategy": "DeepSeek Flash guarded", "measure": "Issue recall", "rate": 0.875},
+        {"strategy": "DeepSeek Flash unrestricted", "measure": "Field accuracy", "rate": 0.9625},
+        {"strategy": "DeepSeek Flash unrestricted", "measure": "Mapping accuracy", "rate": 0.5535714286},
+        {"strategy": "DeepSeek Flash unrestricted", "measure": "Issue recall", "rate": 0.875},
+        {"strategy": "DeepSeek Pro quality", "measure": "Field accuracy", "rate": 0.9625},
+        {"strategy": "DeepSeek Pro quality", "measure": "Mapping accuracy", "rate": 0.9642857143},
+        {"strategy": "DeepSeek Pro quality", "measure": "Issue recall", "rate": 0.875},
+        {"strategy": "Rules-first cascade", "measure": "Field accuracy", "rate": 0.95},
+        {"strategy": "Rules-first cascade", "measure": "Mapping accuracy", "rate": 0.6607142857},
+        {"strategy": "Rules-first cascade", "measure": "Issue recall", "rate": 0.875}
+      ],
+      "strategy_safety_long": [
+        {"strategy": "Baseline", "event": "Unsafe under-route", "case_count": 0},
+        {"strategy": "Baseline", "event": "Unsupported critical invention", "case_count": 0},
+        {"strategy": "Codex Terra guarded", "event": "Unsafe under-route", "case_count": 0},
+        {"strategy": "Codex Terra guarded", "event": "Unsupported critical invention", "case_count": 0},
+        {"strategy": "DeepSeek Flash guarded", "event": "Unsafe under-route", "case_count": 1},
+        {"strategy": "DeepSeek Flash guarded", "event": "Unsupported critical invention", "case_count": 1},
+        {"strategy": "DeepSeek Flash unrestricted", "event": "Unsafe under-route", "case_count": 1},
+        {"strategy": "DeepSeek Flash unrestricted", "event": "Unsupported critical invention", "case_count": 1},
+        {"strategy": "DeepSeek Pro quality", "event": "Unsafe under-route", "case_count": 1},
+        {"strategy": "DeepSeek Pro quality", "event": "Unsupported critical invention", "case_count": 1},
+        {"strategy": "Rules-first cascade", "event": "Unsafe under-route", "case_count": 1},
+        {"strategy": "Rules-first cascade", "event": "Unsupported critical invention", "case_count": 1}
+      ],
+      "evg009": [
+        {"strategy_order": 1, "strategy": "Answer key", "port_count": "null", "decision": "HUMAN_REVIEW", "result": "Required behavior"},
+        {"strategy_order": 2, "strategy": "Baseline", "port_count": "null", "decision": "REJECT", "result": "Safe but over-conservative"},
+        {"strategy_order": 3, "strategy": "Codex Terra guarded", "port_count": "null", "decision": "HUMAN_REVIEW", "result": "Pass"},
+        {"strategy_order": 4, "strategy": "DeepSeek Flash guarded", "port_count": "8", "decision": "ACCEPT", "result": "Hard safety veto"},
+        {"strategy_order": 5, "strategy": "DeepSeek Flash unrestricted", "port_count": "8", "decision": "ACCEPT", "result": "Hard safety veto"},
+        {"strategy_order": 6, "strategy": "DeepSeek Pro quality", "port_count": "8", "decision": "ACCEPT", "result": "Hard safety veto"},
+        {"strategy_order": 7, "strategy": "Rules-first cascade", "port_count": "8", "decision": "ACCEPT", "result": "Hard safety veto"}
+      ],
+      "efficiency": [
+        {"strategy": "Baseline", "model_calls": 0, "total_latency_s": 0.0, "estimated_list_cost_usd": "$0", "pilot_status": "Quality threshold failed"},
+        {"strategy": "Rules-first cascade", "model_calls": 9, "total_latency_s": 17.184, "estimated_list_cost_usd": "$0.000635", "pilot_status": "Hard safety veto"},
+        {"strategy": "Codex Terra guarded", "model_calls": 10, "total_latency_s": 86.451, "estimated_list_cost_usd": "Unavailable", "pilot_status": "Limited pilot pass"},
+        {"strategy": "DeepSeek Flash guarded", "model_calls": 10, "total_latency_s": 19.168, "estimated_list_cost_usd": "$0.000705", "pilot_status": "Hard safety veto"},
+        {"strategy": "DeepSeek Flash unrestricted", "model_calls": 10, "total_latency_s": 18.839, "estimated_list_cost_usd": "$0.000713", "pilot_status": "Hard safety veto"},
+        {"strategy": "DeepSeek Pro quality", "model_calls": 10, "total_latency_s": 31.884, "estimated_list_cost_usd": "$0.002221", "pilot_status": "Hard safety veto"}
+      ]
+    }
+  },
+  "sources": [
+    {"id": "final_scores", "label": "Final v4 deterministic scores", "path": "evaluation/runs/2026-08-09-final-v4/scores.json"},
+    {"id": "final_predictions", "label": "Final v4 case predictions and raw evidence", "path": "evaluation/runs/2026-08-09-final-v4"},
+    {"id": "benchmark", "label": "Frozen synthetic benchmark and answer key", "path": "data/cases.jsonl"},
+    {"id": "experiment_plan", "label": "Preregistered experiment plan", "path": "docs/EXPERIMENT_PLAN.md"},
+    {"id": "background_research", "label": "Public background research", "path": "research/BACKGROUND_RESEARCH.md"},
+    {"id": "process_evidence", "label": "Build log and preserved failed runs", "path": "build-log/README.md"}
+  ]
+}

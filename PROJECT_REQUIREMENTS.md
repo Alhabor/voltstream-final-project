@@ -5,36 +5,36 @@ treated as the repository's working submission contract.
 
 ## Product and scope
 
-- [ ] Address Con Edison's EV Charger Data problem area.
-- [ ] Build a generative-AI agent system that supports one specific,
+- [x] Address Con Edison's EV Charger Data problem area.
+- [x] Build a generative-AI agent system that supports one specific,
       defensible part of the business decision or workflow.
-- [ ] Keep the prototype real, tested, and honest about what it can and cannot
+- [x] Keep the prototype real, tested, and honest about what it can and cannot
       do; the complete enterprise system is not required.
-- [ ] Begin with public or synthetic data and respect data/privacy boundaries.
+- [x] Begin with public or synthetic data and respect data/privacy boundaries.
 
 ## Evaluation evidence
 
-- [ ] Define a fixed set of representative cases and write the answer key
+- [x] Define a fixed set of representative cases and write the answer key
       before running the models.
-- [ ] Include normal, hard, missing-data, and abstention cases.
-- [ ] Run a simple baseline on the same cases.
-- [ ] Run at least one open-weights model and one closed model on the same
+- [x] Include normal, hard, missing-data, and abstention cases.
+- [x] Run a simple baseline on the same cases.
+- [x] Run at least one open-weights model and one closed model on the same
       inputs and task.
-- [ ] Judge all outputs using the same rubric.
-- [ ] Include one evaluation aimed at reducing cost and one aimed at improving
+- [x] Judge all outputs using the same rubric.
+- [x] Include one evaluation aimed at reducing cost and one aimed at improving
       quality relative to the baseline.
-- [ ] Report errors by category, not only as a single aggregate score.
-- [ ] Report latency and/or cost where useful.
-- [ ] Use metrics the team can explain clearly during the presentation.
+- [x] Report errors by category, not only as a single aggregate score.
+- [x] Report latency and/or cost where useful.
+- [x] Use metrics the team can explain clearly during the presentation.
 
 ## Process evidence
 
-- [ ] Maintain a build log showing what the team tried.
-- [ ] Document at least one failed or stopped approach: what was attempted,
+- [x] Maintain a build log showing what the team tried.
+- [x] Document at least one failed or stopped approach: what was attempted,
       what the evidence showed, and why it was stopped.
-- [ ] Document at least one potentially promising approach and the evidence so
+- [x] Document at least one potentially promising approach and the evidence so
       far.
-- [ ] Preserve prompts, model/version information, raw outputs, scoring code,
+- [x] Preserve prompts, model/version information, raw outputs, scoring code,
       and reproducible run instructions.
 - [ ] Add every team member as a GitHub collaborator.
 - [ ] Ensure every team member's agent makes a traceable commit.
@@ -55,15 +55,15 @@ cover, in the following order:
 
 ## Final repository contents
 
-- [ ] Background research and sources
-- [ ] Product and technical documentation
-- [ ] Runnable prototype
-- [ ] Public/synthetic input data and answer key
-- [ ] Baseline and multi-model raw outputs
-- [ ] Evaluation code and results
-- [ ] Build log, including failed and promising approaches
-- [ ] HTML presentation page
-- [ ] Reproduction instructions and dependency manifest
+- [x] Background research and sources
+- [x] Product and technical documentation
+- [x] Runnable prototype
+- [x] Public/synthetic input data and answer key
+- [x] Baseline and multi-model raw outputs
+- [x] Evaluation code and results
+- [x] Build log, including failed and promising approaches
+- [x] HTML presentation page
+- [x] Reproduction instructions and dependency manifest
 
 ## Final recommendation boundary
 

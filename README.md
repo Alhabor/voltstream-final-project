@@ -39,9 +39,11 @@ contract distilled from the assignment page.
 
 ## Repository status
 
-The directory is initialized as a local Git repository. A GitHub remote,
-collaborators, model credentials, and team-member contribution assignments have
-not yet been configured.
+The private GitHub remote is configured at
+`Alhabor/voltstream-final-project`, and the complete v4 experiment plus final
+HTML presentation are versioned on `main`. GitHub collaborator membership and
+one attributable commit per human team member must still be verified by the
+team before submission; the repository does not fabricate that evidence.
 
 ## Local validation
 
@@ -51,6 +53,37 @@ The deterministic prototype uses Python 3.9+ and has no runtime dependencies.
 make check
 ```
 
-This runs unit tests, benchmark-contract validation, bytecode compilation, and
-the repository secret scan. API keys are read from local environment variables
+This runs unit tests, benchmark-contract validation, a read-only end-to-end
+integrity audit of the final experiment bundle, bytecode compilation, and the
+repository secret scan. API keys are read from local environment variables
 only; see `SECURITY.md` and `.env.example`.
+
+## Reproduce the evidence
+
+Run the deterministic baseline or a registered model strategy:
+
+```bash
+PYTHONPATH=src python3 scripts/run_experiments.py \
+  --run-id <new-run-id> --strategy baseline
+
+# Model strategies require their normal local provider authentication.
+PYTHONPATH=src python3 scripts/run_experiments.py \
+  --run-id <new-run-id> --strategy codex-terra-guarded
+```
+
+Score a completed run without sending data to a provider:
+
+```bash
+python3 scripts/score_run.py --run-id <run-id>
+```
+
+Verify the frozen files, per-case evidence, aggregate predictions, and saved
+scores of a completed run without rewriting it:
+
+```bash
+PYTHONPATH=src python3 scripts/verify_run.py --run-id <run-id>
+```
+
+The audited final evidence is in `evaluation/runs/2026-08-09-final-v4/`.
+Open `presentation/index.html` directly; it is self-contained and requires no
+server, network request, or sibling data file.
