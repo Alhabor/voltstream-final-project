@@ -358,12 +358,12 @@ const html = `<!doctype html>
     .slide.active .prototype .pipeline-step:nth-child(1) { animation: pipeline-rise .45s ease-out both 2.9s; }
     .slide.active .prototype .pipeline-step:nth-child(2) { animation: pipeline-rise .45s ease-out both 3.35s; }
     .slide.active .prototype .pipeline-step:nth-child(3) { animation: pipeline-rise .45s ease-out both 3.8s; }
-    .slide.active .pipeline-conflict { animation: conflict-arrives .7s ease-out both 4.25s; }
-    .slide.active .prototype .pipeline-step:nth-child(4) { animation: pipeline-rise .45s ease-out both 4.9s; }
-    .slide.active .pipeline-decisions { animation: pipeline-rise .45s ease-out both 5.35s; }
+    .slide.active .prototype .pipeline-step:nth-child(4) { animation: pipeline-rise .45s ease-out both 4.25s; }
+    .slide.active .pipeline-conflict { animation: conflict-arrives .7s ease-out both 4.8s; }
+    .slide.active .pipeline-decisions { animation: pipeline-rise .45s ease-out both 5.45s; }
     .slide.active .prototype .lane-outcome,
     .slide.active .pipeline-guardrail,
-    .slide.active .pipeline-facts { animation: pipeline-rise .45s ease-out both 5.8s; }
+    .slide.active .pipeline-facts { animation: pipeline-rise .45s ease-out both 5.95s; }
     @keyframes pipeline-rise { from { opacity: 0; transform: translateY(calc(var(--u) * .5)); } }
     @keyframes conflict-arrives {
       from { opacity: 0; transform: scale(.96); }

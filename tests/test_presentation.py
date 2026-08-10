@@ -256,6 +256,24 @@ class PresentationContractTests(unittest.TestCase):
         ]:
             self.assertIn(marker, self.document)
         self.assertNotIn("animation-iteration-count: infinite", self.document)
+        # Preserve the visible top-to-bottom teaching order on the prototype
+        # lane: step 3, step 4, then the conflict example and route chips.
+        ordered_timing = [
+            (".prototype .pipeline-step:nth-child(3)", 3.8),
+            (".prototype .pipeline-step:nth-child(4)", 4.25),
+            (".pipeline-conflict", 4.8),
+            (".pipeline-decisions", 5.45),
+        ]
+        for selector, delay in ordered_timing:
+            self.assertIn(
+                f".slide.active {selector}",
+                self.document,
+            )
+            self.assertRegex(
+                self.document,
+                re.escape(f".slide.active {selector}")
+                + rf"[^;]+both {delay:g}s;",
+            )
 
     def test_language_and_theme_controls_are_embedded(self):
         for text in [
