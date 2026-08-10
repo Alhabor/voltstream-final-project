@@ -1,0 +1,18 @@
+.DS_Store
+.Rhistory
+.env
+.env.*
+!.env.example
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+node_modules/
+dist/
+build/
+
+# Keep secrets and ad-hoc large model artifacts out of the submission.
+*.key
+*.pem
+models/
