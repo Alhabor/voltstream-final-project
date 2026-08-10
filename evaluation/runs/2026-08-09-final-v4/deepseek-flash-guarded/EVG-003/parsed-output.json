@@ -1,0 +1,32 @@
+{
+  "case_id": "EVG-003",
+  "record": {
+    "station_id": "GAMMA-009",
+    "address": "9 Demo Plaza Queens NY 11101",
+    "charger_level": "DCFC",
+    "port_count": 6,
+    "power_kw": 150,
+    "connector_type": "CCS1",
+    "operational_status": "operational",
+    "source_record_id": "G-9001"
+  },
+  "source_mappings": {
+    "station_id": "$.site.id",
+    "address": "$.site.location",
+    "charger_level": "$.equipment.level",
+    "port_count": "$.equipment.ports",
+    "power_kw": "$.equipment.rated_kw",
+    "connector_type": "$.equipment.connector",
+    "operational_status": "$.state",
+    "source_record_id": "$.vendor_record"
+  },
+  "decision": "ACCEPT",
+  "issue_codes": [],
+  "latency_ms": 1429.696,
+  "input_tokens": 990,
+  "output_tokens": 147,
+  "cached_input_tokens": 896,
+  "estimated_cost_usd": 5.68288e-05,
+  "model_calls": 1,
+  "provider_model": "deepseek-v4-flash"
+}

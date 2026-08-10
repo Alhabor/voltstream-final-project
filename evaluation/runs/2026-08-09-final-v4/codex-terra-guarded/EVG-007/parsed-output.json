@@ -1,0 +1,36 @@
+{
+  "case_id": "EVG-007",
+  "record": {
+    "station_id": null,
+    "address": null,
+    "charger_level": null,
+    "port_count": null,
+    "power_kw": null,
+    "connector_type": null,
+    "operational_status": "unknown",
+    "source_record_id": null
+  },
+  "source_mappings": {
+    "station_id": "station identifier unknown",
+    "address": "address unknown",
+    "charger_level": "charger level unknown",
+    "port_count": "port count unknown",
+    "power_kw": "rated power unavailable",
+    "connector_type": "connector type unknown",
+    "operational_status": "operating status unknown",
+    "source_record_id": null
+  },
+  "decision": "REJECT",
+  "issue_codes": [
+    "MISSING_STABLE_IDENTITY",
+    "MISSING_SOURCE_LINEAGE",
+    "MISSING_REQUIRED_FIELD"
+  ],
+  "latency_ms": 6972.986,
+  "input_tokens": 15496,
+  "output_tokens": 135,
+  "cached_input_tokens": 13056,
+  "estimated_cost_usd": null,
+  "model_calls": 1,
+  "provider_model": "gpt-5.6-terra"
+}

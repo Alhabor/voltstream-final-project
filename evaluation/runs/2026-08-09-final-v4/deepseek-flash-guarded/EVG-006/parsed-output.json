@@ -1,0 +1,34 @@
+{
+  "case_id": "EVG-006",
+  "record": {
+    "station_id": "BETA-606",
+    "address": "606 Test Lane Staten Island NY 10301",
+    "charger_level": "DCFC",
+    "port_count": 4,
+    "power_kw": 7.2,
+    "connector_type": "CCS1",
+    "operational_status": "operational",
+    "source_record_id": "B-606"
+  },
+  "source_mappings": {
+    "station_id": "stationId",
+    "address": "address",
+    "charger_level": "chargerLevel",
+    "port_count": "ports",
+    "power_kw": "ratedPowerKw",
+    "connector_type": "connector",
+    "operational_status": "status",
+    "source_record_id": "recordId"
+  },
+  "decision": "HUMAN_REVIEW",
+  "issue_codes": [
+    "LEVEL_POWER_CONFLICT"
+  ],
+  "latency_ms": 1769.59,
+  "input_tokens": 985,
+  "output_tokens": 196,
+  "cached_input_tokens": 896,
+  "estimated_cost_usd": 6.98488e-05,
+  "model_calls": 1,
+  "provider_model": "deepseek-v4-flash"
+}

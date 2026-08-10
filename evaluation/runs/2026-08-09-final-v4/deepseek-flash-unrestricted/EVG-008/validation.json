@@ -1,0 +1,46 @@
+{
+  "candidate": {
+    "record": {
+      "station_id": "DELTA-808",
+      "address": "808 Prototype Blvd New York NY 10003",
+      "charger_level": "DCFC",
+      "port_count": null,
+      "power_kw": 100,
+      "connector_type": "CCS1",
+      "operational_status": "operational",
+      "source_record_id": "D-808"
+    },
+    "source_mappings": {
+      "station_id": "station",
+      "address": "address",
+      "charger_level": "type",
+      "port_count": "number_of_ports",
+      "power_kw": "max_power_kw",
+      "connector_type": "plug",
+      "operational_status": "current_state",
+      "source_record_id": "contractor_record"
+    },
+    "issue_codes": [
+      "INVALID_PORT_COUNT"
+    ]
+  },
+  "decision": "REJECT",
+  "issues": [
+    {
+      "code": "MISSING_REQUIRED_FIELD",
+      "severity": "review",
+      "message": "Port count is missing and requires review.",
+      "field": "port_count"
+    },
+    {
+      "code": "INVALID_PORT_COUNT",
+      "severity": "reject",
+      "message": "Issue reported by the model candidate and retained for review.",
+      "field": null
+    }
+  ],
+  "issue_codes": [
+    "MISSING_REQUIRED_FIELD",
+    "INVALID_PORT_COUNT"
+  ]
+}

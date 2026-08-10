@@ -1,0 +1,34 @@
+{
+  "case_id": "EVG-009",
+  "record": {
+    "station_id": null,
+    "address": "909 Sandbox Way Brooklyn NY 11215",
+    "charger_level": null,
+    "port_count": null,
+    "power_kw": null,
+    "connector_type": null,
+    "operational_status": null,
+    "source_record_id": "A-909"
+  },
+  "source_mappings": {
+    "station_id": null,
+    "address": "location",
+    "charger_level": null,
+    "port_count": null,
+    "power_kw": null,
+    "connector_type": null,
+    "operational_status": null,
+    "source_record_id": "record_id"
+  },
+  "decision": "REJECT",
+  "issue_codes": [
+    "OUTPUT_SCHEMA_ERROR",
+    "MISSING_STABLE_IDENTITY",
+    "MISSING_REQUIRED_FIELD"
+  ],
+  "latency_ms": 0.0,
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "estimated_cost_usd": 0.0,
+  "model_calls": 0
+}

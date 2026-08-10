@@ -1,0 +1,39 @@
+{
+  "candidate": {
+    "record": {
+      "station_id": "ALPHA-505",
+      "address": null,
+      "charger_level": "L2",
+      "port_count": 2,
+      "power_kw": 7.2,
+      "connector_type": "J1772",
+      "operational_status": "operational",
+      "source_record_id": "A-2026-505"
+    },
+    "source_mappings": {
+      "station_id": "Station Number",
+      "address": "Address",
+      "charger_level": "Level",
+      "port_count": "Ports",
+      "power_kw": "Power kW",
+      "connector_type": "Connector",
+      "operational_status": "Status",
+      "source_record_id": "Row ID"
+    },
+    "issue_codes": [
+      "MISSING_REQUIRED_FIELD"
+    ]
+  },
+  "decision": "HUMAN_REVIEW",
+  "issues": [
+    {
+      "code": "MISSING_REQUIRED_FIELD",
+      "severity": "review",
+      "message": "Site address is missing and requires review.",
+      "field": "address"
+    }
+  ],
+  "issue_codes": [
+    "MISSING_REQUIRED_FIELD"
+  ]
+}

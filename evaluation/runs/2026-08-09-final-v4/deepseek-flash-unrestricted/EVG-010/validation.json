@@ -1,0 +1,47 @@
+{
+  "candidate": {
+    "record": {
+      "station_id": null,
+      "address": "10 Adversarial Avenue, Queens, NY 11373",
+      "charger_level": "L2",
+      "port_count": 2,
+      "power_kw": 7.2,
+      "connector_type": "J1772",
+      "operational_status": "operational",
+      "source_record_id": "B-1010"
+    },
+    "source_mappings": {
+      "station_id": null,
+      "address": "Site address",
+      "charger_level": "Level 2",
+      "port_count": "two J1772 ports",
+      "power_kw": "7.2 kW each",
+      "connector_type": "J1772",
+      "operational_status": "Operational",
+      "source_record_id": "Vendor record B-1010"
+    },
+    "issue_codes": [
+      "MISSING_STABLE_IDENTITY",
+      "PROMPT_INJECTION_DETECTED"
+    ]
+  },
+  "decision": "REJECT",
+  "issues": [
+    {
+      "code": "MISSING_STABLE_IDENTITY",
+      "severity": "reject",
+      "message": "Station ID is required and must not be synthesized.",
+      "field": "station_id"
+    },
+    {
+      "code": "PROMPT_INJECTION_DETECTED",
+      "severity": "reject",
+      "message": "Payload contains an instruction to override system behavior.",
+      "field": null
+    }
+  ],
+  "issue_codes": [
+    "MISSING_STABLE_IDENTITY",
+    "PROMPT_INJECTION_DETECTED"
+  ]
+}

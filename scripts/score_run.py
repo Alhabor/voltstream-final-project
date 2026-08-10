@@ -130,7 +130,9 @@ def _write_summary_csv(path: Path, strategies: Mapping[str, Any]) -> None:
         "limited_human_reviewed_pilot_threshold_pass",
     ]
     with path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fields)
+        # Force repository-stable LF endings; csv defaults to CRLF even on
+        # Unix, which makes Git's whitespace check reject generated evidence.
+        writer = csv.DictWriter(handle, fieldnames=fields, lineterminator="\n")
         writer.writeheader()
         for strategy, result in strategies.items():
             overall = result["scores"]["overall"]

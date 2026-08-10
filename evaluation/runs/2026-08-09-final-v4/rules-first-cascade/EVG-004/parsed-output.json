@@ -1,0 +1,33 @@
+{
+  "case_id": "EVG-004",
+  "record": {
+    "station_id": "DELTA-44",
+    "address": "44 Fictional Road, Bronx, NY 10451",
+    "charger_level": "L2",
+    "port_count": 4,
+    "power_kw": 7.2,
+    "connector_type": "J1772",
+    "operational_status": "operational",
+    "source_record_id": "D-44"
+  },
+  "source_mappings": {
+    "station_id": "station DELTA-44",
+    "address": "44 Fictional Road, Bronx, NY 10451",
+    "charger_level": "Level 2",
+    "port_count": "four operational Level 2 ports",
+    "power_kw": "7.2 kW",
+    "connector_type": "J1772",
+    "operational_status": "operational",
+    "source_record_id": "D-44"
+  },
+  "decision": "ACCEPT",
+  "issue_codes": [],
+  "latency_ms": 2250.018,
+  "input_tokens": 976,
+  "output_tokens": 211,
+  "cached_input_tokens": 896,
+  "estimated_cost_usd": 7.27888e-05,
+  "model_calls": 1,
+  "provider_model": "deepseek-v4-flash",
+  "cascade_source": "deepseek-flash-guarded"
+}

@@ -1,0 +1,9 @@
+{
+  "model": "deepseek-v4-pro",
+  "latency_ms": 3483.799167,
+  "input_tokens": 989,
+  "output_tokens": 196,
+  "cached_input_tokens": 896,
+  "provider_request_id": null,
+  "estimated_cost_usd": 0.000214223
+}

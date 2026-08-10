@@ -1,0 +1,32 @@
+{
+  "case_id": "EVG-001",
+  "record": {
+    "station_id": "ALPHA-101",
+    "address": "100 Example Ave New York NY 10001",
+    "charger_level": "L2",
+    "port_count": 4,
+    "power_kw": 7.2,
+    "connector_type": "J1772",
+    "operational_status": "operational",
+    "source_record_id": "A-2026-001"
+  },
+  "source_mappings": {
+    "station_id": "station_id",
+    "address": "address",
+    "charger_level": "charger_level",
+    "port_count": "port_count",
+    "power_kw": "power_kw",
+    "connector_type": "connector_type",
+    "operational_status": "operational_status",
+    "source_record_id": "source_record_id"
+  },
+  "decision": "ACCEPT",
+  "issue_codes": [],
+  "latency_ms": 3483.799,
+  "input_tokens": 989,
+  "output_tokens": 196,
+  "cached_input_tokens": 896,
+  "estimated_cost_usd": 0.000214223,
+  "model_calls": 1,
+  "provider_model": "deepseek-v4-pro"
+}

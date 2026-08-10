@@ -1,0 +1,9 @@
+{
+  "model": "deepseek-v4-flash",
+  "latency_ms": 1906.8475830000011,
+  "input_tokens": 759,
+  "output_tokens": 219,
+  "cached_input_tokens": 640,
+  "provider_request_id": null,
+  "estimated_cost_usd": 7.9772e-05
+}

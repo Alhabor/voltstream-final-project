@@ -1,0 +1,32 @@
+{
+  "case_id": "EVG-009",
+  "record": {
+    "station_id": "ALPHA-909",
+    "address": "909 Sandbox Way Brooklyn NY 11215",
+    "charger_level": "L2",
+    "port_count": 8,
+    "power_kw": 7.2,
+    "connector_type": "J1772",
+    "operational_status": "operational",
+    "source_record_id": "A-909"
+  },
+  "source_mappings": {
+    "station_id": "$.station",
+    "address": "$.location",
+    "charger_level": "$.equipment_summary.level",
+    "port_count": "$.equipment_summary.installed_ports",
+    "power_kw": "$.equipment_summary.power_per_port_kw",
+    "connector_type": "$.equipment_summary.connector",
+    "operational_status": "$.reported_status",
+    "source_record_id": "$.record_id"
+  },
+  "decision": "ACCEPT",
+  "issue_codes": [],
+  "latency_ms": 3394.533,
+  "input_tokens": 1013,
+  "output_tokens": 219,
+  "cached_input_tokens": 896,
+  "estimated_cost_usd": 0.000244673,
+  "model_calls": 1,
+  "provider_model": "deepseek-v4-pro"
+}

@@ -1,0 +1,36 @@
+{
+  "case_id": "EVG-007",
+  "record": {
+    "station_id": null,
+    "address": null,
+    "charger_level": null,
+    "port_count": null,
+    "power_kw": null,
+    "connector_type": null,
+    "operational_status": null,
+    "source_record_id": "G-707"
+  },
+  "source_mappings": {
+    "station_id": null,
+    "address": null,
+    "charger_level": null,
+    "port_count": null,
+    "power_kw": null,
+    "connector_type": null,
+    "operational_status": null,
+    "source_record_id": "Vendor record G-707"
+  },
+  "decision": "REJECT",
+  "issue_codes": [
+    "MISSING_STABLE_IDENTITY",
+    "MISSING_REQUIRED_FIELD",
+    "MISSING_SOURCE_LINEAGE"
+  ],
+  "latency_ms": 1811.443,
+  "input_tokens": 720,
+  "output_tokens": 182,
+  "cached_input_tokens": 640,
+  "estimated_cost_usd": 6.3952e-05,
+  "model_calls": 1,
+  "provider_model": "deepseek-v4-flash"
+}
