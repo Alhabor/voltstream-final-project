@@ -85,5 +85,6 @@ PYTHONPATH=src python3 scripts/verify_run.py --run-id <run-id>
 ```
 
 The audited final evidence is in `evaluation/runs/2026-08-09-final-v4/`.
-Open `presentation/index.html` directly; it is self-contained and requires no
-server, network request, or sibling data file.
+Open `presentation/index.html` directly; it is self-contained, includes
+English/Chinese and dark/light switching, and requires no server, network
+request, or sibling data file.

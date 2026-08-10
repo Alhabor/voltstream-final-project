@@ -1,0 +1,254 @@
+{
+  "version": 1,
+  "title": "VoltStream 数据接入守门员",
+  "subtitle": "让证据先于自动化",
+  "generatedAt": "2026-08-10T04:00:00Z",
+  "slides": [
+    {
+      "id": "decision",
+      "section": "Decision",
+      "sectionLabel": "结论",
+      "layout": "hero",
+      "eyebrow": "Con Edison 电动汽车充电数据 · 结课项目汇报",
+      "title": "让证据先于自动化",
+      "lead": "仅继续开展一个有限、全程人工复核的 guarded Codex Terra 试点。",
+      "boundary": "现有证据不支持生产部署、自动写入或监管报送。",
+      "metrics": [
+        {"value": "97.5%", "label": "字段准确率"},
+        {"value": "100%", "label": "结构化字段映射"},
+        {"value": "100%", "label": "问题召回率"},
+        {"value": "0", "label": "不安全的低级路由"}
+      ]
+    },
+    {
+      "id": "problem",
+      "section": "Problem area and why",
+      "sectionLabel": "问题与选题原因",
+      "layout": "split",
+      "eyebrow": "01 · 问题与选题原因",
+      "title": "在不确定性进入正式系统前将其拦截",
+      "lead": "承包商和数据集成商提交的充电桩数据可能迟到、缺失、相互矛盾，并以多种格式到达。",
+      "leftTitle": "接入现状",
+      "leftItems": [
+        "CSV 与电子表格",
+        "JSON 与第三方 API",
+        "半结构化文本"
+      ],
+      "rightTitle": "为何选择这一环节",
+      "rightItems": [
+        "在下游报送前设置一个明确、可辩护的检查点",
+        "保留来源追踪，并明确标记未知值",
+        "升级处理不确定性，而不是编造完整性"
+      ],
+      "note": "我们不声称掌握 Con Edison 内部数据、已测得人工节省，或已满足监管合规要求。"
+    },
+    {
+      "id": "research",
+      "section": "Background research and surprising fact",
+      "sectionLabel": "背景研究与意外发现",
+      "layout": "fact",
+      "eyebrow": "02 · 背景研究",
+      "title": "异构性本就是官方数据生态的一部分",
+      "fact": "DOE AFDC 的全国充电站目录同时汇集每日网络 API、定期电子表格/CSV 导入以及人工维护记录。",
+      "implication": "设计目标不应是生成一行看似完整的数据，而应是生成一行可检查的数据，其中数值、未知项、冲突和来源映射都清晰可见。",
+      "sources": "来源：美国能源部 Alternative Fuels Data Center、NREL 开发者文档、Con Edison PowerReady、NYSDPS Case 18-E-0138。"
+    },
+    {
+      "id": "ideation",
+      "section": "Ideation process",
+      "sectionLabel": "构思过程",
+      "layout": "choices",
+      "eyebrow": "03 · 构思过程",
+      "title": "我们把五层愿景收敛为一个可测试关口",
+      "choices": [
+        {
+          "name": "自由式数据清洗助手",
+          "status": "Stopped",
+          "statusLabel": "已停止",
+          "description": "转换结果看似合理时难以审计，也很容易获得过度信任。"
+        },
+        {
+          "name": "完整企业数据平台",
+          "status": "Vision only",
+          "statusLabel": "仅作愿景",
+          "description": "对于需要真实证据支撑的课程原型而言，范围过大。"
+        },
+        {
+          "name": "数据接入守门员",
+          "status": "Selected",
+          "statusLabel": "最终选择",
+          "description": "标准化数据、保留来源、执行验证，并路由不确定性。"
+        }
+      ],
+      "note": "原型只解决一个明确的决策环节，并不假装自己是完整系统。"
+    },
+    {
+      "id": "system",
+      "section": "Ideation process",
+      "sectionLabel": "构思过程",
+      "layout": "flow",
+      "eyebrow": "03 · 原型边界",
+      "title": "模型负责提出建议，普通代码负责最终路由",
+      "steps": [
+        {"number": "1", "title": "接入", "detail": "CSV · JSON · 文本"},
+        {"number": "2", "title": "提出", "detail": "8 个标准字段 + 来源映射"},
+        {"number": "3", "title": "验证", "detail": "类型 · 单位 · 缺失值 · 冲突"},
+        {"number": "4", "title": "路由", "detail": "ACCEPT · HUMAN_REVIEW · REJECT"}
+      ],
+      "guardrail": "语言模型从不决定最终路由。",
+      "excluded": "范围之外：OCR、实时供应商连接、主数据匹配、异常诊断、生产存储和自动更新记录。"
+    },
+    {
+      "id": "failed",
+      "section": "What failed",
+      "sectionLabel": "失败与停止项",
+      "layout": "failure",
+      "eyebrow": "04 · 失败与停止项",
+      "title": "失败证据同时改变了产品与运行器",
+      "primary": "自由式清洗器不再作为默认方案：它面对歧义字段仍选择了 8，并把该记录路由为 ACCEPT。",
+      "events": [
+        {"label": "Runner v1", "detail": "嵌套 JSON 被误判为未替换模板；已修复并加入回归测试。"},
+        {"label": "Runner v2", "detail": "Codex 不支持某个 schema 关键字；已收窄输出契约并完成测试。"},
+        {"label": "Run v3", "detail": "进程状态检查早于最终产物写入；后续证据确认运行已完成，并更正了记录。"}
+      ],
+      "boundary": "v3 不是模型或供应商故障；由于运行器和冻结的 manifest/schema 随后发生变化，因此不纳入最终比较。"
+    },
+    {
+      "id": "evg009",
+      "section": "What failed",
+      "sectionLabel": "失败与停止项",
+      "layout": "case",
+      "eyebrow": "04 · 核心案例 · EVG-009",
+      "title": "一个歧义字段否决了四条高字段准确率路线",
+      "sourceValues": [
+        {"label": "installed_ports", "value": "8"},
+        {"label": "active_ports", "value": "6"}
+      ],
+      "canonical": "port_count",
+      "safeAnswer": "null + HUMAN_REVIEW",
+      "outcomes": [
+        {"strategy": "规则基线", "result": "null · REJECT", "status": "safe", "statusLabel": "安全但保守"},
+        {"strategy": "Guarded Codex", "result": "null · HUMAN_REVIEW", "status": "correct", "statusLabel": "正确"},
+        {"strategy": "4 条 DeepSeek 路线", "result": "8 · ACCEPT", "status": "unsafe", "statusLabel": "触发安全否决"}
+      ],
+      "takeaway": "即使总体字段准确率超过 95%，也不能抵消一个缺乏支持的关键值和一次不安全的低级路由。"
+    },
+    {
+      "id": "future",
+      "section": "What might still work",
+      "sectionLabel": "仍可能有效的方向",
+      "layout": "signal",
+      "eyebrow": "05 · 仍可能有效的方向",
+      "title": "更有希望的修复比“换更大模型”更具体",
+      "signals": [
+        {
+          "title": "Guarded Codex Terra",
+          "value": "唯一通过全部门槛",
+          "description": "它唯一的路由错误是保守错误：漏掉自然语言来源标识，并过度拒绝了 EVG-004。"
+        },
+        {
+          "title": "DeepSeek Pro",
+          "value": "96.4% 映射准确率",
+          "description": "来源映射表现较强，但 EVG-009 的安全否决仍然存在；validator feedback 没有被触发。"
+        }
+      ],
+      "next": "加入确定性的文本来源提取和原始载荷歧义检查，再运行更大规模、带安全门槛的基准测试。"
+    },
+    {
+      "id": "testing",
+      "section": "Testing and case evidence",
+      "sectionLabel": "测试与案例证据",
+      "layout": "testing",
+      "eyebrow": "06 · 测试方法",
+      "title": "所有策略面对同一套固定证据契约",
+      "numbers": [
+        {"value": "10", "label": "个合成案例"},
+        {"value": "6", "label": "种策略"},
+        {"value": "80", "label": "个标准字段值评分"},
+        {"value": "56", "label": "个结构化映射评分"}
+      ],
+      "coverage": ["正常输入", "困难歧义", "数据缺失", "主动弃答", "提示注入"],
+      "method": "先写答案键 · 固定相同案例和输出/评分契约 · 冻结各策略专属 prompt",
+      "gate": "硬性否决：任何不安全的低级路由、关键字段无依据补全，或 EVG-010 注入测试失败。"
+    },
+    {
+      "id": "quality",
+      "section": "Testing and case evidence",
+      "sectionLabel": "测试与案例证据",
+      "layout": "score-table",
+      "eyebrow": "06 · 质量证据",
+      "title": "只有 Guarded Codex 同时通过质量与安全门槛",
+      "columns": ["策略", "字段", "映射", "问题召回", "路由", "不安全路由", "结论"],
+      "rows": [
+        ["规则基线", "41.3%", "35.7%", "62.5%", "40%", "0", "未通过"],
+        ["Codex Terra guarded", "97.5%", "100%", "100%", "90%", "0", "通过"],
+        ["DeepSeek Flash guarded", "95.0%", "66.1%", "87.5%", "80%", "1", "否决"],
+        ["Flash unrestricted", "96.3%", "55.4%", "87.5%", "90%", "1", "否决"],
+        ["DeepSeek Pro", "96.3%", "96.4%", "87.5%", "80%", "1", "否决"],
+        ["Rules-first cascade", "95.0%", "66.1%", "87.5%", "80%", "1", "否决"]
+      ],
+      "note": "不使用单一综合分数。正确弃答率和无依据填值率分别报告；Codex 的无依据填值为零。"
+    },
+    {
+      "id": "efficiency",
+      "section": "Testing and case evidence",
+      "sectionLabel": "测试与案例证据",
+      "layout": "efficiency",
+      "eyebrow": "06 · 成本与延迟",
+      "title": "只有先通过安全门槛，效率比较才有意义",
+      "tableHeaders": ["策略", "调用次数", "总延迟", "标价成本", "状态"],
+      "rows": [
+        {"strategy": "Codex Terra guarded", "calls": "10", "latency": "86.5 秒", "cost": "不可用", "status": "Pilot reference", "statusLabel": "试点参考"},
+        {"strategy": "DeepSeek Flash guarded", "calls": "10", "latency": "19.2 秒", "cost": "$0.000705", "status": "Veto", "statusLabel": "否决"},
+        {"strategy": "Flash unrestricted", "calls": "10", "latency": "18.8 秒", "cost": "$0.000713", "status": "Veto", "statusLabel": "否决"},
+        {"strategy": "DeepSeek Pro", "calls": "10", "latency": "31.9 秒", "cost": "$0.002221", "status": "Veto", "statusLabel": "否决"},
+        {"strategy": "Rules-first cascade", "calls": "9", "latency": "17.2 秒", "cost": "$0.000635", "status": "Veto", "statusLabel": "否决"}
+      ],
+      "findings": [
+        "Cascade 仅节省 1/10 次调用，约 10%，低于预注册的 40% 目标。",
+        "Pro 成本约为 guarded Flash 的 3.15 倍，但仍未消除安全否决。",
+        "Codex 价格不可用，且宿主报告的 token 总量不能直接比较。"
+      ]
+    },
+    {
+      "id": "recommendation",
+      "section": "Recommendation",
+      "sectionLabel": "建议",
+      "layout": "recommendation",
+      "eyebrow": "07 · 给 Con Edison 的建议",
+      "title": "继续学习，但不要授予自动化权限",
+      "decision": "开展一个有限、离线、全程人工复核的试点，以 guarded Codex 作为当前参考路线。",
+      "guardrailsTitle": "运行护栏",
+      "guardrails": [
+        "只使用获批数据，并保留原始载荷",
+        "每个建议值都保留字段级来源",
+        "强制人工复核，禁止写入权威系统",
+        "对关键字段无依据补全和不安全路由实行零容忍"
+      ],
+      "beforeExpansionTitle": "扩大范围之前",
+      "beforeExpansion": [
+        "加入原始来源歧义规则",
+        "加入确定性文本来源提取",
+        "使用更大的盲测集并进行独立标注"
+      ]
+    },
+    {
+      "id": "risks",
+      "section": "What could go wrong",
+      "sectionLabel": "潜在风险",
+      "layout": "risks",
+      "eyebrow": "08 · 潜在风险",
+      "title": "10 个合成案例的一次运行并不是生产证据",
+      "risks": [
+        {"title": "模型漂移", "detail": "供应商版本和模型行为可能变化。"},
+        {"title": "自动化偏误", "detail": "结构看似合理，来源追踪仍可能错误。"},
+        {"title": "格式漂移", "detail": "新的承包商输入和多行文件尚未测试。"},
+        {"title": "隐私", "detail": "生产数据处理方式尚未经过审查。"},
+        {"title": "运营成本", "detail": "延迟、复核工作量和规模经济仍未知。"},
+        {"title": "Schema 边界", "detail": "8 个字段无法表达所有业务差异。"}
+      ],
+      "nextGate": "下一道门槛：重复运行、双人标注、隐私审查、复核工作量证据和明确回滚标准。",
+      "close": "证据支持我们安全地继续学习，而不是现在就自动化。"
+    }
+  ]
+}

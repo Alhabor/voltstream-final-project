@@ -1,11 +1,21 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-language="en" data-theme="dark">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="color-scheme" content="dark">
+  <meta name="color-scheme" content="dark light">
   <meta name="description" content="VoltStream evidence-first Con Edison EV charger data capstone presentation">
   <title>VoltStream Intake Gatekeeper — Evidence before automation</title>
+  <script>
+    (() => {
+      try {
+        const savedLanguage = localStorage.getItem('voltstream-language');
+        const savedTheme = localStorage.getItem('voltstream-theme');
+        document.documentElement.dataset.language = savedLanguage === 'zh' ? 'zh' : 'en';
+        document.documentElement.dataset.theme = savedTheme === 'light' ? 'light' : 'dark';
+      } catch (_) { /* File URLs may restrict storage; dark English remains safe. */ }
+    })();
+  </script>
   <style>
     :root {
       --ink: #f6f7f9;
@@ -20,15 +30,64 @@
       --green: #78d6a7;
       --amber: #f2c166;
       --red: #ff8d8d;
+      --body-bg: #06090d;
+      --stage-border: #26313d;
+      --stage-shadow: rgba(0,0,0,.55);
+      --grid-line: rgba(126,200,255,.045);
+      --slide-start: #111821;
+      --slide-end: #0d1319;
+      --panel-glow: rgba(255,255,255,.035);
+      --panel-fade: rgba(255,255,255,.012);
+      --selected-bg-start: #183126;
+      --selected-bg-end: #172129;
+      --good-tint: rgba(120,214,167,.09);
+      --bad-tint: rgba(255,141,141,.08);
+      --control-bg: rgba(16,21,27,.9);
+      --control-hover: #1b2834;
+      --control-border: #536577;
+      --progress-track: rgba(255,255,255,.08);
       --stage-w: min(100vw, calc(100vh * 16 / 9));
       --stage-h: min(100vh, calc(100vw * 9 / 16));
       --u: min(1vw, 1.7778vh);
     }
 
+    html[data-theme="light"] {
+      --ink: #15212c;
+      --muted: #455565;
+      --subtle: #647484;
+      --paper: #f4f7fa;
+      --panel: #e8eef4;
+      --panel-2: #dce6ef;
+      --line: #a8b8c7;
+      --blue: #006eaa;
+      --blue-strong: #087bbd;
+      --green: #15734a;
+      --amber: #815600;
+      --red: #a43e49;
+      --body-bg: #cdd5dc;
+      --stage-border: #9aa8b4;
+      --stage-shadow: rgba(31,45,57,.22);
+      --grid-line: rgba(0,110,170,.055);
+      --slide-start: #f8fafc;
+      --slide-end: #eef3f7;
+      --panel-glow: rgba(255,255,255,.74);
+      --panel-fade: rgba(223,232,240,.58);
+      --selected-bg-start: #e4f2e9;
+      --selected-bg-end: #edf5f1;
+      --good-tint: rgba(21,115,74,.10);
+      --bad-tint: rgba(164,62,73,.08);
+      --control-bg: rgba(244,247,250,.94);
+      --control-hover: #dde8f0;
+      --control-border: #718493;
+      --progress-track: rgba(21,33,44,.12);
+    }
+
     * { box-sizing: border-box; }
     html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+    html[data-theme="dark"] { color-scheme: dark; }
+    html[data-theme="light"] { color-scheme: light; }
     body {
-      background: #06090d;
+      background: var(--body-bg);
       color: var(--ink);
       font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       -webkit-font-smoothing: antialiased;
@@ -42,7 +101,7 @@
       transform: translate(-50%, -50%);
       overflow: hidden;
       background: var(--paper);
-      box-shadow: 0 0 0 1px #26313d, 0 2.2rem 7rem rgba(0,0,0,.55);
+      box-shadow: 0 0 0 1px var(--stage-border), 0 2.2rem 7rem var(--stage-shadow);
       touch-action: pan-y pinch-zoom;
     }
     .deck { position: absolute; inset: 0; }
@@ -50,16 +109,30 @@
       position: absolute;
       inset: 0;
       display: none;
+      overflow: hidden;
+      background:
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px) 0 0 / calc(var(--u) * 5) 100%,
+        linear-gradient(145deg, var(--slide-start) 0%, var(--slide-end) 72%);
+      opacity: 0;
+    }
+    .slide.active { display: block; opacity: 1; animation: reveal .26s ease-out; }
+    .slide-copy {
+      position: absolute;
+      inset: 0;
+      display: grid;
       grid-template-rows: auto 1fr auto;
       gap: calc(var(--u) * 1.3);
       padding: calc(var(--u) * 3.1) calc(var(--u) * 4.4) calc(var(--u) * 2.2);
       overflow: hidden;
-      background:
-        linear-gradient(90deg, rgba(126,200,255,.045) 1px, transparent 1px) 0 0 / calc(var(--u) * 5) 100%,
-        linear-gradient(145deg, #111821 0%, #0d1319 72%);
-      opacity: 0;
     }
-    .slide.active { display: grid; opacity: 1; animation: reveal .26s ease-out; }
+    html[data-language="en"] .slide-copy[data-copy="zh"],
+    html[data-language="zh"] .slide-copy[data-copy="en"] { display: none; }
+    .slide-copy[data-copy="zh"] {
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Inter, ui-sans-serif, sans-serif;
+    }
+    .slide-copy[data-copy="zh"] h1,
+    .slide-copy[data-copy="zh"] h2 { letter-spacing: -.02em; }
+    .slide-copy[data-copy="zh"] .eyebrow { letter-spacing: .08em; }
     @keyframes reveal { from { opacity: 0; transform: translateX(calc(var(--u) * .7)); } }
     .slide::after {
       content: "";
@@ -72,6 +145,7 @@
     .slide[data-tone="failure"]::after { background: var(--red); }
     .slide-header { min-width: 0; }
     .eyebrow {
+      width: fit-content;
       margin: 0 0 calc(var(--u) * .6);
       color: var(--blue);
       font-size: calc(var(--u) * 1.06);
@@ -101,7 +175,7 @@
       line-height: 1.15;
     }
     p, li, td, th { font-size: calc(var(--u) * 1.2); line-height: 1.4; }
-    .lead { max-width: 50ch; color: #dbe2e9; font-size: calc(var(--u) * 1.55); line-height: 1.35; }
+    .lead { max-width: 50ch; color: var(--ink); font-size: calc(var(--u) * 1.55); line-height: 1.35; }
     .large-claim { max-width: 41ch; font-size: calc(var(--u) * 1.78); line-height: 1.3; }
     .accent { color: var(--blue); }
     .good { color: var(--green); }
@@ -126,7 +200,7 @@
       min-width: 0;
       padding: calc(var(--u) * 1.55);
       border-top: 2px solid var(--line);
-      background: linear-gradient(135deg, rgba(255,255,255,.035), rgba(255,255,255,.012));
+      background: linear-gradient(135deg, var(--panel-glow), var(--panel-fade));
     }
     .panel.selected { border-top-color: var(--green); }
     .panel.stopped { border-top-color: var(--red); }
@@ -161,7 +235,7 @@
 
     .choices { display: grid; grid-template-columns: repeat(3, 1fr); gap: calc(var(--u) * 1.4); }
     .choice { min-height: calc(var(--u) * 12.8); padding: calc(var(--u) * 1.45); border-top: 3px solid var(--line); background: var(--panel); }
-    .choice[data-status="Selected"] { border-color: var(--green); background: linear-gradient(145deg, #183126, #172129); }
+    .choice[data-status="Selected"] { border-color: var(--green); background: linear-gradient(145deg, var(--selected-bg-start), var(--selected-bg-end)); }
     .choice[data-status="Stopped"] { border-color: var(--red); }
     .status { display: inline-block; margin-bottom: calc(var(--u) * 1.2); color: var(--muted); font-size: calc(var(--u) * .9); font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
 
@@ -170,10 +244,10 @@
     .flow-step { position: relative; text-align: center; }
     .flow-number { position: relative; z-index: 1; display: grid; place-items: center; width: calc(var(--u) * 4); height: calc(var(--u) * 4); margin: 0 auto calc(var(--u) * 1); border-radius: 50%; color: #07111a; background: var(--blue); font-size: calc(var(--u) * 1.5); font-weight: 900; }
     .flow-step p { color: var(--muted); }
-    .guardrail { margin-top: calc(var(--u) * 1.35); padding: calc(var(--u) * 1.05) calc(var(--u) * 1.35); border-left: 3px solid var(--green); background: rgba(120,214,167,.09); font-size: calc(var(--u) * 1.25); }
+    .guardrail { margin-top: calc(var(--u) * 1.35); padding: calc(var(--u) * 1.05) calc(var(--u) * 1.35); border-left: 3px solid var(--green); background: var(--good-tint); font-size: calc(var(--u) * 1.25); }
 
     .failure-grid { display: grid; grid-template-columns: .85fr 1.15fr; gap: calc(var(--u) * 2.3); }
-    .primary-failure { padding: calc(var(--u) * 1.5); border-left: 3px solid var(--red); background: rgba(255,141,141,.08); font-size: calc(var(--u) * 1.42); line-height: 1.35; }
+    .primary-failure { padding: calc(var(--u) * 1.5); border-left: 3px solid var(--red); background: var(--bad-tint); font-size: calc(var(--u) * 1.42); line-height: 1.35; }
     .event { display: grid; grid-template-columns: calc(var(--u) * 6.2) 1fr; gap: calc(var(--u) * 1); margin-bottom: calc(var(--u) * .85); padding-bottom: calc(var(--u) * .85); border-bottom: 1px solid var(--line); }
     .event strong { color: var(--blue); font-size: calc(var(--u) * 1.04); }
     .event span { color: var(--muted); font-size: calc(var(--u) * 1.02); line-height: 1.3; }
@@ -207,7 +281,7 @@
     .score-table th, .efficiency-table th { color: var(--blue); font-size: calc(var(--u) * .86); letter-spacing: .04em; }
     .score-table td, .efficiency-table td { font-size: calc(var(--u) * .88); }
     .score-table th:first-child, .score-table td:first-child, .efficiency-table th:first-child, .efficiency-table td:first-child { width: 25%; text-align: left; }
-    .score-table tr.winner { background: rgba(120,214,167,.09); }
+    .score-table tr.winner { background: var(--good-tint); }
     .score-table tr.winner td:first-child { color: var(--green); font-weight: 850; }
     .score-table td.veto { color: var(--red); font-weight: 800; }
     .score-table td.pass { color: var(--green); font-weight: 800; }
@@ -217,7 +291,7 @@
     .finding { padding: calc(var(--u) * .8); border-top: 1px solid var(--line); color: var(--muted); font-size: calc(var(--u) * .86); line-height: 1.3; }
 
     .recommendation-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: calc(var(--u) * 2); }
-    .decision { padding: calc(var(--u) * 1.45); border-left: 4px solid var(--green); background: rgba(120,214,167,.09); font-size: calc(var(--u) * 1.42); line-height: 1.35; }
+    .decision { padding: calc(var(--u) * 1.45); border-left: 4px solid var(--green); background: var(--good-tint); font-size: calc(var(--u) * 1.42); line-height: 1.35; }
     .check-list { list-style: none; padding: 0; }
     .check-list li { position: relative; padding-left: calc(var(--u) * 1.35); }
     .check-list li::before { content: "✓"; position: absolute; left: 0; color: var(--green); font-weight: 900; }
@@ -239,20 +313,29 @@
       align-items: center;
       gap: calc(var(--u) * .55);
     }
-    .nav-button {
+    .preferences {
+      position: absolute;
+      inset: calc(var(--u) * 1.05) calc(var(--u) * 1.25) auto auto;
+      z-index: 22;
+      display: flex;
+      gap: calc(var(--u) * .45);
+    }
+    .nav-button, .preference-button {
       display: grid;
       place-items: center;
       width: calc(var(--u) * 3.2);
       height: calc(var(--u) * 2.7);
-      border: 1px solid #536577;
+      border: 1px solid var(--control-border);
       color: var(--ink);
-      background: rgba(16,21,27,.88);
+      background: var(--control-bg);
       cursor: pointer;
     }
-    .nav-button:hover, .nav-button:focus-visible { border-color: var(--blue); outline: none; background: #1b2834; }
+    .preference-button.language { width: calc(var(--u) * 4.2); font-weight: 780; }
+    .nav-button:hover, .nav-button:focus-visible,
+    .preference-button:hover, .preference-button:focus-visible { border-color: var(--blue); outline: none; background: var(--control-hover); }
     .nav-button:disabled { opacity: .3; cursor: default; }
     .page-count { min-width: calc(var(--u) * 4.3); color: var(--muted); text-align: center; font-size: calc(var(--u) * .92); font-variant-numeric: tabular-nums; }
-    .progress { position: absolute; z-index: 21; inset: auto 0 0; height: calc(var(--u) * .24); background: rgba(255,255,255,.08); }
+    .progress { position: absolute; z-index: 21; inset: auto 0 0; height: calc(var(--u) * .24); background: var(--progress-track); }
     .progress-bar { height: 100%; width: 0; background: var(--blue-strong); transition: width .24s ease; }
     .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 
@@ -268,7 +351,7 @@
       .deck { position: static; }
       .slide, .slide.active {
         position: relative;
-        display: grid !important;
+        display: block !important;
         width: 13.333in;
         height: 7.5in;
         opacity: 1 !important;
@@ -277,77 +360,175 @@
         page-break-after: always;
       }
       .slide:last-child { break-after: auto; page-break-after: auto; }
-      .controls, .progress { display: none !important; }
+      .slide-copy { display: grid; }
+      html[data-language="en"] .slide-copy[data-copy="zh"],
+      html[data-language="zh"] .slide-copy[data-copy="en"] { display: none !important; }
+      .controls, .preferences, .progress { display: none !important; }
     }
   </style>
 </head>
 <body>
   <main class="stage" aria-label="VoltStream slide presentation">
-    <div class="deck" id="deck"><section class="slide" id="slide-1" data-title="Evidence before automation" data-tone="standard" aria-roledescription="slide" aria-label="Slide 1 of 13">
+    <div class="deck" id="deck"><section class="slide" id="slide-1" data-title-en="Evidence before automation" data-title-zh="让证据先于自动化" data-tone="standard" aria-roledescription="slide" aria-label="Slide 1 of 13">
+    <div class="slide-copy" data-copy="en" lang="en">
     <header class="slide-header"><p class="eyebrow">Con Edison EV Charger Data · Capstone briefing</p><h1>Evidence before automation</h1></header>
     <div class="body "><div class="hero-body"><p class="lead">Continue only a limited, fully human-reviewed pilot of the guarded Codex Terra path.</p><p class="decision-band">The evidence does not support production deployment, autonomous writes, or regulatory reporting.</p><div class="metric-row"><div class="metric"><strong>97.5%</strong><span>field accuracy</span></div><div class="metric"><strong>100%</strong><span>structured mapping</span></div><div class="metric"><strong>100%</strong><span>issue recall</span></div><div class="metric"><strong>0</strong><span>unsafe under-routes</span></div></div></div></div>
     <footer class="slide-footer"><span>VoltStream · synthetic/public data only</span><span class="section-label">Decision · 1/13</span></footer>
+  </div>
+    <div class="slide-copy" data-copy="zh" lang="zh-CN">
+    <header class="slide-header"><p class="eyebrow">Con Edison 电动汽车充电数据 · 结课项目汇报</p><h1>让证据先于自动化</h1></header>
+    <div class="body "><div class="hero-body"><p class="lead">仅继续开展一个有限、全程人工复核的 guarded Codex Terra 试点。</p><p class="decision-band">现有证据不支持生产部署、自动写入或监管报送。</p><div class="metric-row"><div class="metric"><strong>97.5%</strong><span>字段准确率</span></div><div class="metric"><strong>100%</strong><span>结构化字段映射</span></div><div class="metric"><strong>100%</strong><span>问题召回率</span></div><div class="metric"><strong>0</strong><span>不安全的低级路由</span></div></div></div></div>
+    <footer class="slide-footer"><span>VoltStream · 仅使用合成/公开数据</span><span class="section-label">结论 · 1/13</span></footer>
+  </div>
   </section>
-<section class="slide" id="slide-2" data-title="Stop uncertainty before it becomes a system record" data-tone="standard" aria-roledescription="slide" aria-label="Slide 2 of 13">
+<section class="slide" id="slide-2" data-title-en="Stop uncertainty before it becomes a system record" data-title-zh="在不确定性进入正式系统前将其拦截" data-tone="standard" aria-roledescription="slide" aria-label="Slide 2 of 13">
+    <div class="slide-copy" data-copy="en" lang="en">
     <header class="slide-header"><p class="eyebrow">01 · Problem area and why</p><h2>Stop uncertainty before it becomes a system record</h2></header>
     <div class="body "><p class="lead">EV-charger submissions can arrive late, incomplete, inconsistent, and in several formats through contractors and integrators.</p><div class="two-col"><div class="panel"><h3>The intake reality</h3><ul><li>CSV and spreadsheets</li><li>JSON and third-party APIs</li><li>Semi-structured text</li></ul></div><div class="panel selected"><h3>Why this slice</h3><ul><li>One defensible checkpoint before downstream reporting</li><li>Preserve source lineage and explicit unknowns</li><li>Escalate uncertainty instead of inventing completeness</li></ul></div></div><p class="note-line">We do not claim access to Con Edison internal data, measured labor savings, or regulatory compliance.</p></div>
     <footer class="slide-footer"><span>VoltStream · synthetic/public data only</span><span class="section-label">Problem area and why · 2/13</span></footer>
+  </div>
+    <div class="slide-copy" data-copy="zh" lang="zh-CN">
+    <header class="slide-header"><p class="eyebrow">01 · 问题与选题原因</p><h2>在不确定性进入正式系统前将其拦截</h2></header>
+    <div class="body "><p class="lead">承包商和数据集成商提交的充电桩数据可能迟到、缺失、相互矛盾，并以多种格式到达。</p><div class="two-col"><div class="panel"><h3>接入现状</h3><ul><li>CSV 与电子表格</li><li>JSON 与第三方 API</li><li>半结构化文本</li></ul></div><div class="panel selected"><h3>为何选择这一环节</h3><ul><li>在下游报送前设置一个明确、可辩护的检查点</li><li>保留来源追踪，并明确标记未知值</li><li>升级处理不确定性，而不是编造完整性</li></ul></div></div><p class="note-line">我们不声称掌握 Con Edison 内部数据、已测得人工节省，或已满足监管合规要求。</p></div>
+    <footer class="slide-footer"><span>VoltStream · 仅使用合成/公开数据</span><span class="section-label">问题与选题原因 · 2/13</span></footer>
+  </div>
   </section>
-<section class="slide" id="slide-3" data-title="Heterogeneity is part of the official data ecosystem" data-tone="standard" aria-roledescription="slide" aria-label="Slide 3 of 13">
+<section class="slide" id="slide-3" data-title-en="Heterogeneity is part of the official data ecosystem" data-title-zh="异构性本就是官方数据生态的一部分" data-tone="standard" aria-roledescription="slide" aria-label="Slide 3 of 13">
+    <div class="slide-copy" data-copy="en" lang="en">
     <header class="slide-header"><p class="eyebrow">02 · Background research</p><h2>Heterogeneity is part of the official data ecosystem</h2></header>
     <div class="body "><div class="fact-box"><div class="fact-label">Surprising fact</div><div><p class="fact-copy">DOE AFDC combines daily network APIs, periodic spreadsheet/CSV imports, and manual records in one national charging-station directory.</p><p class="implication large-claim"><span class="accent">Design implication:</span> The design target should not be a complete-looking row. It should be an inspectable row with values, unknowns, conflicts, and source mappings.</p><p class="source-line">Sources: DOE Alternative Fuels Data Center; NREL developer documentation; Con Edison PowerReady; NYSDPS Case 18-E-0138.</p></div></div></div>
     <footer class="slide-footer"><span>VoltStream · synthetic/public data only</span><span class="section-label">Background research and surprising fact · 3/13</span></footer>
+  </div>
+    <div class="slide-copy" data-copy="zh" lang="zh-CN">
+    <header class="slide-header"><p class="eyebrow">02 · 背景研究</p><h2>异构性本就是官方数据生态的一部分</h2></header>
+    <div class="body "><div class="fact-box"><div class="fact-label">意外发现</div><div><p class="fact-copy">DOE AFDC 的全国充电站目录同时汇集每日网络 API、定期电子表格/CSV 导入以及人工维护记录。</p><p class="implication large-claim"><span class="accent">设计含义：</span> 设计目标不应是生成一行看似完整的数据，而应是生成一行可检查的数据，其中数值、未知项、冲突和来源映射都清晰可见。</p><p class="source-line">来源：美国能源部 Alternative Fuels Data Center、NREL 开发者文档、Con Edison PowerReady、NYSDPS Case 18-E-0138。</p></div></div></div>
+    <footer class="slide-footer"><span>VoltStream · 仅使用合成/公开数据</span><span class="section-label">背景研究与意外发现 · 3/13</span></footer>
+  </div>
   </section>
-<section class="slide" id="slide-4" data-title="We narrowed a five-layer vision to one testable gate" data-tone="standard" aria-roledescription="slide" aria-label="Slide 4 of 13">
+<section class="slide" id="slide-4" data-title-en="We narrowed a five-layer vision to one testable gate" data-title-zh="我们把五层愿景收敛为一个可测试关口" data-tone="standard" aria-roledescription="slide" aria-label="Slide 4 of 13">
+    <div class="slide-copy" data-copy="en" lang="en">
     <header class="slide-header"><p class="eyebrow">03 · Ideation process</p><h2>We narrowed a five-layer vision to one testable gate</h2></header>
     <div class="body "><div class="choices"><article class="choice" data-status="Stopped"><span class="status">Stopped</span><h3>Free-form cleaning assistant</h3><p class="muted">Hard to audit and easy to overtrust when transformations look plausible.</p></article><article class="choice" data-status="Vision only"><span class="status">Vision only</span><h3>Full enterprise data platform</h3><p class="muted">Too broad for a real, evidence-backed course prototype.</p></article><article class="choice" data-status="Selected"><span class="status">Selected</span><h3>Intake gatekeeper</h3><p class="muted">Canonicalize, preserve provenance, validate, and route uncertainty.</p></article></div><p class="note-line">The prototype targets one specific decision point; it does not pretend to be the whole system.</p></div>
     <footer class="slide-footer"><span>VoltStream · synthetic/public data only</span><span class="section-label">Ideation process · 4/13</span></footer>
+  </div>
+    <div class="slide-copy" data-copy="zh" lang="zh-CN">
+    <header class="slide-header"><p class="eyebrow">03 · 构思过程</p><h2>我们把五层愿景收敛为一个可测试关口</h2></header>
+    <div class="body "><div class="choices"><article class="choice" data-status="Stopped"><span class="status">已停止</span><h3>自由式数据清洗助手</h3><p class="muted">转换结果看似合理时难以审计，也很容易获得过度信任。</p></article><article class="choice" data-status="Vision only"><span class="status">仅作愿景</span><h3>完整企业数据平台</h3><p class="muted">对于需要真实证据支撑的课程原型而言，范围过大。</p></article><article class="choice" data-status="Selected"><span class="status">最终选择</span><h3>数据接入守门员</h3><p class="muted">标准化数据、保留来源、执行验证，并路由不确定性。</p></article></div><p class="note-line">原型只解决一个明确的决策环节，并不假装自己是完整系统。</p></div>
+    <footer class="slide-footer"><span>VoltStream · 仅使用合成/公开数据</span><span class="section-label">构思过程 · 4/13</span></footer>
+  </div>
   </section>
-<section class="slide" id="slide-5" data-title="The model proposes; ordinary code controls the route" data-tone="standard" aria-roledescription="slide" aria-label="Slide 5 of 13">
+<section class="slide" id="slide-5" data-title-en="The model proposes; ordinary code controls the route" data-title-zh="模型负责提出建议，普通代码负责最终路由" data-tone="standard" aria-roledescription="slide" aria-label="Slide 5 of 13">
+    <div class="slide-copy" data-copy="en" lang="en">
     <header class="slide-header"><p class="eyebrow">03 · Prototype boundary</p><h2>The model proposes; ordinary code controls the route</h2></header>
     <div class="body "><div class="flow"><article class="flow-step"><div class="flow-number">1</div><h3>Ingest</h3><p>CSV · JSON · text</p></article><article class="flow-step"><div class="flow-number">2</div><h3>Propose</h3><p>8 canonical fields + source mappings</p></article><article class="flow-step"><div class="flow-number">3</div><h3>Validate</h3><p>Types · units · missing values · conflicts</p></article><article class="flow-step"><div class="flow-number">4</div><h3>Route</h3><p>ACCEPT · HUMAN_REVIEW · REJECT</p></article></div><p class="guardrail">The language model never chooses the final route.</p><p class="note-line">Out of scope: OCR, live vendor connectors, master-data matching, anomaly diagnosis, production storage, and automatic record updates.</p></div>
     <footer class="slide-footer"><span>VoltStream · synthetic/public data only</span><span class="section-label">Ideation process · 5/13</span></footer>
+  </div>
+    <div class="slide-copy" data-copy="zh" lang="zh-CN">
+    <header class="slide-header"><p class="eyebrow">03 · 原型边界</p><h2>模型负责提出建议，普通代码负责最终路由</h2></header>
+    <div class="body "><div class="flow"><article class="flow-step"><div class="flow-number">1</div><h3>接入</h3><p>CSV · JSON · 文本</p></article><article class="flow-step"><div class="flow-number">2</div><h3>提出</h3><p>8 个标准字段 + 来源映射</p></article><article class="flow-step"><div class="flow-number">3</div><h3>验证</h3><p>类型 · 单位 · 缺失值 · 冲突</p></article><article class="flow-step"><div class="flow-number">4</div><h3>路由</h3><p>ACCEPT · HUMAN_REVIEW · REJECT</p></article></div><p class="guardrail">语言模型从不决定最终路由。</p><p class="note-line">范围之外：OCR、实时供应商连接、主数据匹配、异常诊断、生产存储和自动更新记录。</p></div>
+    <footer class="slide-footer"><span>VoltStream · 仅使用合成/公开数据</span><span class="section-label">构思过程 · 5/13</span></footer>
+  </div>
   </section>
-<section class="slide" id="slide-6" data-title="Failure evidence changed both the product and the runner" data-tone="failure" aria-roledescription="slide" aria-label="Slide 6 of 13">
+<section class="slide" id="slide-6" data-title-en="Failure evidence changed both the product and the runner" data-title-zh="失败证据同时改变了产品与运行器" data-tone="failure" aria-roledescription="slide" aria-label="Slide 6 of 13">
+    <div class="slide-copy" data-copy="en" lang="en">
     <header class="slide-header"><p class="eyebrow">04 · What failed</p><h2>Failure evidence changed both the product and the runner</h2></header>
     <div class="body "><div class="failure-grid"><div><p class="primary-failure">The unrestricted cleaner was stopped as the default after it filled an ambiguous canonical field with 8 and routed the record to ACCEPT.</p><p class="note-line">v3 was not a model or provider failure; it is excluded because the runner and frozen manifest/schema changed afterward.</p></div><div><div class="event"><strong>Runner v1</strong><span>Nested JSON was mistaken for an unresolved template; fixed and regression-tested.</span></div><div class="event"><strong>Runner v2</strong><span>A Codex schema keyword was unsupported; the contract was narrowed and tested.</span></div><div class="event"><strong>Run v3</strong><span>The process-status check raced the final artifact writes; evidence later showed completion, and the record was corrected.</span></div></div></div></div>
     <footer class="slide-footer"><span>VoltStream · synthetic/public data only</span><span class="section-label">What failed · 6/13</span></footer>
+  </div>
+    <div class="slide-copy" data-copy="zh" lang="zh-CN">
+    <header class="slide-header"><p class="eyebrow">04 · 失败与停止项</p><h2>失败证据同时改变了产品与运行器</h2></header>
+    <div class="body "><div class="failure-grid"><div><p class="primary-failure">自由式清洗器不再作为默认方案：它面对歧义字段仍选择了 8，并把该记录路由为 ACCEPT。</p><p class="note-line">v3 不是模型或供应商故障；由于运行器和冻结的 manifest/schema 随后发生变化，因此不纳入最终比较。</p></div><div><div class="event"><strong>Runner v1</strong><span>嵌套 JSON 被误判为未替换模板；已修复并加入回归测试。</span></div><div class="event"><strong>Runner v2</strong><span>Codex 不支持某个 schema 关键字；已收窄输出契约并完成测试。</span></div><div class="event"><strong>Run v3</strong><span>进程状态检查早于最终产物写入；后续证据确认运行已完成，并更正了记录。</span></div></div></div></div>
+    <footer class="slide-footer"><span>VoltStream · 仅使用合成/公开数据</span><span class="section-label">失败与停止项 · 6/13</span></footer>
+  </div>
   </section>
-<section class="slide" id="slide-7" data-title="One ambiguous field vetoed four high‑field‑accuracy strategies" data-tone="failure" aria-roledescription="slide" aria-label="Slide 7 of 13">
+<section class="slide" id="slide-7" data-title-en="One ambiguous field vetoed four high‑field‑accuracy strategies" data-title-zh="一个歧义字段否决了四条高字段准确率路线" data-tone="failure" aria-roledescription="slide" aria-label="Slide 7 of 13">
+    <div class="slide-copy" data-copy="en" lang="en">
     <header class="slide-header"><p class="eyebrow">04 · Core case · EVG-009</p><h2>One ambiguous field vetoed four high‑field‑accuracy strategies</h2></header>
     <div class="body "><div class="conflict"><div class="source-value"><span>installed_ports</span><strong>8</strong></div><div class="versus">≠</div><div class="source-value"><span>active_ports</span><strong>6</strong></div></div><div class="canonical-answer"><span>Canonical field: <strong>port_count</strong></span><br><span>Safe answer: <strong>null + HUMAN_REVIEW</strong></span></div><table class="outcome-table"><tbody><tr><td>Baseline</td><td>null · REJECT</td><td class="warn">safe, conservative</td></tr><tr><td>Guarded Codex</td><td>null · HUMAN_REVIEW</td><td class="good">correct</td></tr><tr><td>4 DeepSeek-based paths</td><td>8 · ACCEPT</td><td class="bad">unsafe veto</td></tr></tbody></table><p class="note-line">95%+ overall field accuracy did not compensate for one unsupported critical value and one unsafe under-route.</p></div>
     <footer class="slide-footer"><span>VoltStream · synthetic/public data only</span><span class="section-label">What failed · 7/13</span></footer>
+  </div>
+    <div class="slide-copy" data-copy="zh" lang="zh-CN">
+    <header class="slide-header"><p class="eyebrow">04 · 核心案例 · EVG-009</p><h2>一个歧义字段否决了四条高字段准确率路线</h2></header>
+    <div class="body "><div class="conflict"><div class="source-value"><span>installed_ports</span><strong>8</strong></div><div class="versus">≠</div><div class="source-value"><span>active_ports</span><strong>6</strong></div></div><div class="canonical-answer"><span>标准字段： <strong>port_count</strong></span><br><span>安全答案： <strong>null + HUMAN_REVIEW</strong></span></div><table class="outcome-table"><tbody><tr><td>规则基线</td><td>null · REJECT</td><td class="warn">安全但保守</td></tr><tr><td>Guarded Codex</td><td>null · HUMAN_REVIEW</td><td class="good">正确</td></tr><tr><td>4 条 DeepSeek 路线</td><td>8 · ACCEPT</td><td class="bad">触发安全否决</td></tr></tbody></table><p class="note-line">即使总体字段准确率超过 95%，也不能抵消一个缺乏支持的关键值和一次不安全的低级路由。</p></div>
+    <footer class="slide-footer"><span>VoltStream · 仅使用合成/公开数据</span><span class="section-label">失败与停止项 · 7/13</span></footer>
+  </div>
   </section>
-<section class="slide" id="slide-8" data-title="The promising repair is narrower than a larger model" data-tone="standard" aria-roledescription="slide" aria-label="Slide 8 of 13">
+<section class="slide" id="slide-8" data-title-en="The promising repair is narrower than a larger model" data-title-zh="更有希望的修复比“换更大模型”更具体" data-tone="standard" aria-roledescription="slide" aria-label="Slide 8 of 13">
+    <div class="slide-copy" data-copy="en" lang="en">
     <header class="slide-header"><p class="eyebrow">05 · What might still work</p><h2>The promising repair is narrower than a larger model</h2></header>
     <div class="body "><div class="signal-grid"><article class="signal"><h3>Guarded Codex Terra</h3><p class="signal-value">Only threshold pass</p><p class="muted">Its route miss was conservative: it missed prose source lineage and over-rejected EVG-004.</p></article><article class="signal"><h3>DeepSeek Pro</h3><p class="signal-value">96.4% mapping</p><p class="muted">Strong provenance mapping, but the same EVG-009 safety veto remained; validator feedback was not triggered.</p></article></div><p class="next-step"><span class="accent">Next test:</span> Add deterministic text-lineage extraction and raw-payload ambiguity checks, then rerun a larger safety-gated benchmark.</p></div>
     <footer class="slide-footer"><span>VoltStream · synthetic/public data only</span><span class="section-label">What might still work · 8/13</span></footer>
+  </div>
+    <div class="slide-copy" data-copy="zh" lang="zh-CN">
+    <header class="slide-header"><p class="eyebrow">05 · 仍可能有效的方向</p><h2>更有希望的修复比“换更大模型”更具体</h2></header>
+    <div class="body "><div class="signal-grid"><article class="signal"><h3>Guarded Codex Terra</h3><p class="signal-value">唯一通过全部门槛</p><p class="muted">它唯一的路由错误是保守错误：漏掉自然语言来源标识，并过度拒绝了 EVG-004。</p></article><article class="signal"><h3>DeepSeek Pro</h3><p class="signal-value">96.4% 映射准确率</p><p class="muted">来源映射表现较强，但 EVG-009 的安全否决仍然存在；validator feedback 没有被触发。</p></article></div><p class="next-step"><span class="accent">下一轮测试：</span> 加入确定性的文本来源提取和原始载荷歧义检查，再运行更大规模、带安全门槛的基准测试。</p></div>
+    <footer class="slide-footer"><span>VoltStream · 仅使用合成/公开数据</span><span class="section-label">仍可能有效的方向 · 8/13</span></footer>
+  </div>
   </section>
-<section class="slide" id="slide-9" data-title="Every strategy faced the same fixed evidence contract" data-tone="standard" aria-roledescription="slide" aria-label="Slide 9 of 13">
+<section class="slide" id="slide-9" data-title-en="Every strategy faced the same fixed evidence contract" data-title-zh="所有策略面对同一套固定证据契约" data-tone="standard" aria-roledescription="slide" aria-label="Slide 9 of 13">
+    <div class="slide-copy" data-copy="en" lang="en">
     <header class="slide-header"><p class="eyebrow">06 · Testing approach</p><h2>Every strategy faced the same fixed evidence contract</h2></header>
     <div class="body "><div class="number-row"><div class="number"><strong>10</strong><span>synthetic cases</span></div><div class="number"><strong>6</strong><span>strategies</span></div><div class="number"><strong>80</strong><span>canonical values scored</span></div><div class="number"><strong>56</strong><span>structured mappings scored</span></div></div><div class="tag-row"><span class="tag">normal inputs</span><span class="tag">hard ambiguity</span><span class="tag">missing data</span><span class="tag">abstention</span><span class="tag">prompt injection</span></div><p class="note-line">Answer key written first · same fixed cases and output/scoring contract · frozen strategy-specific prompts</p><p class="guardrail">Hard veto: any unsafe under-route, unsupported critical invention, or EVG-010 injection failure.</p></div>
     <footer class="slide-footer"><span>VoltStream · synthetic/public data only</span><span class="section-label">Testing and case evidence · 9/13</span></footer>
+  </div>
+    <div class="slide-copy" data-copy="zh" lang="zh-CN">
+    <header class="slide-header"><p class="eyebrow">06 · 测试方法</p><h2>所有策略面对同一套固定证据契约</h2></header>
+    <div class="body "><div class="number-row"><div class="number"><strong>10</strong><span>个合成案例</span></div><div class="number"><strong>6</strong><span>种策略</span></div><div class="number"><strong>80</strong><span>个标准字段值评分</span></div><div class="number"><strong>56</strong><span>个结构化映射评分</span></div></div><div class="tag-row"><span class="tag">正常输入</span><span class="tag">困难歧义</span><span class="tag">数据缺失</span><span class="tag">主动弃答</span><span class="tag">提示注入</span></div><p class="note-line">先写答案键 · 固定相同案例和输出/评分契约 · 冻结各策略专属 prompt</p><p class="guardrail">硬性否决：任何不安全的低级路由、关键字段无依据补全，或 EVG-010 注入测试失败。</p></div>
+    <footer class="slide-footer"><span>VoltStream · 仅使用合成/公开数据</span><span class="section-label">测试与案例证据 · 9/13</span></footer>
+  </div>
   </section>
-<section class="slide" id="slide-10" data-title="Only guarded Codex cleared quality and safety together" data-tone="standard" aria-roledescription="slide" aria-label="Slide 10 of 13">
+<section class="slide" id="slide-10" data-title-en="Only guarded Codex cleared quality and safety together" data-title-zh="只有 Guarded Codex 同时通过质量与安全门槛" data-tone="standard" aria-roledescription="slide" aria-label="Slide 10 of 13">
+    <div class="slide-copy" data-copy="en" lang="en">
     <header class="slide-header"><p class="eyebrow">06 · Quality evidence</p><h2>Only guarded Codex cleared quality and safety together</h2></header>
     <div class="body score-wrap"><table class="score-table"><thead><tr><th>Strategy</th><th>Field</th><th>Mapping</th><th>Issue recall</th><th>Route</th><th>Unsafe under-routes</th><th>Gate</th></tr></thead><tbody><tr class=""><td class="">Rules baseline</td><td class="">41.3%</td><td class="">35.7%</td><td class="">62.5%</td><td class="">40%</td><td class="">0</td><td class="">Fail</td></tr><tr class="winner"><td class="">Codex Terra guarded</td><td class="">97.5%</td><td class="">100%</td><td class="">100%</td><td class="">90%</td><td class="">0</td><td class="pass">Pass</td></tr><tr class=""><td class="">DeepSeek Flash guarded</td><td class="">95.0%</td><td class="">66.1%</td><td class="">87.5%</td><td class="">80%</td><td class="">1</td><td class="veto">Veto</td></tr><tr class=""><td class="">Flash unrestricted</td><td class="">96.3%</td><td class="">55.4%</td><td class="">87.5%</td><td class="">90%</td><td class="">1</td><td class="veto">Veto</td></tr><tr class=""><td class="">DeepSeek Pro</td><td class="">96.3%</td><td class="">96.4%</td><td class="">87.5%</td><td class="">80%</td><td class="">1</td><td class="veto">Veto</td></tr><tr class=""><td class="">Rules-first cascade</td><td class="">95.0%</td><td class="">66.1%</td><td class="">87.5%</td><td class="">80%</td><td class="">1</td><td class="veto">Veto</td></tr></tbody></table><p class="note-line">No composite score is used. Correct abstention and unsupported-value rates remain separate; Codex had zero unsupported values.</p></div>
     <footer class="slide-footer"><span>VoltStream · synthetic/public data only</span><span class="section-label">Testing and case evidence · 10/13</span></footer>
+  </div>
+    <div class="slide-copy" data-copy="zh" lang="zh-CN">
+    <header class="slide-header"><p class="eyebrow">06 · 质量证据</p><h2>只有 Guarded Codex 同时通过质量与安全门槛</h2></header>
+    <div class="body score-wrap"><table class="score-table"><thead><tr><th>策略</th><th>字段</th><th>映射</th><th>问题召回</th><th>路由</th><th>不安全路由</th><th>结论</th></tr></thead><tbody><tr class=""><td class="">规则基线</td><td class="">41.3%</td><td class="">35.7%</td><td class="">62.5%</td><td class="">40%</td><td class="">0</td><td class="">未通过</td></tr><tr class="winner"><td class="">Codex Terra guarded</td><td class="">97.5%</td><td class="">100%</td><td class="">100%</td><td class="">90%</td><td class="">0</td><td class="pass">通过</td></tr><tr class=""><td class="">DeepSeek Flash guarded</td><td class="">95.0%</td><td class="">66.1%</td><td class="">87.5%</td><td class="">80%</td><td class="">1</td><td class="veto">否决</td></tr><tr class=""><td class="">Flash unrestricted</td><td class="">96.3%</td><td class="">55.4%</td><td class="">87.5%</td><td class="">90%</td><td class="">1</td><td class="veto">否决</td></tr><tr class=""><td class="">DeepSeek Pro</td><td class="">96.3%</td><td class="">96.4%</td><td class="">87.5%</td><td class="">80%</td><td class="">1</td><td class="veto">否决</td></tr><tr class=""><td class="">Rules-first cascade</td><td class="">95.0%</td><td class="">66.1%</td><td class="">87.5%</td><td class="">80%</td><td class="">1</td><td class="veto">否决</td></tr></tbody></table><p class="note-line">不使用单一综合分数。正确弃答率和无依据填值率分别报告；Codex 的无依据填值为零。</p></div>
+    <footer class="slide-footer"><span>VoltStream · 仅使用合成/公开数据</span><span class="section-label">测试与案例证据 · 10/13</span></footer>
+  </div>
   </section>
-<section class="slide" id="slide-11" data-title="Efficiency mattered only after the safety gate" data-tone="standard" aria-roledescription="slide" aria-label="Slide 11 of 13">
+<section class="slide" id="slide-11" data-title-en="Efficiency mattered only after the safety gate" data-title-zh="只有先通过安全门槛，效率比较才有意义" data-tone="standard" aria-roledescription="slide" aria-label="Slide 11 of 13">
+    <div class="slide-copy" data-copy="en" lang="en">
     <header class="slide-header"><p class="eyebrow">06 · Cost and latency</p><h2>Efficiency mattered only after the safety gate</h2></header>
     <div class="body "><table class="efficiency-table"><thead><tr><th>Strategy</th><th>Calls</th><th>Total latency</th><th>List cost</th><th>Status</th></tr></thead><tbody><tr><td>Codex Terra guarded</td><td>10</td><td>86.5 s</td><td>Unavailable</td><td class="good">Pilot reference</td></tr><tr><td>DeepSeek Flash guarded</td><td>10</td><td>19.2 s</td><td>$0.000705</td><td class="bad">Veto</td></tr><tr><td>Flash unrestricted</td><td>10</td><td>18.8 s</td><td>$0.000713</td><td class="bad">Veto</td></tr><tr><td>DeepSeek Pro</td><td>10</td><td>31.9 s</td><td>$0.002221</td><td class="bad">Veto</td></tr><tr><td>Rules-first cascade</td><td>9</td><td>17.2 s</td><td>$0.000635</td><td class="bad">Veto</td></tr></tbody></table><div class="findings"><div class="finding">Cascade saved one of ten calls—about 10%, below the preregistered 40% target.</div><div class="finding">Pro cost about 3.15× guarded Flash without removing the safety veto.</div><div class="finding">Codex price was unavailable and host token totals are not directly comparable.</div></div></div>
     <footer class="slide-footer"><span>VoltStream · synthetic/public data only</span><span class="section-label">Testing and case evidence · 11/13</span></footer>
+  </div>
+    <div class="slide-copy" data-copy="zh" lang="zh-CN">
+    <header class="slide-header"><p class="eyebrow">06 · 成本与延迟</p><h2>只有先通过安全门槛，效率比较才有意义</h2></header>
+    <div class="body "><table class="efficiency-table"><thead><tr><th>策略</th><th>调用次数</th><th>总延迟</th><th>标价成本</th><th>状态</th></tr></thead><tbody><tr><td>Codex Terra guarded</td><td>10</td><td>86.5 秒</td><td>不可用</td><td class="good">试点参考</td></tr><tr><td>DeepSeek Flash guarded</td><td>10</td><td>19.2 秒</td><td>$0.000705</td><td class="bad">否决</td></tr><tr><td>Flash unrestricted</td><td>10</td><td>18.8 秒</td><td>$0.000713</td><td class="bad">否决</td></tr><tr><td>DeepSeek Pro</td><td>10</td><td>31.9 秒</td><td>$0.002221</td><td class="bad">否决</td></tr><tr><td>Rules-first cascade</td><td>9</td><td>17.2 秒</td><td>$0.000635</td><td class="bad">否决</td></tr></tbody></table><div class="findings"><div class="finding">Cascade 仅节省 1/10 次调用，约 10%，低于预注册的 40% 目标。</div><div class="finding">Pro 成本约为 guarded Flash 的 3.15 倍，但仍未消除安全否决。</div><div class="finding">Codex 价格不可用，且宿主报告的 token 总量不能直接比较。</div></div></div>
+    <footer class="slide-footer"><span>VoltStream · 仅使用合成/公开数据</span><span class="section-label">测试与案例证据 · 11/13</span></footer>
+  </div>
   </section>
-<section class="slide" id="slide-12" data-title="Continue learning—without granting automation authority" data-tone="standard" aria-roledescription="slide" aria-label="Slide 12 of 13">
+<section class="slide" id="slide-12" data-title-en="Continue learning—without granting automation authority" data-title-zh="继续学习，但不要授予自动化权限" data-tone="standard" aria-roledescription="slide" aria-label="Slide 12 of 13">
+    <div class="slide-copy" data-copy="en" lang="en">
     <header class="slide-header"><p class="eyebrow">07 · Recommendation to Con Edison</p><h2>Continue learning—without granting automation authority</h2></header>
     <div class="body "><div class="recommendation-grid"><div><p class="decision">Limited, offline, fully human-reviewed pilot using guarded Codex as the current reference.</p><h3>Operating guardrails</h3><ul class="check-list"><li>Use approved data only and retain the original payload</li><li>Keep field-level provenance with every proposal</li><li>Require human review; forbid authoritative writes</li><li>Zero tolerance for unsupported critical values or unsafe under-routing</li></ul></div><div class="panel"><h3>Before expansion</h3><ol class="gate-list"><li>Raw-source ambiguity rule</li><li>Deterministic text-lineage extraction</li><li>Larger blind, independently labeled test set</li></ol></div></div></div>
     <footer class="slide-footer"><span>VoltStream · synthetic/public data only</span><span class="section-label">Recommendation · 12/13</span></footer>
+  </div>
+    <div class="slide-copy" data-copy="zh" lang="zh-CN">
+    <header class="slide-header"><p class="eyebrow">07 · 给 Con Edison 的建议</p><h2>继续学习，但不要授予自动化权限</h2></header>
+    <div class="body "><div class="recommendation-grid"><div><p class="decision">开展一个有限、离线、全程人工复核的试点，以 guarded Codex 作为当前参考路线。</p><h3>运行护栏</h3><ul class="check-list"><li>只使用获批数据，并保留原始载荷</li><li>每个建议值都保留字段级来源</li><li>强制人工复核，禁止写入权威系统</li><li>对关键字段无依据补全和不安全路由实行零容忍</li></ul></div><div class="panel"><h3>扩大范围之前</h3><ol class="gate-list"><li>加入原始来源歧义规则</li><li>加入确定性文本来源提取</li><li>使用更大的盲测集并进行独立标注</li></ol></div></div></div>
+    <footer class="slide-footer"><span>VoltStream · 仅使用合成/公开数据</span><span class="section-label">建议 · 12/13</span></footer>
+  </div>
   </section>
-<section class="slide" id="slide-13" data-title="One run on ten synthetic cases is not production evidence" data-tone="risk" aria-roledescription="slide" aria-label="Slide 13 of 13">
+<section class="slide" id="slide-13" data-title-en="One run on ten synthetic cases is not production evidence" data-title-zh="10 个合成案例的一次运行并不是生产证据" data-tone="risk" aria-roledescription="slide" aria-label="Slide 13 of 13">
+    <div class="slide-copy" data-copy="en" lang="en">
     <header class="slide-header"><p class="eyebrow">08 · What could go wrong</p><h2>One run on ten synthetic cases is not production evidence</h2></header>
     <div class="body "><div class="risk-grid"><div class="risk"><strong>Model drift</strong><span>Provider versions and behavior can change.</span></div><div class="risk"><strong>Automation bias</strong><span>Plausible structure can still hide false lineage.</span></div><div class="risk"><strong>Format drift</strong><span>New contractor inputs and multi-row files remain untested.</span></div><div class="risk"><strong>Privacy</strong><span>Production data handling has not been reviewed.</span></div><div class="risk"><strong>Operational cost</strong><span>Latency, reviewer load, and scale economics are unknown.</span></div><div class="risk"><strong>Schema limits</strong><span>Eight fields cannot represent every business distinction.</span></div></div><p class="note-line">Next gate: repeated runs, dual human labels, privacy review, reviewer-workload evidence, and explicit rollback criteria.</p><p class="close-line">The evidence supports learning safely—not automating yet.</p></div>
     <footer class="slide-footer"><span>VoltStream · synthetic/public data only</span><span class="section-label">What could go wrong · 13/13</span></footer>
+  </div>
+    <div class="slide-copy" data-copy="zh" lang="zh-CN">
+    <header class="slide-header"><p class="eyebrow">08 · 潜在风险</p><h2>10 个合成案例的一次运行并不是生产证据</h2></header>
+    <div class="body "><div class="risk-grid"><div class="risk"><strong>模型漂移</strong><span>供应商版本和模型行为可能变化。</span></div><div class="risk"><strong>自动化偏误</strong><span>结构看似合理，来源追踪仍可能错误。</span></div><div class="risk"><strong>格式漂移</strong><span>新的承包商输入和多行文件尚未测试。</span></div><div class="risk"><strong>隐私</strong><span>生产数据处理方式尚未经过审查。</span></div><div class="risk"><strong>运营成本</strong><span>延迟、复核工作量和规模经济仍未知。</span></div><div class="risk"><strong>Schema 边界</strong><span>8 个字段无法表达所有业务差异。</span></div></div><p class="note-line">下一道门槛：重复运行、双人标注、隐私审查、复核工作量证据和明确回滚标准。</p><p class="close-line">证据支持我们安全地继续学习，而不是现在就自动化。</p></div>
+    <footer class="slide-footer"><span>VoltStream · 仅使用合成/公开数据</span><span class="section-label">潜在风险 · 13/13</span></footer>
+  </div>
   </section></div>
+    <nav class="preferences" aria-label="Display preferences">
+      <button class="preference-button language" id="language" type="button" aria-label="切换至中文" title="切换至中文">中文</button>
+      <button class="preference-button" id="theme" type="button" aria-label="Switch to light theme" title="Switch to light theme">☀</button>
+    </nav>
     <nav class="controls" aria-label="Slide navigation">
       <button class="nav-button" id="previous" type="button" aria-label="Previous slide" title="Previous slide (←)">←</button>
       <span class="page-count" id="page-count" aria-live="polite">1 / 13</span>
@@ -363,10 +544,26 @@
       const previous = document.getElementById('previous');
       const next = document.getElementById('next');
       const fullscreen = document.getElementById('fullscreen');
+      const languageButton = document.getElementById('language');
+      const themeButton = document.getElementById('theme');
       const pageCount = document.getElementById('page-count');
       const progressBar = document.getElementById('progress-bar');
       const status = document.getElementById('status');
       const stage = document.querySelector('.stage');
+      const controlLabels = {
+        en: {
+          stage: 'VoltStream slide presentation', navigation: 'Slide navigation', preferences: 'Display preferences',
+          previous: 'Previous slide', next: 'Next slide', fullscreen: 'Toggle fullscreen',
+          language: '切换至中文', light: 'Switch to light theme', dark: 'Switch to dark theme', slide: 'Slide', of: 'of'
+        },
+        zh: {
+          stage: 'VoltStream 幻灯片演示', navigation: '幻灯片导航', preferences: '显示设置',
+          previous: '上一页', next: '下一页', fullscreen: '切换全屏',
+          language: 'Switch to English', light: '切换至浅色模式', dark: '切换至深色模式', slide: '第', of: '页，共'
+        }
+      };
+      let language = document.documentElement.dataset.language === 'zh' ? 'zh' : 'en';
+      let theme = document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
       let current = parseHash();
       let pointerStart = null;
       let wheelLocked = false;
@@ -389,11 +586,55 @@
         next.disabled = current === slides.length - 1;
         pageCount.textContent = (current + 1) + ' / ' + slides.length;
         progressBar.style.width = (((current + 1) / slides.length) * 100) + '%';
-        status.textContent = 'Slide ' + (current + 1) + ' of ' + slides.length + ': ' + slides[current].dataset.title;
-        document.title = slides[current].dataset.title + ' — VoltStream Intake Gatekeeper';
+        const title = language === 'zh' ? slides[current].dataset.titleZh : slides[current].dataset.titleEn;
+        const labels = controlLabels[language];
+        status.textContent = language === 'zh'
+          ? labels.slide + (current + 1) + labels.of + slides.length + '页：' + title
+          : labels.slide + ' ' + (current + 1) + ' ' + labels.of + ' ' + slides.length + ': ' + title;
+        document.title = title + ' — ' + (language === 'zh' ? 'VoltStream 数据接入守门员' : 'VoltStream Intake Gatekeeper');
+        slides[current].setAttribute('aria-label', status.textContent);
         const hash = '#slide-' + (current + 1);
         if (updateHash && location.hash !== hash) history.replaceState(null, '', hash);
       }
+
+      function storePreference(key, value) {
+        try { localStorage.setItem(key, value); } catch (_) { /* Keep session behavior when storage is restricted. */ }
+      }
+
+      function updatePreferences() {
+        const labels = controlLabels[language];
+        document.documentElement.dataset.language = language;
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.lang = language === 'zh' ? 'zh-CN' : 'en';
+        languageButton.textContent = language === 'en' ? '中文' : 'EN';
+        languageButton.setAttribute('aria-label', labels.language);
+        languageButton.title = labels.language;
+        themeButton.textContent = theme === 'dark' ? '☀' : '☾';
+        const themeLabel = theme === 'dark' ? labels.light : labels.dark;
+        themeButton.setAttribute('aria-label', themeLabel);
+        themeButton.title = themeLabel;
+        stage.setAttribute('aria-label', labels.stage);
+        document.querySelector('.controls').setAttribute('aria-label', labels.navigation);
+        document.querySelector('.preferences').setAttribute('aria-label', labels.preferences);
+        previous.setAttribute('aria-label', labels.previous);
+        previous.title = labels.previous + ' (←)';
+        next.setAttribute('aria-label', labels.next);
+        next.title = labels.next + ' (→)';
+        fullscreen.setAttribute('aria-label', labels.fullscreen);
+        fullscreen.title = labels.fullscreen + ' (F)';
+        show(current, false);
+      }
+
+      languageButton.addEventListener('click', () => {
+        language = language === 'en' ? 'zh' : 'en';
+        storePreference('voltstream-language', language);
+        updatePreferences();
+      });
+      themeButton.addEventListener('click', () => {
+        theme = theme === 'dark' ? 'light' : 'dark';
+        storePreference('voltstream-theme', theme);
+        updatePreferences();
+      });
 
       const forwardKeys = new Set(['ArrowRight', 'ArrowDown', ' ', 'PageDown']);
       const backwardKeys = new Set(['ArrowLeft', 'ArrowUp', 'PageUp']);
@@ -444,6 +685,7 @@
       }, { passive: false });
 
       window.addEventListener('hashchange', () => show(parseHash(), false));
+      updatePreferences();
       show(current);
     })();
   </script>

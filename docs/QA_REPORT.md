@@ -24,7 +24,7 @@ The v4 run passed the integrity checks performed in this review:
   aggregate scores;
 - fixture validation passed with 10 cases, 10 answers, and 7 structured mapping
   answer rows;
-- all 70 automated tests passed under Python 3.9.6;
+- all 72 automated tests passed under Python 3.9.6;
 - the current repository and Git history produced no high-signal secret-pattern
   matches; and
 - the result commit `627830a` is on `main`, is synchronized with `origin/main`,
@@ -39,12 +39,17 @@ No defect was found that invalidates or requires rerunning v4.
 #### H1 — Required HTML presentation (resolved after independent QA)
 
 `presentation/index.html` is now a self-contained 13-slide presentation built
-from `presentation/slides.json` by `presentation/build.mjs`. The builder checks
-slide count, unique IDs, and required section order. Real-browser QA in Google
-Chrome passed 43 checks across 1920×1080 and 1280×800 viewports plus a 1280×720
-touch context, including all navigation methods, hash recovery, fullscreen,
-reduced motion, zero external requests, zero browser errors, and no detected
-content clipping. Print output contains 13 independent 16:9 pages.
+from structurally matched English and Chinese sources (`slides.json` and
+`slides.zh.json`) by `presentation/build.mjs`. It contains dark and light
+themes, persists both preferences locally, and preserves the current slide
+while switching. The builder checks slide count, unique IDs, required section
+order, and bilingual structural parity. Real-browser QA in Google Chrome passed
+125 checks across 1920×1080 and 1280×800 viewports in all four language/theme
+combinations. Coverage included navigation, rapid switching, hash recovery,
+preference persistence, fullscreen, reduced motion, contrast, zero external
+requests, zero browser errors, no control overlap, and no detected content
+clipping. English/dark and Chinese/light print outputs each contain 13
+independent 16:9 pages.
 
 #### H2 — Team-level Git contribution requirement is not yet evidenced
 
@@ -212,7 +217,7 @@ python3 scripts/validate_fixtures.py
 
 PYTHONPATH=src PYTHONPYCACHEPREFIX=/tmp/voltstream-pycache \
   python3 -m unittest discover -s tests -v
-  PASS — 70 tests
+  PASS — 72 tests
 
 PYTHONPATH=src python3 scripts/verify_run.py \
   --run-id 2026-08-09-final-v4
