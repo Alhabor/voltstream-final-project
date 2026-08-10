@@ -113,20 +113,23 @@ The page counter and bottom progress bar update with every navigation method.
 The deck honors `prefers-reduced-motion`. / 所有导航方式都会同步更新页码、URL hash
 与底部进度条，并支持 `prefers-reduced-motion`。
 
-## Explanatory animation / 解释性动画
+## Presentation motion / 演示动效
 
-Slides 6 and 8 use restrained, one-time animation to teach the process rather
-than decorate it. Slide 6 reveals the current manual path and the prototype path
-for the same incoming file. Slide 8 reveals the installed-versus-active conflict,
-the safe blank-plus-human-review answer, and the observed strategy outcomes.
-Each sequence restarts when the audience leaves and returns to the slide, then
-holds the complete final state. Nothing loops. Reduced-motion mode and printing
-show the complete final state immediately.
+All slides share one restrained, one-time entrance rhythm: the major content
+blocks fade upward in reading order and then remain still. Tables move as whole
+blocks rather than cell by cell. Slides 6 and 8 use a more detailed version of
+the same motion language because they teach a sequence. Slide 6 reveals the
+current manual path and prototype path for the same incoming file. Slide 8
+reveals the installed-versus-active conflict, the safe blank-plus-human-review
+answer, and the observed strategy outcomes. Returning to a slide restarts its
+sequence. Nothing loops. Reduced-motion mode and printing show every complete
+final state immediately.
 
-第 6 页和第 8 页使用克制的单次动画解释流程，而不是装饰页面。第 6 页依次展示同一份
-新文件的当前人工路线与原型路线；第 8 页依次展示“已安装数量与当前启用数量”的冲突、
-留空并人工复核的安全答案，以及各方案的实测结果。离开后重新进入页面时会重新播放，
-播放结束后停留在完整结果；动画不会循环。减少动态效果模式和打印状态会立即显示完整内容。
+所有页面现在共享同一套克制的单次进入节奏：主要内容块按照阅读顺序轻微上移淡入，之后
+保持静止；表格作为完整内容块出现，不会逐个单元格跳动。第 6 页和第 8 页承担流程教学，
+因此使用同一动效语言的详细版本：第 6 页依次展示同一份新文件的人工路线与原型路线；
+第 8 页依次展示“已安装数量与当前启用数量”的冲突、安全答案和实测结果。返回某页时会
+重新播放；动画不会循环。减少动态效果模式和打印状态会立即显示全部完整内容。
 
 ## Print or save as PDF / 打印或另存 PDF
 

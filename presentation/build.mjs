@@ -144,6 +144,20 @@ const html = `<!doctype html>
       opacity: 0;
     }
     .slide.active { display: block; opacity: 1; animation: reveal .26s ease-out; }
+    /* Every non-teaching slide uses the same restrained content rhythm:
+       major body blocks enter in reading order and then remain still. Slides
+       6 and 8 keep their purpose-built explanatory sequences below. */
+    .slide.active:not([data-layout="pipeline-compare"]):not([data-layout="case"]) .body > * {
+      animation: content-arrives .42s ease-out both .14s;
+    }
+    .slide.active:not([data-layout="pipeline-compare"]):not([data-layout="case"]) .body > *:nth-child(2) { animation-delay: .3s; }
+    .slide.active:not([data-layout="pipeline-compare"]):not([data-layout="case"]) .body > *:nth-child(3) { animation-delay: .46s; }
+    .slide.active:not([data-layout="pipeline-compare"]):not([data-layout="case"]) .body > *:nth-child(n+4) { animation-delay: .62s; }
+    .slide.active[data-layout="hero"] .body > .hero-body { animation: none; }
+    .slide.active[data-layout="hero"] .hero-body > * { animation: content-arrives .42s ease-out both .14s; }
+    .slide.active[data-layout="hero"] .hero-body > *:nth-child(2) { animation-delay: .3s; }
+    .slide.active[data-layout="hero"] .hero-body > *:nth-child(3) { animation-delay: .46s; }
+    @keyframes content-arrives { from { opacity: 0; transform: translateY(calc(var(--u) * .42)); } }
     .slide-copy {
       position: absolute;
       inset: 0;
@@ -533,6 +547,11 @@ const html = `<!doctype html>
         transform: none !important;
         animation-delay: 0ms !important;
       }
+      .slide .body > *, .slide .hero-body > * {
+        opacity: 1 !important;
+        transform: none !important;
+        animation-delay: 0ms !important;
+      }
     }
 
     @media (hover: none) {
@@ -568,6 +587,7 @@ const html = `<!doctype html>
       .pipeline-decisions, .pipeline-guardrail, .pipeline-facts,
       .case-context, .source-value, .versus, .canonical-answer,
       .outcome-table tr, .case-takeaway { opacity: 1 !important; transform: none !important; animation: none !important; }
+      .slide .body > *, .slide .hero-body > * { opacity: 1 !important; transform: none !important; animation: none !important; }
     }
   </style>
 </head>
@@ -785,7 +805,7 @@ function validateTranslation(english, chinese) {
 
 function renderSlide(slide, chineseSlide, index, total) {
   const tone = slide.layout === "failure" || slide.layout === "case" ? "failure" : slide.layout === "risks" ? "risk" : "standard";
-  return `<section class="slide" id="slide-${index + 1}" data-title-en="${escapeHtml(slide.title)}" data-title-zh="${escapeHtml(chineseSlide.title)}" data-tone="${tone}" aria-roledescription="slide" aria-label="Slide ${index + 1} of ${total}">
+  return `<section class="slide" id="slide-${index + 1}" data-layout="${escapeHtml(slide.layout)}" data-title-en="${escapeHtml(slide.title)}" data-title-zh="${escapeHtml(chineseSlide.title)}" data-tone="${tone}" aria-roledescription="slide" aria-label="Slide ${index + 1} of ${total}">
     ${renderCopy(slide, "en", index, total)}
     ${renderCopy(chineseSlide, "zh", index, total)}
   </section>`;

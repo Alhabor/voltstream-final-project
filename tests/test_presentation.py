@@ -275,6 +275,24 @@ class PresentationContractTests(unittest.TestCase):
                 + rf"[^;]+both {delay:g}s;",
             )
 
+    def test_all_other_slides_share_restrained_content_motion(self):
+        """Every slide should feel related without turning tables into effects."""
+        for slide in self.source["slides"]:
+            self.assertIn(
+                f'data-layout="{slide["layout"]}"',
+                self.document,
+            )
+        for marker in [
+            ':not([data-layout="pipeline-compare"]):not([data-layout="case"]) .body > *',
+            "@keyframes content-arrives",
+            '.slide.active[data-layout="hero"] .hero-body > *',
+            ".slide .body > *, .slide .hero-body > *",
+        ]:
+            self.assertIn(marker, self.document)
+        # The common transition acts on major blocks, not every table cell.
+        self.assertNotIn("td { animation:", self.document)
+        self.assertNotIn("th { animation:", self.document)
+
     def test_language_and_theme_controls_are_embedded(self):
         for text in [
             'id="language"',

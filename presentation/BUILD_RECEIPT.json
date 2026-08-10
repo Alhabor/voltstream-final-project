@@ -12,11 +12,12 @@
     "name": "Google Chrome",
     "version": "151.0.7922.77",
     "automation": "Playwright 1.62.0",
-    "checks_passed": 153,
+    "checks_passed": 168,
     "checks_breakdown": {
       "all_slide_text_bounds_in_two_viewports_and_four_review_modes": 136,
       "navigation_hash_fullscreen_and_gestures": 10,
       "bounded_animation_order_replay_and_reduced_motion": 5,
+      "common_finite_content_motion_on_remaining_slides": 15,
       "print_page_count_and_size": 2
     },
     "viewports": ["1920x1080", "1280x800"],
@@ -49,7 +50,7 @@
     "outputs_checked": ["animated final state"]
   },
   "artifact": {
-    "bytes": 114754,
-    "sha256": "698c464bc3fc75936f331c54d6975d986369d831f09fb0c5f1c093a284225042"
+    "bytes": 116690,
+    "sha256": "fb188e62bbee0a76cbd1daac1d1e4fe387994985ed07f7a7084927c056659c6b"
   }
 }
