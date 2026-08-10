@@ -113,6 +113,21 @@ The page counter and bottom progress bar update with every navigation method.
 The deck honors `prefers-reduced-motion`. / 所有导航方式都会同步更新页码、URL hash
 与底部进度条，并支持 `prefers-reduced-motion`。
 
+## Explanatory animation / 解释性动画
+
+Slides 6 and 8 use restrained, one-time animation to teach the process rather
+than decorate it. Slide 6 reveals the current manual path and the prototype path
+for the same incoming file. Slide 8 reveals the installed-versus-active conflict,
+the safe blank-plus-human-review answer, and the observed strategy outcomes.
+Each sequence restarts when the audience leaves and returns to the slide, then
+holds the complete final state. Nothing loops. Reduced-motion mode and printing
+show the complete final state immediately.
+
+第 6 页和第 8 页使用克制的单次动画解释流程，而不是装饰页面。第 6 页依次展示同一份
+新文件的当前人工路线与原型路线；第 8 页依次展示“已安装数量与当前启用数量”的冲突、
+留空并人工复核的安全答案，以及各方案的实测结果。离开后重新进入页面时会重新播放，
+播放结束后停留在完整结果；动画不会循环。减少动态效果模式和打印状态会立即显示完整内容。
+
 ## Print or save as PDF / 打印或另存 PDF
 
 Select the desired language and theme first, then use the browser's Print
@@ -126,21 +141,19 @@ browser offers that option.
 
 ## Verification / 验证
 
-`BUILD_RECEIPT.json` records the generated artifact and browser QA. The deck
-passed 937 real-Chrome checks at 1920×1080 and 1280×800 across English/dark,
-English/light, Chinese/dark, and Chinese/light. Coverage includes navigation,
-rapid switching, hash recovery, language/theme persistence, fullscreen,
-reduced motion, contrast, external requests, browser errors, control overlap,
-content clipping, every slide's evidence links, safe new-tab behavior, all 21
-format-specific evidence viewers, JSONL controls, and the low-prominence preference controls. The checks include
-a dedicated typography gate for every slide in both languages. English/dark and
-Chinese/light print outputs were each confirmed as 17 independent 960×540-point
-pages.
+`BUILD_RECEIPT.json` records the generated artifact and the current browser QA.
+The animated build passed 152 real-Chrome checks at 1920×1080 and 1280×800
+across English/dark, English/light, Chinese/dark, and Chinese/light. The 136
+full-deck checks verified every slide and found no text outside the 16:9 stage.
+Additional checks covered keyboard and button navigation, rapid switching, hash
+recovery, fullscreen, pointer and wheel gestures, one-time animation playback,
+return-to-slide replay, reduced motion, and printing. Slides 6 and 8 were also
+visually inspected in both presentation and review modes. The print output was
+confirmed as 17 independent 960×540-point pages.
 
-`BUILD_RECEIPT.json` 记录生成产物与浏览器 QA。演示在 1920×1080 和 1280×800
-视口下，对英文深色、英文浅色、中文深色、中文浅色四种组合完成 937 项真实 Chrome
-检查，覆盖导航、快速切页、hash 恢复、语言与主题持久化、全屏、减少动态效果、对比度、
-外部请求、浏览器错误、控件遮挡、内容裁切、每页证据链接、新标签页安全行为与全部 21 个
-按文件类型渲染的证据查看页、JSONL 展开/收起操作，以及设置控件的低存在感与可操作性，
-并逐页检查中英文标题平衡与最小正文字号。
-英文深色与中文浅色打印稿均验证为 17 个独立的 960×540 点页面。
+`BUILD_RECEIPT.json` 记录生成产物与当前浏览器 QA。动画版本在 1920×1080 和
+1280×800 视口下，对英文深色、英文浅色、中文深色、中文浅色四种组合完成 152 项真实
+Chrome 检查。其中 136 项逐页检查覆盖全部 17 页，没有发现文字超出 16:9 舞台。其余
+检查覆盖键盘和按钮导航、快速切页、hash 恢复、全屏、指针与滚轮手势、单次动画播放、
+返回页面后重播、减少动态效果和打印；第 6 页与第 8 页还完成了演示模式和审阅模式下的
+人工视觉检查。打印稿验证为 17 个独立的 960×540 点页面。

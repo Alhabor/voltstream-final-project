@@ -229,6 +229,34 @@ class PresentationContractTests(unittest.TestCase):
         self.assertIn("page-break-after: always", self.document)
         self.assertIn("aria-live=\"polite\"", self.document)
 
+    def test_pipeline_comparison_and_core_case_have_bounded_animation(self):
+        """The explanatory animation must preserve the final static evidence."""
+        english = {slide["id"]: slide for slide in self.source["slides"]}
+        chinese = {slide["id"]: slide for slide in self.chinese_source["slides"]}
+        for slides in [english, chinese]:
+            pipeline = slides["prototype"]
+            self.assertEqual(pipeline["layout"], "pipeline-compare")
+            self.assertEqual(len(pipeline["manualLane"]["steps"]), 4)
+            self.assertEqual(len(pipeline["prototypeLane"]["steps"]), 4)
+            self.assertEqual(
+                pipeline["prototypeLane"]["decisions"],
+                ["ACCEPT", "HUMAN_REVIEW", "REJECT"],
+            )
+            self.assertIn("8", pipeline["prototypeLane"]["conflict"])
+            self.assertIn("6", pipeline["prototypeLane"]["conflict"])
+        for marker in [
+            'class="pipeline-lane manual"',
+            'class="pipeline-lane prototype"',
+            "@keyframes pipeline-rise",
+            "@keyframes conflict-arrives",
+            ".slide.active .pipeline-intake",
+            ".slide.active .case-context",
+            "animation-delay: 0ms !important",
+            "animation: none !important",
+        ]:
+            self.assertIn(marker, self.document)
+        self.assertNotIn("animation-iteration-count: infinite", self.document)
+
     def test_language_and_theme_controls_are_embedded(self):
         for text in [
             'id="language"',
@@ -347,6 +375,9 @@ class PresentationContractTests(unittest.TestCase):
         self.assertEqual(receipt["print"]["pages"], len(self.source["slides"]))
         self.assertEqual(set(receipt["languages"]), {"en", "zh-CN"})
         self.assertEqual(set(receipt["themes"]), {"dark", "light"})
+        artifact = (PRESENTATION / "index.html").read_bytes()
+        self.assertEqual(receipt["artifact"]["bytes"], len(artifact))
+        self.assertEqual(receipt["artifact"]["sha256"], hashlib.sha256(artifact).hexdigest())
 
 
 if __name__ == "__main__":

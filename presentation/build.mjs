@@ -306,6 +306,71 @@ const html = `<!doctype html>
     .scope-flow .flow-step h3 { margin-bottom: calc(var(--u) * .35); }
     .scope-flow .flow-step p { margin-bottom: 0; font-size: calc(var(--u) * 1.08); }
 
+    .pipeline-lead { margin-bottom: calc(var(--u) * .7); color: var(--muted); font-size: calc(var(--u) * 1.14); line-height: 1.3; }
+    .pipeline-intake {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: calc(var(--u) * .55);
+      margin-bottom: calc(var(--u) * .75);
+      color: var(--muted);
+      font-size: calc(var(--u) * .95);
+    }
+    .pipeline-intake strong { color: var(--ink); font-size: calc(var(--u) * 1.05); }
+    .file-chip { padding: calc(var(--u) * .28) calc(var(--u) * .55); border: 1px solid var(--line); background: var(--panel); }
+    .pipeline-split { color: var(--blue); font-size: calc(var(--u) * 1.2); font-weight: 900; }
+    .pipeline-grid { display: grid; grid-template-columns: 1fr 1fr; gap: calc(var(--u) * 1.25); }
+    .pipeline-lane { min-width: 0; padding: calc(var(--u) * .9); border-top: 3px solid var(--amber); background: var(--panel); }
+    .pipeline-lane.prototype { border-top-color: var(--green); background: linear-gradient(145deg, var(--selected-bg-start), var(--selected-bg-end)); }
+    .lane-label { display: block; margin-bottom: calc(var(--u) * .18); color: var(--amber); font-size: calc(var(--u) * .78); font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
+    .pipeline-lane.prototype .lane-label { color: var(--green); }
+    .lane-title { margin-bottom: calc(var(--u) * .55); color: var(--ink); font-size: calc(var(--u) * 1.17); }
+    .pipeline-steps { display: grid; gap: calc(var(--u) * .34); }
+    .pipeline-step {
+      display: grid;
+      grid-template-columns: calc(var(--u) * 1.65) calc(var(--u) * 5.2) 1fr;
+      align-items: center;
+      gap: calc(var(--u) * .55);
+      min-height: calc(var(--u) * 2.2);
+      padding: calc(var(--u) * .28) calc(var(--u) * .45);
+      border-bottom: 1px solid var(--line);
+    }
+    .pipeline-step-number { display: grid; place-items: center; width: calc(var(--u) * 1.5); height: calc(var(--u) * 1.5); border-radius: 50%; color: #07111a; background: var(--amber); font-size: calc(var(--u) * .8); font-weight: 900; }
+    .prototype .pipeline-step-number { background: var(--blue); }
+    .pipeline-step strong { font-size: calc(var(--u) * .96); }
+    .pipeline-step span:last-child { color: var(--muted); font-size: calc(var(--u) * .86); line-height: 1.2; }
+    .pipeline-conflict { margin: calc(var(--u) * .5) 0; padding: calc(var(--u) * .38) calc(var(--u) * .55); border-left: 3px solid var(--red); color: var(--ink); background: var(--bad-tint); font-size: calc(var(--u) * .9); font-weight: 760; }
+    .pipeline-decisions { display: grid; grid-template-columns: repeat(3, 1fr); gap: calc(var(--u) * .35); margin-top: calc(var(--u) * .48); }
+    .decision-chip { padding: calc(var(--u) * .32); border: 1px solid var(--line); color: var(--muted); text-align: center; font-size: calc(var(--u) * .72); font-weight: 850; }
+    .decision-chip.review { border-color: var(--amber); color: var(--amber); background: var(--bad-tint); }
+    .lane-outcome { margin: calc(var(--u) * .55) 0 0; color: var(--muted); font-size: calc(var(--u) * .86); line-height: 1.23; }
+    .pipeline-guardrail { margin-top: calc(var(--u) * .65); padding-left: calc(var(--u) * .75); border-left: 3px solid var(--green); color: var(--ink); font-size: calc(var(--u) * .97); font-weight: 720; }
+    .pipeline-facts { margin-top: calc(var(--u) * .4); color: var(--subtle); font-size: calc(var(--u) * .74); line-height: 1.24; }
+
+    /* The sequence plays once whenever slide 6 becomes active, then holds the
+       complete comparison on screen for discussion. No animation loops. */
+    .slide.active .pipeline-intake { animation: pipeline-rise .45s ease-out both .15s; }
+    .slide.active .manual .pipeline-step:nth-child(1) { animation: pipeline-rise .45s ease-out both .65s; }
+    .slide.active .manual .pipeline-step:nth-child(2) { animation: pipeline-rise .45s ease-out both 1.1s; }
+    .slide.active .manual .pipeline-step:nth-child(3) { animation: pipeline-rise .45s ease-out both 1.55s; }
+    .slide.active .manual .pipeline-step:nth-child(4) { animation: pipeline-rise .45s ease-out both 2s; }
+    .slide.active .manual .lane-outcome { animation: pipeline-rise .45s ease-out both 2.45s; }
+    .slide.active .prototype .pipeline-step:nth-child(1) { animation: pipeline-rise .45s ease-out both 2.9s; }
+    .slide.active .prototype .pipeline-step:nth-child(2) { animation: pipeline-rise .45s ease-out both 3.35s; }
+    .slide.active .prototype .pipeline-step:nth-child(3) { animation: pipeline-rise .45s ease-out both 3.8s; }
+    .slide.active .pipeline-conflict { animation: conflict-arrives .7s ease-out both 4.25s; }
+    .slide.active .prototype .pipeline-step:nth-child(4) { animation: pipeline-rise .45s ease-out both 4.9s; }
+    .slide.active .pipeline-decisions { animation: pipeline-rise .45s ease-out both 5.35s; }
+    .slide.active .prototype .lane-outcome,
+    .slide.active .pipeline-guardrail,
+    .slide.active .pipeline-facts { animation: pipeline-rise .45s ease-out both 5.8s; }
+    @keyframes pipeline-rise { from { opacity: 0; transform: translateY(calc(var(--u) * .5)); } }
+    @keyframes conflict-arrives {
+      from { opacity: 0; transform: scale(.96); }
+      65% { box-shadow: 0 0 0 calc(var(--u) * .3) color-mix(in srgb, var(--red) 18%, transparent); }
+      to { opacity: 1; transform: scale(1); box-shadow: none; }
+    }
+
     .flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: calc(var(--u) * 1.55); position: relative; }
     .flow::before { content: ""; position: absolute; top: calc(var(--u) * 2); left: 9%; right: 9%; height: 2px; background: var(--line); }
     .flow-step { position: relative; text-align: center; }
@@ -329,6 +394,15 @@ const html = `<!doctype html>
     .outcome-table { width: 100%; border-collapse: collapse; }
     .outcome-table td { padding: calc(var(--u) * .7) calc(var(--u) * .8); border-bottom: 1px solid var(--line); font-size: calc(var(--u) * 1.12); }
     .outcome-table td:last-child { text-align: right; font-weight: 800; }
+    .slide.active .case-context { animation: pipeline-rise .45s ease-out both .15s; }
+    .slide.active .source-value:first-child { animation: pipeline-rise .5s ease-out both .65s; }
+    .slide.active .source-value:last-child { animation: pipeline-rise .5s ease-out both 1.1s; }
+    .slide.active .versus { animation: conflict-arrives .7s ease-out both 1.65s; }
+    .slide.active .canonical-answer { animation: pipeline-rise .5s ease-out both 2.25s; }
+    .slide.active .outcome-table tr:nth-child(1) { animation: pipeline-rise .45s ease-out both 2.85s; }
+    .slide.active .outcome-table tr:nth-child(2) { animation: pipeline-rise .45s ease-out both 3.3s; }
+    .slide.active .outcome-table tr:nth-child(3) { animation: conflict-arrives .65s ease-out both 3.75s; }
+    .slide.active .case-takeaway { animation: pipeline-rise .45s ease-out both 4.4s; }
 
     .signal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: calc(var(--u) * 1.6); }
     .signal { min-height: calc(var(--u) * 10.5); padding: calc(var(--u) * 1.5); border-top: 3px solid var(--line); background: var(--panel); }
@@ -451,6 +525,14 @@ const html = `<!doctype html>
 
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+      .pipeline-intake, .pipeline-step, .lane-outcome, .pipeline-conflict,
+      .pipeline-decisions, .pipeline-guardrail, .pipeline-facts,
+      .case-context, .source-value, .versus, .canonical-answer,
+      .outcome-table tr, .case-takeaway {
+        opacity: 1 !important;
+        transform: none !important;
+        animation-delay: 0ms !important;
+      }
     }
 
     @media (hover: none) {
@@ -482,6 +564,10 @@ const html = `<!doctype html>
       html[data-language="en"] .slide-copy[data-copy="zh"],
       html[data-language="zh"] .slide-copy[data-copy="en"] { display: none !important; }
       .controls, .preferences, .progress { display: none !important; }
+      .pipeline-intake, .pipeline-step, .lane-outcome, .pipeline-conflict,
+      .pipeline-decisions, .pipeline-guardrail, .pipeline-facts,
+      .case-context, .source-value, .versus, .canonical-answer,
+      .outcome-table tr, .case-takeaway { opacity: 1 !important; transform: none !important; animation: none !important; }
     }
   </style>
 </head>
@@ -540,11 +626,14 @@ const html = `<!doctype html>
       function show(index, updateHash = true) {
         current = Math.min(slides.length - 1, Math.max(0, index));
         slides.forEach((slide, i) => {
-          const active = i === current;
-          slide.classList.toggle('active', active);
-          slide.setAttribute('aria-hidden', String(!active));
-          if ('inert' in slide) slide.inert = !active;
+          slide.classList.remove('active');
+          slide.setAttribute('aria-hidden', String(i !== current));
+          if ('inert' in slide) slide.inert = i !== current;
         });
+        // Removing the class and forcing one layout read guarantees that the
+        // two explanatory sequences restart when a presenter returns to them.
+        void slides[current].offsetWidth;
+        slides[current].classList.add('active');
         previous.disabled = current === 0;
         next.disabled = current === slides.length - 1;
         pageCount.textContent = (current + 1) + ' / ' + slides.length;
@@ -649,7 +738,10 @@ const html = `<!doctype html>
 
       window.addEventListener('hashchange', () => show(parseHash(), false));
       updatePreferences();
-      show(current);
+      // Wait for the first painted frame before starting an explanatory
+      // sequence. This makes direct hash links and refreshes behave like
+      // normal slide navigation instead of skipping to the final frame.
+      requestAnimationFrame(() => requestAnimationFrame(() => show(current)));
     })();
   </script>
 </body>
@@ -725,10 +817,12 @@ function renderBody(slide, language) {
       return `<div class="scope-flow"><div class="scope-top">${slide.rejected.map(item => `<div class="scope-option"><strong>${escapeHtml(item.name)}</strong><span>${escapeHtml(item.reason)}</span></div>`).join("")}<div class="scope-selected"><span>${isChinese ? "最终选择" : "SELECTED"}</span><strong>${escapeHtml(slide.selected)}</strong></div></div><div class="flow">${slide.steps.map(step => `<article class="flow-step"><div class="flow-number">${escapeHtml(step.number)}</div><h3>${escapeHtml(step.title)}</h3><p>${escapeHtml(step.detail)}</p></article>`).join("")}</div><p class="guardrail">${escapeHtml(slide.note)}</p></div>`;
     case "flow":
       return `<div class="flow">${slide.steps.map(step => `<article class="flow-step"><div class="flow-number">${escapeHtml(step.number)}</div><h3>${escapeHtml(step.title)}</h3><p>${escapeHtml(step.detail)}</p></article>`).join("")}</div><p class="guardrail">${escapeHtml(slide.guardrail)}</p><p class="note-line">${escapeHtml(slide.excluded)}</p>`;
+    case "pipeline-compare":
+      return `<p class="pipeline-lead">${escapeHtml(slide.lead)}</p><div class="pipeline-intake"><strong>${isChinese ? "同一份新材料" : "THE SAME INCOMING SUBMISSION"}</strong><span class="pipeline-split">→</span>${slide.intake.map(item => `<span class="file-chip">${escapeHtml(item)}</span>`).join("")}</div><div class="pipeline-grid">${renderPipelineLane(slide.manualLane, "manual")}${renderPipelineLane(slide.prototypeLane, "prototype")}</div><p class="pipeline-guardrail">${escapeHtml(slide.guardrail)}</p><p class="pipeline-facts">${escapeHtml(slide.excluded)}</p>`;
     case "failure":
       return `<div class="failure-grid"><div><p class="primary-failure">${escapeHtml(slide.primary)}</p><p class="note-line">${escapeHtml(slide.boundary)}</p></div><div>${slide.events.map(event => `<div class="event"><strong>${escapeHtml(event.label)}</strong><span>${escapeHtml(event.detail)}</span></div>`).join("")}</div></div>`;
     case "case":
-      return `<p class="case-context">${escapeHtml(slide.context)}</p><div class="conflict"><div class="source-value"><span>${escapeHtml(slide.sourceValues[0].label)}</span><strong>${escapeHtml(slide.sourceValues[0].value)}</strong></div><div class="versus">≠</div><div class="source-value"><span>${escapeHtml(slide.sourceValues[1].label)}</span><strong>${escapeHtml(slide.sourceValues[1].value)}</strong></div></div><div class="canonical-answer"><span>${isChinese ? "输出表格只提供：" : "The output table offers only:"} <strong>${escapeHtml(slide.canonical)}</strong></span><br><span>${isChinese ? "安全回答：" : "Safe response:"} <strong>${escapeHtml(slide.safeAnswer)}</strong></span></div><table class="outcome-table"><tbody>${slide.outcomes.map(outcome => `<tr><td>${escapeHtml(outcome.strategy)}</td><td>${escapeHtml(outcome.result)}</td><td class="${outcome.status.includes("unsafe") ? "bad" : outcome.status === "correct" ? "good" : "warn"}">${escapeHtml(outcome.statusLabel || outcome.status)}</td></tr>`).join("")}</tbody></table><p class="note-line">${escapeHtml(slide.takeaway)}</p>`;
+      return `<p class="case-context">${escapeHtml(slide.context)}</p><div class="conflict"><div class="source-value"><span>${escapeHtml(slide.sourceValues[0].label)}</span><strong>${escapeHtml(slide.sourceValues[0].value)}</strong></div><div class="versus">≠</div><div class="source-value"><span>${escapeHtml(slide.sourceValues[1].label)}</span><strong>${escapeHtml(slide.sourceValues[1].value)}</strong></div></div><div class="canonical-answer"><span>${isChinese ? "输出表格只提供：" : "The output table offers only:"} <strong>${escapeHtml(slide.canonical)}</strong></span><br><span>${isChinese ? "安全回答：" : "Safe response:"} <strong>${escapeHtml(slide.safeAnswer)}</strong></span></div><table class="outcome-table"><tbody>${slide.outcomes.map(outcome => `<tr><td>${escapeHtml(outcome.strategy)}</td><td>${escapeHtml(outcome.result)}</td><td class="${outcome.status.includes("unsafe") ? "bad" : outcome.status === "correct" ? "good" : "warn"}">${escapeHtml(outcome.statusLabel || outcome.status)}</td></tr>`).join("")}</tbody></table><p class="note-line case-takeaway">${escapeHtml(slide.takeaway)}</p>`;
     case "signal":
       return `<div class="signal-grid">${slide.signals.map(signal => `<article class="signal"><h3>${escapeHtml(signal.title)}</h3><p class="signal-value">${escapeHtml(signal.value)}</p><p class="muted">${escapeHtml(signal.description)}</p></article>`).join("")}</div><p class="next-step"><span class="accent">${isChinese ? "下一步：" : "Next step:"}</span> ${escapeHtml(slide.next)}</p>`;
     case "testing":
@@ -754,6 +848,12 @@ function renderBody(slide, language) {
 
 function list(items) {
   return `<ul>${items.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
+}
+
+function renderPipelineLane(lane, laneClass) {
+  const conflict = lane.conflict ? `<div class="pipeline-conflict">${escapeHtml(lane.conflict)}</div>` : "";
+  const decisions = lane.decisions ? `<div class="pipeline-decisions">${lane.decisions.map(decision => `<span class="decision-chip ${decision === "HUMAN_REVIEW" ? "review" : ""}">${escapeHtml(decision)}</span>`).join("")}</div>` : "";
+  return `<article class="pipeline-lane ${laneClass}"><span class="lane-label">${escapeHtml(lane.label)}</span><h3 class="lane-title">${escapeHtml(lane.title)}</h3><div class="pipeline-steps">${lane.steps.map(step => `<div class="pipeline-step"><span class="pipeline-step-number">${escapeHtml(step.number)}</span><strong>${escapeHtml(step.title)}</strong><span>${escapeHtml(step.detail)}</span></div>`).join("")}</div>${conflict}${decisions}<p class="lane-outcome">${escapeHtml(lane.outcome)}</p></article>`;
 }
 
 function renderEvidenceLinks(slideId, language) {
