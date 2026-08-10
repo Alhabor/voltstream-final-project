@@ -52,11 +52,11 @@ the underlying v4 scores.
 
 #### H2 — Team-level Git contribution requirement is not yet evidenced
 
-`git shortlog -sne --all` reports one author for all eight commits. The
+`git shortlog -sne --all` reports one author for all current commits. The
 assignment requires every team member to be a GitHub collaborator and each
-member's agent to make a traceable commit. Local evidence cannot confirm the
-GitHub collaborator list, and commit history currently demonstrates only one
-contributor.
+member's agent to make a traceable commit. A final read-only GitHub check found
+only the repository owner in the collaborator list, and commit history
+currently demonstrates only one contributor.
 
 Required action: add/verify collaborators and obtain a genuine, attributable
 commit from every team member's own agent. Do not manufacture authorship or
@@ -188,7 +188,7 @@ disclosure or a dedicated secret-scanning service.
 
 ## Traceability review
 
-The eight commits form a clear staged history:
+The staged commits form a clear history:
 
 1. repository initialization;
 2. fixed benchmark and answer key;
@@ -196,8 +196,9 @@ The eight commits form a clear staged history:
 4. nested-JSON and failed-evidence preservation fix;
 5. Codex schema compatibility fix;
 6. immutable per-case resume support;
-7. correction of the v3 late-completion interpretation; and
-8. committed v4 comparison evidence.
+7. correction of the v3 late-completion interpretation;
+8. committed v4 comparison evidence; and
+9. final analysis, run-bundle verification, recommendation, and HTML briefing.
 
 Failed attempts are retained separately and the v3 interpretation is explicitly
 corrected rather than silently rewritten. The final v4 manifest points to clean
@@ -256,5 +257,5 @@ git fsck --no-dangling --no-reflogs
 - [x] Keep the human-review-only recommendation and EVG-009 limitation explicit.
 - [x] Correct stale README repository-status language.
 - [x] Run `make check`, the secret scan, and presentation QA after final edits.
-- [ ] Confirm the final worktree is clean and `main` is synchronized with
+- [x] Confirm the final worktree is clean and `main` is synchronized with
       `origin/main`.
