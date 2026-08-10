@@ -37,6 +37,7 @@ class BaselineParseResult:
     record: CanonicalRecord
     issues: list[Issue] = field(default_factory=list)
     unmapped_fields: list[str] = field(default_factory=list)
+    source_mappings: dict[str, Optional[str]] = field(default_factory=dict)
 
 
 def _normalize_key(value: str) -> str:
@@ -195,6 +196,7 @@ class DeterministicBaseline:
 
     def canonicalize(self, raw: dict[str, Any]) -> BaselineParseResult:
         values: dict[str, Any] = {}
+        source_mappings: dict[str, Optional[str]] = {}
         issues: list[Issue] = []
         unmapped: list[str] = []
 
@@ -218,11 +220,14 @@ class DeterministicBaseline:
 
             if canonical_key not in values:
                 values[canonical_key] = converted_value
+                source_mappings[canonical_key] = str(raw_key)
             elif values[canonical_key] is None and converted_value is not None:
                 # A populated alias safely fills an earlier blank alias.
                 values[canonical_key] = converted_value
+                source_mappings[canonical_key] = str(raw_key)
             elif converted_value is not None and converted_value != values[canonical_key]:
                 # Preserve the first populated value and surface the disagreement.
+                source_mappings[canonical_key] = None
                 issues.append(
                     Issue(
                         code="DUPLICATE_CANONICAL_FIELD",
@@ -240,4 +245,10 @@ class DeterministicBaseline:
                     message="One or more source fields are not in the audited alias dictionary.",
                 )
             )
-        return BaselineParseResult(CanonicalRecord(**values), issues, sorted(unmapped))
+        complete_mappings = {
+            field_name: source_mappings.get(field_name)
+            for field_name in CanonicalRecord.__dataclass_fields__
+        }
+        return BaselineParseResult(
+            CanonicalRecord(**values), issues, sorted(unmapped), complete_mappings
+        )

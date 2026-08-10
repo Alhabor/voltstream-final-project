@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "VoltStream Model Candidate",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["record", "source_mappings", "issue_codes"],
+  "properties": {
+    "record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["station_id", "address", "charger_level", "port_count", "power_kw", "connector_type", "operational_status", "source_record_id"],
+      "properties": {
+        "station_id": {"type": ["string", "null"]},
+        "address": {"type": ["string", "null"]},
+        "charger_level": {"enum": ["L1", "L2", "DCFC", null]},
+        "port_count": {"type": ["integer", "null"]},
+        "power_kw": {"type": ["number", "null"]},
+        "connector_type": {"enum": ["J1772", "CCS1", "NACS", "CHADEMO", "OTHER", null]},
+        "operational_status": {"enum": ["operational", "temporarily_unavailable", "planned", "retired", "unknown", null]},
+        "source_record_id": {"type": ["string", "null"]}
+      }
+    },
+    "source_mappings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["station_id", "address", "charger_level", "port_count", "power_kw", "connector_type", "operational_status", "source_record_id"],
+      "properties": {
+        "station_id": {"type": ["string", "null"]},
+        "address": {"type": ["string", "null"]},
+        "charger_level": {"type": ["string", "null"]},
+        "port_count": {"type": ["string", "null"]},
+        "power_kw": {"type": ["string", "null"]},
+        "connector_type": {"type": ["string", "null"]},
+        "operational_status": {"type": ["string", "null"]},
+        "source_record_id": {"type": ["string", "null"]}
+      }
+    },
+    "issue_codes": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": ["MISSING_REQUIRED_FIELD", "MISSING_STABLE_IDENTITY", "MISSING_SOURCE_LINEAGE", "AMBIGUOUS_FIELD_VALUE", "LEVEL_POWER_CONFLICT", "INVALID_PORT_COUNT", "INVALID_POWER_VALUE", "PROMPT_INJECTION_DETECTED", "UNSUPPORTED_VALUE_INVENTED", "OUTPUT_SCHEMA_ERROR", "PARSER_FAILURE"]
+      }
+    }
+  }
+}

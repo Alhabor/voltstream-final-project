@@ -17,6 +17,8 @@ class BaselineTests(unittest.TestCase):
         self.assertEqual(parsed.record.station_id, "CE-104")
         self.assertEqual(parsed.record.port_count, 4)
         self.assertEqual(parsed.record.power_kw, 7.2)
+        self.assertEqual(parsed.source_mappings["station_id"], "Site Ref")
+        self.assertEqual(parsed.source_mappings["power_kw"], "Rated Output")
 
     def test_json_list_yields_multiple_rows(self) -> None:
         rows, issues = self.baseline.parse_envelope(
@@ -57,6 +59,7 @@ class BaselineTests(unittest.TestCase):
         conflicted = self.baseline.canonicalize({"station_id": "CE-1", "site ref": "CE-2"})
         self.assertEqual(conflicted.record.station_id, "CE-1")
         self.assertIn("DUPLICATE_CANONICAL_FIELD", {issue.code for issue in conflicted.issues})
+        self.assertIsNone(conflicted.source_mappings["station_id"])
 
 
 if __name__ == "__main__":

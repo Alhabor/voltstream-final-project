@@ -1,0 +1,19 @@
+{
+  "currency": "USD",
+  "unit": "per_1m_tokens",
+  "accessed_at": "2026-08-09",
+  "source_url": "https://api-docs.deepseek.com/quick_start/pricing/",
+  "models": {
+    "deepseek-v4-flash": {
+      "cached_input": 0.0028,
+      "uncached_input": 0.14,
+      "output": 0.28
+    },
+    "deepseek-v4-pro": {
+      "cached_input": 0.003625,
+      "uncached_input": 0.435,
+      "output": 0.87
+    }
+  },
+  "note": "Estimated list prices only. Course-granted credits make the team's billed cost different from resource cost."
+}
