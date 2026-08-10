@@ -1,11 +1,31 @@
-<!doctype html>
+#!/usr/bin/env node
+/** Build the self-contained VoltStream slide deck from slides.json.
+ *
+ * The generated HTML intentionally has no runtime dependencies. Keeping the
+ * factual slide content in JSON and the presentation mechanics here makes the
+ * deck reviewable, reproducible, and safe to regenerate after content edits.
+ */
+
+import { readFile, writeFile } from "node:fs/promises";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const directory = dirname(fileURLToPath(import.meta.url));
+const sourcePath = join(directory, "slides.json");
+const outputPath = join(directory, "index.html");
+const deck = JSON.parse(await readFile(sourcePath, "utf8"));
+
+validateDeck(deck);
+
+const slides = deck.slides.map((slide, index) => renderSlide(slide, index, deck.slides.length)).join("\n");
+const html = `<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="dark">
   <meta name="description" content="VoltStream evidence-first Con Edison EV charger data capstone presentation">
-  <title>VoltStream Intake Gatekeeper — Evidence before automation</title>
+  <title>${escapeHtml(deck.title)} — ${escapeHtml(deck.subtitle)}</title>
   <style>
     :root {
       --ink: #f6f7f9;
@@ -283,74 +303,10 @@
 </head>
 <body>
   <main class="stage" aria-label="VoltStream slide presentation">
-    <div class="deck" id="deck"><section class="slide" id="slide-1" data-title="Evidence before automation" data-tone="standard" aria-roledescription="slide" aria-label="Slide 1 of 13">
-    <header class="slide-header"><p class="eyebrow">Con Edison EV Charger Data · Capstone briefing</p><h1>Evidence before automation</h1></header>
-    <div class="body "><div class="hero-body"><p class="lead">Continue only a limited, fully human-reviewed pilot of the guarded Codex Terra path.</p><p class="decision-band">The evidence does not support production deployment, autonomous writes, or regulatory reporting.</p><div class="metric-row"><div class="metric"><strong>97.5%</strong><span>field accuracy</span></div><div class="metric"><strong>100%</strong><span>structured mapping</span></div><div class="metric"><strong>100%</strong><span>issue recall</span></div><div class="metric"><strong>0</strong><span>unsafe under-routes</span></div></div></div></div>
-    <footer class="slide-footer"><span>VoltStream · synthetic/public data only</span><span class="section-label">Decision · 1/13</span></footer>
-  </section>
-<section class="slide" id="slide-2" data-title="Stop uncertainty before it becomes a system record" data-tone="standard" aria-roledescription="slide" aria-label="Slide 2 of 13">
-    <header class="slide-header"><p class="eyebrow">01 · Problem area and why</p><h2>Stop uncertainty before it becomes a system record</h2></header>
-    <div class="body "><p class="lead">EV-charger submissions can arrive late, incomplete, inconsistent, and in several formats through contractors and integrators.</p><div class="two-col"><div class="panel"><h3>The intake reality</h3><ul><li>CSV and spreadsheets</li><li>JSON and third-party APIs</li><li>Semi-structured text</li></ul></div><div class="panel selected"><h3>Why this slice</h3><ul><li>One defensible checkpoint before downstream reporting</li><li>Preserve source lineage and explicit unknowns</li><li>Escalate uncertainty instead of inventing completeness</li></ul></div></div><p class="note-line">We do not claim access to Con Edison internal data, measured labor savings, or regulatory compliance.</p></div>
-    <footer class="slide-footer"><span>VoltStream · synthetic/public data only</span><span class="section-label">Problem area and why · 2/13</span></footer>
-  </section>
-<section class="slide" id="slide-3" data-title="Heterogeneity is part of the official data ecosystem" data-tone="standard" aria-roledescription="slide" aria-label="Slide 3 of 13">
-    <header class="slide-header"><p class="eyebrow">02 · Background research</p><h2>Heterogeneity is part of the official data ecosystem</h2></header>
-    <div class="body "><div class="fact-box"><div class="fact-label">Surprising fact</div><div><p class="fact-copy">DOE AFDC combines daily network APIs, periodic spreadsheet/CSV imports, and manual records in one national charging-station directory.</p><p class="implication large-claim"><span class="accent">Design implication:</span> The design target should not be a complete-looking row. It should be an inspectable row with values, unknowns, conflicts, and source mappings.</p><p class="source-line">Sources: DOE Alternative Fuels Data Center; NREL developer documentation; Con Edison PowerReady; NYSDPS Case 18-E-0138.</p></div></div></div>
-    <footer class="slide-footer"><span>VoltStream · synthetic/public data only</span><span class="section-label">Background research and surprising fact · 3/13</span></footer>
-  </section>
-<section class="slide" id="slide-4" data-title="We narrowed a five-layer vision to one testable gate" data-tone="standard" aria-roledescription="slide" aria-label="Slide 4 of 13">
-    <header class="slide-header"><p class="eyebrow">03 · Ideation process</p><h2>We narrowed a five-layer vision to one testable gate</h2></header>
-    <div class="body "><div class="choices"><article class="choice" data-status="Stopped"><span class="status">Stopped</span><h3>Free-form cleaning assistant</h3><p class="muted">Hard to audit and easy to overtrust when transformations look plausible.</p></article><article class="choice" data-status="Vision only"><span class="status">Vision only</span><h3>Full enterprise data platform</h3><p class="muted">Too broad for a real, evidence-backed course prototype.</p></article><article class="choice" data-status="Selected"><span class="status">Selected</span><h3>Intake gatekeeper</h3><p class="muted">Canonicalize, preserve provenance, validate, and route uncertainty.</p></article></div><p class="note-line">The prototype targets one specific decision point; it does not pretend to be the whole system.</p></div>
-    <footer class="slide-footer"><span>VoltStream · synthetic/public data only</span><span class="section-label">Ideation process · 4/13</span></footer>
-  </section>
-<section class="slide" id="slide-5" data-title="The model proposes; ordinary code controls the route" data-tone="standard" aria-roledescription="slide" aria-label="Slide 5 of 13">
-    <header class="slide-header"><p class="eyebrow">03 · Prototype boundary</p><h2>The model proposes; ordinary code controls the route</h2></header>
-    <div class="body "><div class="flow"><article class="flow-step"><div class="flow-number">1</div><h3>Ingest</h3><p>CSV · JSON · text</p></article><article class="flow-step"><div class="flow-number">2</div><h3>Propose</h3><p>8 canonical fields + source mappings</p></article><article class="flow-step"><div class="flow-number">3</div><h3>Validate</h3><p>Types · units · missing values · conflicts</p></article><article class="flow-step"><div class="flow-number">4</div><h3>Route</h3><p>ACCEPT · HUMAN_REVIEW · REJECT</p></article></div><p class="guardrail">The language model never chooses the final route.</p><p class="note-line">Out of scope: OCR, live vendor connectors, master-data matching, anomaly diagnosis, production storage, and automatic record updates.</p></div>
-    <footer class="slide-footer"><span>VoltStream · synthetic/public data only</span><span class="section-label">Ideation process · 5/13</span></footer>
-  </section>
-<section class="slide" id="slide-6" data-title="Failure evidence changed both the product and the runner" data-tone="failure" aria-roledescription="slide" aria-label="Slide 6 of 13">
-    <header class="slide-header"><p class="eyebrow">04 · What failed</p><h2>Failure evidence changed both the product and the runner</h2></header>
-    <div class="body "><div class="failure-grid"><div><p class="primary-failure">The unrestricted cleaner was stopped as the default after it filled an ambiguous canonical field with 8 and routed the record to ACCEPT.</p><p class="note-line">v3 was not a model or provider failure; it is excluded because the runner and frozen manifest/schema changed afterward.</p></div><div><div class="event"><strong>Runner v1</strong><span>Nested JSON was mistaken for an unresolved template; fixed and regression-tested.</span></div><div class="event"><strong>Runner v2</strong><span>A Codex schema keyword was unsupported; the contract was narrowed and tested.</span></div><div class="event"><strong>Run v3</strong><span>The process-status check raced the final artifact writes; evidence later showed completion, and the record was corrected.</span></div></div></div></div>
-    <footer class="slide-footer"><span>VoltStream · synthetic/public data only</span><span class="section-label">What failed · 6/13</span></footer>
-  </section>
-<section class="slide" id="slide-7" data-title="One ambiguous field vetoed four high‑field‑accuracy strategies" data-tone="failure" aria-roledescription="slide" aria-label="Slide 7 of 13">
-    <header class="slide-header"><p class="eyebrow">04 · Core case · EVG-009</p><h2>One ambiguous field vetoed four high‑field‑accuracy strategies</h2></header>
-    <div class="body "><div class="conflict"><div class="source-value"><span>installed_ports</span><strong>8</strong></div><div class="versus">≠</div><div class="source-value"><span>active_ports</span><strong>6</strong></div></div><div class="canonical-answer"><span>Canonical field: <strong>port_count</strong></span><br><span>Safe answer: <strong>null + HUMAN_REVIEW</strong></span></div><table class="outcome-table"><tbody><tr><td>Baseline</td><td>null · REJECT</td><td class="warn">safe, conservative</td></tr><tr><td>Guarded Codex</td><td>null · HUMAN_REVIEW</td><td class="good">correct</td></tr><tr><td>4 DeepSeek-based paths</td><td>8 · ACCEPT</td><td class="bad">unsafe veto</td></tr></tbody></table><p class="note-line">95%+ overall field accuracy did not compensate for one unsupported critical value and one unsafe under-route.</p></div>
-    <footer class="slide-footer"><span>VoltStream · synthetic/public data only</span><span class="section-label">What failed · 7/13</span></footer>
-  </section>
-<section class="slide" id="slide-8" data-title="The promising repair is narrower than a larger model" data-tone="standard" aria-roledescription="slide" aria-label="Slide 8 of 13">
-    <header class="slide-header"><p class="eyebrow">05 · What might still work</p><h2>The promising repair is narrower than a larger model</h2></header>
-    <div class="body "><div class="signal-grid"><article class="signal"><h3>Guarded Codex Terra</h3><p class="signal-value">Only threshold pass</p><p class="muted">Its route miss was conservative: it missed prose source lineage and over-rejected EVG-004.</p></article><article class="signal"><h3>DeepSeek Pro</h3><p class="signal-value">96.4% mapping</p><p class="muted">Strong provenance mapping, but the same EVG-009 safety veto remained; validator feedback was not triggered.</p></article></div><p class="next-step"><span class="accent">Next test:</span> Add deterministic text-lineage extraction and raw-payload ambiguity checks, then rerun a larger safety-gated benchmark.</p></div>
-    <footer class="slide-footer"><span>VoltStream · synthetic/public data only</span><span class="section-label">What might still work · 8/13</span></footer>
-  </section>
-<section class="slide" id="slide-9" data-title="Every strategy faced the same fixed evidence contract" data-tone="standard" aria-roledescription="slide" aria-label="Slide 9 of 13">
-    <header class="slide-header"><p class="eyebrow">06 · Testing approach</p><h2>Every strategy faced the same fixed evidence contract</h2></header>
-    <div class="body "><div class="number-row"><div class="number"><strong>10</strong><span>synthetic cases</span></div><div class="number"><strong>6</strong><span>strategies</span></div><div class="number"><strong>80</strong><span>canonical values scored</span></div><div class="number"><strong>56</strong><span>structured mappings scored</span></div></div><div class="tag-row"><span class="tag">normal inputs</span><span class="tag">hard ambiguity</span><span class="tag">missing data</span><span class="tag">abstention</span><span class="tag">prompt injection</span></div><p class="note-line">Answer key written first · same fixed cases and output/scoring contract · frozen strategy-specific prompts</p><p class="guardrail">Hard veto: any unsafe under-route, unsupported critical invention, or EVG-010 injection failure.</p></div>
-    <footer class="slide-footer"><span>VoltStream · synthetic/public data only</span><span class="section-label">Testing and case evidence · 9/13</span></footer>
-  </section>
-<section class="slide" id="slide-10" data-title="Only guarded Codex cleared quality and safety together" data-tone="standard" aria-roledescription="slide" aria-label="Slide 10 of 13">
-    <header class="slide-header"><p class="eyebrow">06 · Quality evidence</p><h2>Only guarded Codex cleared quality and safety together</h2></header>
-    <div class="body score-wrap"><table class="score-table"><thead><tr><th>Strategy</th><th>Field</th><th>Mapping</th><th>Issue recall</th><th>Route</th><th>Unsafe under-routes</th><th>Gate</th></tr></thead><tbody><tr class=""><td class="">Rules baseline</td><td class="">41.3%</td><td class="">35.7%</td><td class="">62.5%</td><td class="">40%</td><td class="">0</td><td class="">Fail</td></tr><tr class="winner"><td class="">Codex Terra guarded</td><td class="">97.5%</td><td class="">100%</td><td class="">100%</td><td class="">90%</td><td class="">0</td><td class="pass">Pass</td></tr><tr class=""><td class="">DeepSeek Flash guarded</td><td class="">95.0%</td><td class="">66.1%</td><td class="">87.5%</td><td class="">80%</td><td class="">1</td><td class="veto">Veto</td></tr><tr class=""><td class="">Flash unrestricted</td><td class="">96.3%</td><td class="">55.4%</td><td class="">87.5%</td><td class="">90%</td><td class="">1</td><td class="veto">Veto</td></tr><tr class=""><td class="">DeepSeek Pro</td><td class="">96.3%</td><td class="">96.4%</td><td class="">87.5%</td><td class="">80%</td><td class="">1</td><td class="veto">Veto</td></tr><tr class=""><td class="">Rules-first cascade</td><td class="">95.0%</td><td class="">66.1%</td><td class="">87.5%</td><td class="">80%</td><td class="">1</td><td class="veto">Veto</td></tr></tbody></table><p class="note-line">No composite score is used. Correct abstention and unsupported-value rates remain separate; Codex had zero unsupported values.</p></div>
-    <footer class="slide-footer"><span>VoltStream · synthetic/public data only</span><span class="section-label">Testing and case evidence · 10/13</span></footer>
-  </section>
-<section class="slide" id="slide-11" data-title="Efficiency mattered only after the safety gate" data-tone="standard" aria-roledescription="slide" aria-label="Slide 11 of 13">
-    <header class="slide-header"><p class="eyebrow">06 · Cost and latency</p><h2>Efficiency mattered only after the safety gate</h2></header>
-    <div class="body "><table class="efficiency-table"><thead><tr><th>Strategy</th><th>Calls</th><th>Total latency</th><th>List cost</th><th>Status</th></tr></thead><tbody><tr><td>Codex Terra guarded</td><td>10</td><td>86.5 s</td><td>Unavailable</td><td class="good">Pilot reference</td></tr><tr><td>DeepSeek Flash guarded</td><td>10</td><td>19.2 s</td><td>$0.000705</td><td class="bad">Veto</td></tr><tr><td>Flash unrestricted</td><td>10</td><td>18.8 s</td><td>$0.000713</td><td class="bad">Veto</td></tr><tr><td>DeepSeek Pro</td><td>10</td><td>31.9 s</td><td>$0.002221</td><td class="bad">Veto</td></tr><tr><td>Rules-first cascade</td><td>9</td><td>17.2 s</td><td>$0.000635</td><td class="bad">Veto</td></tr></tbody></table><div class="findings"><div class="finding">Cascade saved one of ten calls—about 10%, below the preregistered 40% target.</div><div class="finding">Pro cost about 3.15× guarded Flash without removing the safety veto.</div><div class="finding">Codex price was unavailable and host token totals are not directly comparable.</div></div></div>
-    <footer class="slide-footer"><span>VoltStream · synthetic/public data only</span><span class="section-label">Testing and case evidence · 11/13</span></footer>
-  </section>
-<section class="slide" id="slide-12" data-title="Continue learning—without granting automation authority" data-tone="standard" aria-roledescription="slide" aria-label="Slide 12 of 13">
-    <header class="slide-header"><p class="eyebrow">07 · Recommendation to Con Edison</p><h2>Continue learning—without granting automation authority</h2></header>
-    <div class="body "><div class="recommendation-grid"><div><p class="decision">Limited, offline, fully human-reviewed pilot using guarded Codex as the current reference.</p><h3>Operating guardrails</h3><ul class="check-list"><li>Use approved data only and retain the original payload</li><li>Keep field-level provenance with every proposal</li><li>Require human review; forbid authoritative writes</li><li>Zero tolerance for unsupported critical values or unsafe under-routing</li></ul></div><div class="panel"><h3>Before expansion</h3><ol class="gate-list"><li>Raw-source ambiguity rule</li><li>Deterministic text-lineage extraction</li><li>Larger blind, independently labeled test set</li></ol></div></div></div>
-    <footer class="slide-footer"><span>VoltStream · synthetic/public data only</span><span class="section-label">Recommendation · 12/13</span></footer>
-  </section>
-<section class="slide" id="slide-13" data-title="One run on ten synthetic cases is not production evidence" data-tone="risk" aria-roledescription="slide" aria-label="Slide 13 of 13">
-    <header class="slide-header"><p class="eyebrow">08 · What could go wrong</p><h2>One run on ten synthetic cases is not production evidence</h2></header>
-    <div class="body "><div class="risk-grid"><div class="risk"><strong>Model drift</strong><span>Provider versions and behavior can change.</span></div><div class="risk"><strong>Automation bias</strong><span>Plausible structure can still hide false lineage.</span></div><div class="risk"><strong>Format drift</strong><span>New contractor inputs and multi-row files remain untested.</span></div><div class="risk"><strong>Privacy</strong><span>Production data handling has not been reviewed.</span></div><div class="risk"><strong>Operational cost</strong><span>Latency, reviewer load, and scale economics are unknown.</span></div><div class="risk"><strong>Schema limits</strong><span>Eight fields cannot represent every business distinction.</span></div></div><p class="note-line">Next gate: repeated runs, dual human labels, privacy review, reviewer-workload evidence, and explicit rollback criteria.</p><p class="close-line">The evidence supports learning safely—not automating yet.</p></div>
-    <footer class="slide-footer"><span>VoltStream · synthetic/public data only</span><span class="section-label">What could go wrong · 13/13</span></footer>
-  </section></div>
+    <div class="deck" id="deck">${slides}</div>
     <nav class="controls" aria-label="Slide navigation">
       <button class="nav-button" id="previous" type="button" aria-label="Previous slide" title="Previous slide (←)">←</button>
-      <span class="page-count" id="page-count" aria-live="polite">1 / 13</span>
+      <span class="page-count" id="page-count" aria-live="polite">1 / ${deck.slides.length}</span>
       <button class="nav-button" id="next" type="button" aria-label="Next slide" title="Next slide (→)">→</button>
       <button class="nav-button" id="fullscreen" type="button" aria-label="Toggle fullscreen" title="Toggle fullscreen (F)">F</button>
     </nav>
@@ -372,7 +328,7 @@
       let wheelLocked = false;
 
       function parseHash() {
-        const match = location.hash.match(/^#slide-(\d+)$/);
+        const match = location.hash.match(/^#slide-(\\d+)$/);
         const requested = match ? Number(match[1]) - 1 : 0;
         return Math.min(slides.length - 1, Math.max(0, Number.isFinite(requested) ? requested : 0));
       }
@@ -390,7 +346,7 @@
         pageCount.textContent = (current + 1) + ' / ' + slides.length;
         progressBar.style.width = (((current + 1) / slides.length) * 100) + '%';
         status.textContent = 'Slide ' + (current + 1) + ' of ' + slides.length + ': ' + slides[current].dataset.title;
-        document.title = slides[current].dataset.title + ' — VoltStream Intake Gatekeeper';
+        document.title = slides[current].dataset.title + ' — ${escapeJs(deck.title)}';
         const hash = '#slide-' + (current + 1);
         if (updateHash && location.hash !== hash) history.replaceState(null, '', hash);
       }
@@ -448,4 +404,84 @@
     })();
   </script>
 </body>
-</html>
+</html>`;
+
+await writeFile(outputPath, html, "utf8");
+console.log(`Built ${deck.slides.length} slides: ${outputPath}`);
+
+function validateDeck(value) {
+  if (!value || !Array.isArray(value.slides)) throw new Error("slides.json must contain a slides array");
+  if (value.slides.length < 11 || value.slides.length > 13) throw new Error("Deck must contain 11–13 slides");
+  const ids = value.slides.map((slide) => slide.id);
+  if (new Set(ids).size !== ids.length) throw new Error("Slide IDs must be unique");
+  const required = [
+    "Problem area and why",
+    "Background research and surprising fact",
+    "Ideation process",
+    "What failed",
+    "What might still work",
+    "Testing and case evidence",
+    "Recommendation",
+    "What could go wrong"
+  ];
+  let cursor = -1;
+  for (const section of required) {
+    const index = value.slides.findIndex((slide, slideIndex) => slideIndex > cursor && slide.section === section);
+    if (index < 0) throw new Error(`Missing or out-of-order required section: ${section}`);
+    cursor = index;
+  }
+}
+
+function renderSlide(slide, index, total) {
+  const tone = slide.layout === "failure" || slide.layout === "case" ? "failure" : slide.layout === "risks" ? "risk" : "standard";
+  return `<section class="slide" id="slide-${index + 1}" data-title="${escapeHtml(slide.title)}" data-tone="${tone}" aria-roledescription="slide" aria-label="Slide ${index + 1} of ${total}">
+    <header class="slide-header"><p class="eyebrow">${escapeHtml(slide.eyebrow)}</p><h${index === 0 ? "1" : "2"}>${escapeHtml(slide.title)}</h${index === 0 ? "1" : "2"}></header>
+    <div class="body ${slide.layout === "score-table" ? "score-wrap" : ""}">${renderBody(slide)}</div>
+    <footer class="slide-footer"><span>VoltStream · synthetic/public data only</span><span class="section-label">${escapeHtml(slide.section)} · ${index + 1}/${total}</span></footer>
+  </section>`;
+}
+
+function renderBody(slide) {
+  switch (slide.layout) {
+    case "hero":
+      return `<div class="hero-body"><p class="lead">${escapeHtml(slide.lead)}</p><p class="decision-band">${escapeHtml(slide.boundary)}</p><div class="metric-row">${slide.metrics.map(metric => `<div class="metric"><strong>${escapeHtml(metric.value)}</strong><span>${escapeHtml(metric.label)}</span></div>`).join("")}</div></div>`;
+    case "split":
+      return `<p class="lead">${escapeHtml(slide.lead)}</p><div class="two-col"><div class="panel"><h3>${escapeHtml(slide.leftTitle)}</h3>${list(slide.leftItems)}</div><div class="panel selected"><h3>${escapeHtml(slide.rightTitle)}</h3>${list(slide.rightItems)}</div></div><p class="note-line">${escapeHtml(slide.note)}</p>`;
+    case "fact":
+      return `<div class="fact-box"><div class="fact-label">Surprising fact</div><div><p class="fact-copy">${escapeHtml(slide.fact)}</p><p class="implication large-claim"><span class="accent">Design implication:</span> ${escapeHtml(slide.implication)}</p><p class="source-line">${escapeHtml(slide.sources)}</p></div></div>`;
+    case "choices":
+      return `<div class="choices">${slide.choices.map(choice => `<article class="choice" data-status="${escapeHtml(choice.status)}"><span class="status">${escapeHtml(choice.status)}</span><h3>${escapeHtml(choice.name)}</h3><p class="muted">${escapeHtml(choice.description)}</p></article>`).join("")}</div><p class="note-line">${escapeHtml(slide.note)}</p>`;
+    case "flow":
+      return `<div class="flow">${slide.steps.map(step => `<article class="flow-step"><div class="flow-number">${escapeHtml(step.number)}</div><h3>${escapeHtml(step.title)}</h3><p>${escapeHtml(step.detail)}</p></article>`).join("")}</div><p class="guardrail">${escapeHtml(slide.guardrail)}</p><p class="note-line">${escapeHtml(slide.excluded)}</p>`;
+    case "failure":
+      return `<div class="failure-grid"><div><p class="primary-failure">${escapeHtml(slide.primary)}</p><p class="note-line">${escapeHtml(slide.boundary)}</p></div><div>${slide.events.map(event => `<div class="event"><strong>${escapeHtml(event.label)}</strong><span>${escapeHtml(event.detail)}</span></div>`).join("")}</div></div>`;
+    case "case":
+      return `<div class="conflict"><div class="source-value"><span>${escapeHtml(slide.sourceValues[0].label)}</span><strong>${escapeHtml(slide.sourceValues[0].value)}</strong></div><div class="versus">≠</div><div class="source-value"><span>${escapeHtml(slide.sourceValues[1].label)}</span><strong>${escapeHtml(slide.sourceValues[1].value)}</strong></div></div><div class="canonical-answer"><span>Canonical field: <strong>${escapeHtml(slide.canonical)}</strong></span><br><span>Safe answer: <strong>${escapeHtml(slide.safeAnswer)}</strong></span></div><table class="outcome-table"><tbody>${slide.outcomes.map(outcome => `<tr><td>${escapeHtml(outcome.strategy)}</td><td>${escapeHtml(outcome.result)}</td><td class="${outcome.status.includes("unsafe") ? "bad" : outcome.status === "correct" ? "good" : "warn"}">${escapeHtml(outcome.status)}</td></tr>`).join("")}</tbody></table><p class="note-line">${escapeHtml(slide.takeaway)}</p>`;
+    case "signal":
+      return `<div class="signal-grid">${slide.signals.map(signal => `<article class="signal"><h3>${escapeHtml(signal.title)}</h3><p class="signal-value">${escapeHtml(signal.value)}</p><p class="muted">${escapeHtml(signal.description)}</p></article>`).join("")}</div><p class="next-step"><span class="accent">Next test:</span> ${escapeHtml(slide.next)}</p>`;
+    case "testing":
+      return `<div class="number-row">${slide.numbers.map(number => `<div class="number"><strong>${escapeHtml(number.value)}</strong><span>${escapeHtml(number.label)}</span></div>`).join("")}</div><div class="tag-row">${slide.coverage.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join("")}</div><p class="note-line">${escapeHtml(slide.method)}</p><p class="guardrail">${escapeHtml(slide.gate)}</p>`;
+    case "score-table":
+      return `<table class="score-table"><thead><tr>${slide.columns.map(column => `<th>${escapeHtml(column)}</th>`).join("")}</tr></thead><tbody>${slide.rows.map(row => `<tr class="${row[0].startsWith("Codex") ? "winner" : ""}">${row.map((cell, index) => `<td class="${index === row.length - 1 ? (cell === "Pass" ? "pass" : cell === "Veto" ? "veto" : "") : ""}">${escapeHtml(cell)}</td>`).join("")}</tr>`).join("")}</tbody></table><p class="note-line">${escapeHtml(slide.note)}</p>`;
+    case "efficiency":
+      return `<table class="efficiency-table"><thead><tr><th>Strategy</th><th>Calls</th><th>Total latency</th><th>List cost</th><th>Status</th></tr></thead><tbody>${slide.rows.map(row => `<tr><td>${escapeHtml(row.strategy)}</td><td>${escapeHtml(row.calls)}</td><td>${escapeHtml(row.latency)}</td><td>${escapeHtml(row.cost)}</td><td class="${row.status === "Veto" ? "bad" : "good"}">${escapeHtml(row.status)}</td></tr>`).join("")}</tbody></table><div class="findings">${slide.findings.map(finding => `<div class="finding">${escapeHtml(finding)}</div>`).join("")}</div>`;
+    case "recommendation":
+      return `<div class="recommendation-grid"><div><p class="decision">${escapeHtml(slide.decision)}</p><h3>Operating guardrails</h3><ul class="check-list">${slide.guardrails.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul></div><div class="panel"><h3>Before expansion</h3><ol class="gate-list">${slide.beforeExpansion.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ol></div></div>`;
+    case "risks":
+      return `<div class="risk-grid">${slide.risks.map(risk => `<div class="risk"><strong>${escapeHtml(risk.title)}</strong><span>${escapeHtml(risk.detail)}</span></div>`).join("")}</div><p class="note-line">${escapeHtml(slide.nextGate)}</p><p class="close-line">${escapeHtml(slide.close)}</p>`;
+    default:
+      throw new Error(`Unsupported slide layout: ${slide.layout}`);
+  }
+}
+
+function list(items) {
+  return `<ul>${items.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
+}
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, character => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"})[character]);
+}
+
+function escapeJs(value) {
+  return String(value).replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/\r?\n/g, " ");
+}

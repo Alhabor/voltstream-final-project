@@ -1,19 +1,32 @@
 {
   "ok": true,
   "output": "presentation/index.html",
-  "artifact": "presentation/artifact.json",
-  "stages": {
-    "validation": "passed",
-    "package": "passed",
-    "verification": "structural_only"
+  "source": "presentation/slides.json",
+  "generator": "presentation/build.mjs",
+  "slides": 13,
+  "self_contained": true,
+  "browser": {
+    "name": "Google Chrome",
+    "version": "151.0.7922.77",
+    "automation": "Playwright 1.62.0",
+    "checks_passed": 43,
+    "viewports": ["1920x1080", "1280x800", "1280x720 touch emulation"],
+    "keyboard_navigation": "passed",
+    "button_navigation": "passed",
+    "rapid_switching": "passed",
+    "pointer_swipe": "passed",
+    "touchscreen_swipe": "passed",
+    "wheel_navigation": "passed",
+    "hash_restore": "passed",
+    "fullscreen_enter_exit": "passed",
+    "reduced_motion": "passed",
+    "content_clipping": "none detected",
+    "external_requests": 0,
+    "browser_errors": 0
   },
-  "counts": {
-    "blocks": 21,
-    "charts": 2,
-    "metrics": 4,
-    "tables": 2
-  },
-  "source_dialog": "not_verified",
-  "source_interaction": "not_verified",
-  "browser_qa_note": "Cached Chromium entered semantic fallback and installed Chrome timed out. Exact payload equality and required runtime, reader, and semantic-fallback roots passed structural verification."
+  "print": {
+    "pages": 13,
+    "page_size_points": "960x540",
+    "one_slide_per_page": true
+  }
 }

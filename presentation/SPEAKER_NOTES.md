@@ -1,63 +1,126 @@
 # Ten-Minute Speaker Notes
 
-## 0:00–0:45 — Decision first
+These notes follow the 13-slide HTML deck. The time boxes total 10:00 and leave
+the most time for the EVG-009 case, comparative evidence, and recommendation.
+
+## Slide 1 · 0:00–0:35 — Decision first
 
 VoltStream is an intake gate, not a complete data platform. Lead with the
-recommendation: one guarded Codex configuration earned another limited,
-human-reviewed test; no system earned production or autonomous-write approval.
+decision: one guarded Codex configuration earned another limited,
+human-reviewed test. No configuration earned production or autonomous-write
+approval.
 
-## 0:45–1:35 — Problem selected
+[Sources] `evaluation/runs/2026-08-09-final-v4/summary.csv`;
+`docs/FINAL_RECOMMENDATION.md`.
 
-Explain why intake is the defensible slice. Contractor data can arrive in CSV,
-JSON, or prose, and uncertainty is cheapest to stop before it reaches a system
-of record. Do not claim Con Edison internal error rates or labor savings.
+## Slide 2 · 0:35–1:15 — Problem area and why
 
-## 1:35–2:15 — Research surprise
+Contractor submissions can arrive as CSV, JSON, or prose. Intake is the
+defensible slice because uncertainty is cheapest to stop before it reaches a
+system of record. Do not claim Con Edison internal error rates, measured labor
+savings, or regulatory compliance.
 
-DOE AFDC itself combines daily network APIs, periodic spreadsheet/CSV imports,
-and manual records. Heterogeneity is not an edge case; provenance and explicit
-unknowns therefore matter as much as completeness.
+[Sources] `research/BACKGROUND_RESEARCH.md`; `docs/PROJECT_SCOPE.md`.
 
-## 2:15–3:10 — Prototype and ideation
+## Slide 3 · 1:15–1:55 — Research surprise
 
-Walk through: input → eight-field candidate → source mappings → deterministic
-validation → ACCEPT/HUMAN_REVIEW/REJECT. The model proposes; ordinary code
-routes. Mention the alternatives deliberately excluded: OCR, live portals,
-master-data reconciliation, anomaly diagnosis, production writes.
+The surprising fact is that DOE AFDC itself combines daily network APIs,
+spreadsheet/CSV imports, and manual records. Heterogeneity is not an edge case;
+provenance and explicit unknowns matter as much as completeness.
 
-## 3:10–4:45 — What failed
+[Sources] `research/SOURCES.md` entries for DOE AFDC, NREL, Con Edison
+PowerReady, and NYSDPS Case 18-E-0138.
 
-Use EVG-009. The payload has `installed_ports=8` and `active_ports=6`, while the
-canonical schema has only `port_count`. The safe answer is null plus review.
-All four DeepSeek-based paths chose 8 and ACCEPTed, so one rare case vetoed
-automation despite 95%+ overall field accuracy. Also briefly mention the two
-retained runner failures and the corrected v3 status race as evidence of an
-honest build process.
+## Slide 4 · 1:55–2:35 — Ideation and scope choice
 
-## 4:45–5:35 — Future signal
+We considered a free-form cleaner and the full five-layer platform vision. The
+first was hard to audit; the second was too broad for a real course prototype.
+The selected slice proposes canonical values, preserves provenance, validates,
+and routes uncertainty.
 
-DeepSeek Pro reached 96.4% mapping accuracy but did not solve safety. Codex's
-miss was conservative text-lineage extraction, a narrower and testable repair.
-That is why Codex is promising and Pro is only a future signal.
+[Sources] `docs/PROJECT_SCOPE.md`; `build-log/2026-08-09-freeform-cleaning-hypothesis.md`.
 
-## 5:35–7:35 — Testing and results
+## Slide 5 · 2:35–3:15 — How the gate works
 
-Ten fixed synthetic cases, answer key written first, same contract and rubric.
-Keep metrics separate. Codex: 78/80 values, 56/56 structured mappings, 8/8
-issue recall, 9/10 routes, zero unsafe under-routes, zero unsupported values.
-The baseline was safe but incomplete. The cascade saved only one call and kept
-the safety failure; Pro cost about 3.15× Flash without passing the gate.
+Walk left to right: input, eight-field proposal plus source mappings,
+deterministic validation, then routing. Emphasize that the language model never
+chooses the final route. Briefly name the excluded production capabilities.
 
-## 7:35–8:50 — Recommendation
+[Sources] `docs/ARCHITECTURE.md`; `src/voltstream/model_pipeline.py`.
 
-Continue an offline, fully human-reviewed pilot: approved data only, original
-payload and provenance retained, no authoritative writes, zero tolerance for
-unsupported critical values or unsafe under-routing. Add raw-payload ambiguity
-rules and text-lineage extraction before expanding the benchmark.
+## Slide 6 · 3:15–3:55 — What failed in development
 
-## 8:50–10:00 — Risks and close
+The unrestricted cleaner was stopped as the default. Also show that failures
+were preserved: nested JSON handling, Codex schema compatibility, and the v3
+status check that raced final artifact writes. Clarify that v3 was not a model
+or provider failure.
 
-Ten synthetic cases and one run cannot establish production reliability.
-Mention model drift, automation bias, privacy, false rejection, price/latency
-uncertainty, and schema limits. Close with: evidence supports learning safely,
-not automating yet.
+[Sources] `build-log/README.md`; preserved runs under `evaluation/runs/`.
+
+## Slide 7 · 3:55–5:05 — EVG-009 core case
+
+Slow down here. The payload contains `installed_ports=8` and `active_ports=6`,
+while the schema has one `port_count`. The safe answer is null plus
+HUMAN_REVIEW. Baseline was safely conservative; guarded Codex was correct; all
+four DeepSeek-based paths chose 8 and ACCEPT. One unsupported critical choice
+and unsafe route vetoed automation despite 95%+ field accuracy.
+
+[Sources] `data/cases.jsonl`; `data/answer_key.jsonl`;
+`evaluation/runs/2026-08-09-final-v4/*/predictions.jsonl`.
+
+## Slide 8 · 5:05–5:45 — What might still work
+
+DeepSeek Pro reached 96.4% mapping accuracy but retained the same safety veto;
+its conditional validator feedback was not triggered. Codex's route miss was a
+conservative text-lineage miss, suggesting two narrow repairs: deterministic
+text-lineage extraction and raw-payload ambiguity checks.
+
+[Sources] `evaluation/RESULTS.md`; `docs/FINAL_RECOMMENDATION.md`.
+
+## Slide 9 · 5:45–6:25 — Testing design
+
+Ten synthetic cases and the answer key were fixed first. Six strategies faced
+the same cases and output/scoring contract with frozen strategy-specific
+prompts. Metrics remain separate, and any unsafe under-route, critical
+invention, or EVG-010 injection failure triggers a hard veto.
+
+[Sources] `docs/EXPERIMENT_PLAN.md`; `data/README.md`;
+`evaluation/EVALUATION_SPEC.md`.
+
+## Slide 10 · 6:25–7:35 — Quality and safety evidence
+
+Read the Codex row: 78/80 values, 56/56 structured mappings, 8/8 issue recall,
+9/10 routes, zero unsafe under-routes, and zero unsupported values. The baseline
+was safe but incomplete. Every DeepSeek-based strategy has one unsafe
+under-route, so none is eligible. Do not collapse the table into one score.
+
+[Sources] `evaluation/runs/2026-08-09-final-v4/summary.csv`;
+`evaluation/RESULTS.md`.
+
+## Slide 11 · 7:35–8:10 — Cost and latency
+
+The cascade saved one call and about 10%, below the preregistered 40% target,
+while retaining the safety failure. Pro cost about 3.15 times guarded Flash
+without clearing the veto. Codex was slower, its comparable price was
+unavailable, and host token accounting is not directly comparable.
+
+[Sources] `evaluation/runs/2026-08-09-final-v4/summary.csv`;
+`evaluation/pricing_2026-08-09.json`.
+
+## Slide 12 · 8:10–9:05 — Recommendation
+
+Recommend an offline, fully human-reviewed pilot using approved data only.
+Retain original payloads and provenance; forbid authoritative writes; apply
+zero tolerance to unsupported critical values and unsafe under-routing. Before
+expansion, implement both narrow controls and test a larger blind set.
+
+[Sources] `docs/FINAL_RECOMMENDATION.md`.
+
+## Slide 13 · 9:05–10:00 — Risks and close
+
+Ten synthetic cases and one run cannot establish production reliability. Name
+model drift, automation bias, contractor-format drift, privacy, reviewer load,
+price/latency uncertainty, and schema limits. Close with: **the evidence
+supports learning safely—not automating yet.**
+
+[Sources] `docs/FINAL_RECOMMENDATION.md`; `docs/QA_REPORT.md`.

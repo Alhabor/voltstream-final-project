@@ -9,9 +9,9 @@ fixture, result, or Git changes were made during this review
 ## Executive verdict
 
 **The v4 experiment evidence is internally complete and reproducible. The
-required HTML presentation was subsequently generated and structurally
-verified. Team-level Git contribution evidence remains the only known external
-submission blocker.**
+required HTML presentation was subsequently rebuilt as a 13-slide deck and
+verified in a real browser. Team-level Git contribution evidence remains the
+only known external submission blocker.**
 
 The v4 run passed the integrity checks performed in this review:
 
@@ -24,7 +24,7 @@ The v4 run passed the integrity checks performed in this review:
   aggregate scores;
 - fixture validation passed with 10 cases, 10 answers, and 7 structured mapping
   answer rows;
-- all 63 automated tests passed under Python 3.9.6;
+- all 70 automated tests passed under Python 3.9.6;
 - the current repository and Git history produced no high-signal secret-pattern
   matches; and
 - the result commit `627830a` is on `main`, is synchronized with `origin/main`,
@@ -38,17 +38,13 @@ No defect was found that invalidates or requires rerunning v4.
 
 #### H1 — Required HTML presentation (resolved after independent QA)
 
-`presentation/index.html` now exists as a self-contained portable report built
-from `presentation/artifact.json`. The canonical builder passed validation,
-packaging, exact payload equality, and structural verification with 21 blocks,
-2 charts, 4 metrics, and 2 tables. The eight assignment topics appear in the
-required order.
-
-Two installed Chromium paths failed enhanced-reader extraction/verification in
-this environment, so the final receipt is `structural_only`: semantic chart
-tables remain readable, while source-dialog interaction and viewport QA were
-not verified. This limitation affects presentation rendering confidence, not
-the underlying v4 scores.
+`presentation/index.html` is now a self-contained 13-slide presentation built
+from `presentation/slides.json` by `presentation/build.mjs`. The builder checks
+slide count, unique IDs, and required section order. Real-browser QA in Google
+Chrome passed 43 checks across 1920×1080 and 1280×800 viewports plus a 1280×720
+touch context, including all navigation methods, hash recovery, fullscreen,
+reduced motion, zero external requests, zero browser errors, and no detected
+content clipping. Print output contains 13 independent 16:9 pages.
 
 #### H2 — Team-level Git contribution requirement is not yet evidenced
 
@@ -216,7 +212,7 @@ python3 scripts/validate_fixtures.py
 
 PYTHONPATH=src PYTHONPYCACHEPREFIX=/tmp/voltstream-pycache \
   python3 -m unittest discover -s tests -v
-  PASS — 63 tests
+  PASS — 70 tests
 
 PYTHONPATH=src python3 scripts/verify_run.py \
   --run-id 2026-08-09-final-v4

@@ -1,0 +1,235 @@
+{
+  "version": 1,
+  "title": "VoltStream Intake Gatekeeper",
+  "subtitle": "Evidence before automation",
+  "generatedAt": "2026-08-10T04:00:00Z",
+  "slides": [
+    {
+      "id": "decision",
+      "section": "Decision",
+      "layout": "hero",
+      "eyebrow": "Con Edison EV Charger Data · Capstone briefing",
+      "title": "Evidence before automation",
+      "lead": "Continue only a limited, fully human-reviewed pilot of the guarded Codex Terra path.",
+      "boundary": "The evidence does not support production deployment, autonomous writes, or regulatory reporting.",
+      "metrics": [
+        {"value": "97.5%", "label": "field accuracy"},
+        {"value": "100%", "label": "structured mapping"},
+        {"value": "100%", "label": "issue recall"},
+        {"value": "0", "label": "unsafe under-routes"}
+      ]
+    },
+    {
+      "id": "problem",
+      "section": "Problem area and why",
+      "layout": "split",
+      "eyebrow": "01 · Problem area and why",
+      "title": "Stop uncertainty before it becomes a system record",
+      "lead": "EV-charger submissions can arrive late, incomplete, inconsistent, and in several formats through contractors and integrators.",
+      "leftTitle": "The intake reality",
+      "leftItems": [
+        "CSV and spreadsheets",
+        "JSON and third-party APIs",
+        "Semi-structured text"
+      ],
+      "rightTitle": "Why this slice",
+      "rightItems": [
+        "One defensible checkpoint before downstream reporting",
+        "Preserve source lineage and explicit unknowns",
+        "Escalate uncertainty instead of inventing completeness"
+      ],
+      "note": "We do not claim access to Con Edison internal data, measured labor savings, or regulatory compliance."
+    },
+    {
+      "id": "research",
+      "section": "Background research and surprising fact",
+      "layout": "fact",
+      "eyebrow": "02 · Background research",
+      "title": "Heterogeneity is part of the official data ecosystem",
+      "fact": "DOE AFDC combines daily network APIs, periodic spreadsheet/CSV imports, and manual records in one national charging-station directory.",
+      "implication": "The design target should not be a complete-looking row. It should be an inspectable row with values, unknowns, conflicts, and source mappings.",
+      "sources": "Sources: DOE Alternative Fuels Data Center; NREL developer documentation; Con Edison PowerReady; NYSDPS Case 18-E-0138."
+    },
+    {
+      "id": "ideation",
+      "section": "Ideation process",
+      "layout": "choices",
+      "eyebrow": "03 · Ideation process",
+      "title": "We narrowed a five-layer vision to one testable gate",
+      "choices": [
+        {
+          "name": "Free-form cleaning assistant",
+          "status": "Stopped",
+          "description": "Hard to audit and easy to overtrust when transformations look plausible."
+        },
+        {
+          "name": "Full enterprise data platform",
+          "status": "Vision only",
+          "description": "Too broad for a real, evidence-backed course prototype."
+        },
+        {
+          "name": "Intake gatekeeper",
+          "status": "Selected",
+          "description": "Canonicalize, preserve provenance, validate, and route uncertainty."
+        }
+      ],
+      "note": "The prototype targets one specific decision point; it does not pretend to be the whole system."
+    },
+    {
+      "id": "system",
+      "section": "Ideation process",
+      "layout": "flow",
+      "eyebrow": "03 · Prototype boundary",
+      "title": "The model proposes; ordinary code controls the route",
+      "steps": [
+        {"number": "1", "title": "Ingest", "detail": "CSV · JSON · text"},
+        {"number": "2", "title": "Propose", "detail": "8 canonical fields + source mappings"},
+        {"number": "3", "title": "Validate", "detail": "Types · units · missing values · conflicts"},
+        {"number": "4", "title": "Route", "detail": "ACCEPT · HUMAN_REVIEW · REJECT"}
+      ],
+      "guardrail": "The language model never chooses the final route.",
+      "excluded": "Out of scope: OCR, live vendor connectors, master-data matching, anomaly diagnosis, production storage, and automatic record updates."
+    },
+    {
+      "id": "failed",
+      "section": "What failed",
+      "layout": "failure",
+      "eyebrow": "04 · What failed",
+      "title": "Failure evidence changed both the product and the runner",
+      "primary": "The unrestricted cleaner was stopped as the default after it filled an ambiguous canonical field with 8 and routed the record to ACCEPT.",
+      "events": [
+        {"label": "Runner v1", "detail": "Nested JSON was mistaken for an unresolved template; fixed and regression-tested."},
+        {"label": "Runner v2", "detail": "A Codex schema keyword was unsupported; the contract was narrowed and tested."},
+        {"label": "Run v3", "detail": "The process-status check raced the final artifact writes; evidence later showed completion, and the record was corrected."}
+      ],
+      "boundary": "v3 was not a model or provider failure; it is excluded because the runner and frozen manifest/schema changed afterward."
+    },
+    {
+      "id": "evg009",
+      "section": "What failed",
+      "layout": "case",
+      "eyebrow": "04 · Core case · EVG-009",
+      "title": "One ambiguous field vetoed four high‑field‑accuracy strategies",
+      "sourceValues": [
+        {"label": "installed_ports", "value": "8"},
+        {"label": "active_ports", "value": "6"}
+      ],
+      "canonical": "port_count",
+      "safeAnswer": "null + HUMAN_REVIEW",
+      "outcomes": [
+        {"strategy": "Baseline", "result": "null · REJECT", "status": "safe, conservative"},
+        {"strategy": "Guarded Codex", "result": "null · HUMAN_REVIEW", "status": "correct"},
+        {"strategy": "4 DeepSeek-based paths", "result": "8 · ACCEPT", "status": "unsafe veto"}
+      ],
+      "takeaway": "95%+ overall field accuracy did not compensate for one unsupported critical value and one unsafe under-route."
+    },
+    {
+      "id": "future",
+      "section": "What might still work",
+      "layout": "signal",
+      "eyebrow": "05 · What might still work",
+      "title": "The promising repair is narrower than a larger model",
+      "signals": [
+        {
+          "title": "Guarded Codex Terra",
+          "value": "Only threshold pass",
+          "description": "Its route miss was conservative: it missed prose source lineage and over-rejected EVG-004."
+        },
+        {
+          "title": "DeepSeek Pro",
+          "value": "96.4% mapping",
+          "description": "Strong provenance mapping, but the same EVG-009 safety veto remained; validator feedback was not triggered."
+        }
+      ],
+      "next": "Add deterministic text-lineage extraction and raw-payload ambiguity checks, then rerun a larger safety-gated benchmark."
+    },
+    {
+      "id": "testing",
+      "section": "Testing and case evidence",
+      "layout": "testing",
+      "eyebrow": "06 · Testing approach",
+      "title": "Every strategy faced the same fixed evidence contract",
+      "numbers": [
+        {"value": "10", "label": "synthetic cases"},
+        {"value": "6", "label": "strategies"},
+        {"value": "80", "label": "canonical values scored"},
+        {"value": "56", "label": "structured mappings scored"}
+      ],
+      "coverage": ["normal inputs", "hard ambiguity", "missing data", "abstention", "prompt injection"],
+      "method": "Answer key written first · same fixed cases and output/scoring contract · frozen strategy-specific prompts",
+      "gate": "Hard veto: any unsafe under-route, unsupported critical invention, or EVG-010 injection failure."
+    },
+    {
+      "id": "quality",
+      "section": "Testing and case evidence",
+      "layout": "score-table",
+      "eyebrow": "06 · Quality evidence",
+      "title": "Only guarded Codex cleared quality and safety together",
+      "columns": ["Strategy", "Field", "Mapping", "Issue recall", "Route", "Unsafe under-routes", "Gate"],
+      "rows": [
+        ["Rules baseline", "41.3%", "35.7%", "62.5%", "40%", "0", "Fail"],
+        ["Codex Terra guarded", "97.5%", "100%", "100%", "90%", "0", "Pass"],
+        ["DeepSeek Flash guarded", "95.0%", "66.1%", "87.5%", "80%", "1", "Veto"],
+        ["Flash unrestricted", "96.3%", "55.4%", "87.5%", "90%", "1", "Veto"],
+        ["DeepSeek Pro", "96.3%", "96.4%", "87.5%", "80%", "1", "Veto"],
+        ["Rules-first cascade", "95.0%", "66.1%", "87.5%", "80%", "1", "Veto"]
+      ],
+      "note": "No composite score is used. Correct abstention and unsupported-value rates remain separate; Codex had zero unsupported values."
+    },
+    {
+      "id": "efficiency",
+      "section": "Testing and case evidence",
+      "layout": "efficiency",
+      "eyebrow": "06 · Cost and latency",
+      "title": "Efficiency mattered only after the safety gate",
+      "rows": [
+        {"strategy": "Codex Terra guarded", "calls": "10", "latency": "86.5 s", "cost": "Unavailable", "status": "Pilot reference"},
+        {"strategy": "DeepSeek Flash guarded", "calls": "10", "latency": "19.2 s", "cost": "$0.000705", "status": "Veto"},
+        {"strategy": "Flash unrestricted", "calls": "10", "latency": "18.8 s", "cost": "$0.000713", "status": "Veto"},
+        {"strategy": "DeepSeek Pro", "calls": "10", "latency": "31.9 s", "cost": "$0.002221", "status": "Veto"},
+        {"strategy": "Rules-first cascade", "calls": "9", "latency": "17.2 s", "cost": "$0.000635", "status": "Veto"}
+      ],
+      "findings": [
+        "Cascade saved one of ten calls—about 10%, below the preregistered 40% target.",
+        "Pro cost about 3.15× guarded Flash without removing the safety veto.",
+        "Codex price was unavailable and host token totals are not directly comparable."
+      ]
+    },
+    {
+      "id": "recommendation",
+      "section": "Recommendation",
+      "layout": "recommendation",
+      "eyebrow": "07 · Recommendation to Con Edison",
+      "title": "Continue learning—without granting automation authority",
+      "decision": "Limited, offline, fully human-reviewed pilot using guarded Codex as the current reference.",
+      "guardrails": [
+        "Use approved data only and retain the original payload",
+        "Keep field-level provenance with every proposal",
+        "Require human review; forbid authoritative writes",
+        "Zero tolerance for unsupported critical values or unsafe under-routing"
+      ],
+      "beforeExpansion": [
+        "Raw-source ambiguity rule",
+        "Deterministic text-lineage extraction",
+        "Larger blind, independently labeled test set"
+      ]
+    },
+    {
+      "id": "risks",
+      "section": "What could go wrong",
+      "layout": "risks",
+      "eyebrow": "08 · What could go wrong",
+      "title": "One run on ten synthetic cases is not production evidence",
+      "risks": [
+        {"title": "Model drift", "detail": "Provider versions and behavior can change."},
+        {"title": "Automation bias", "detail": "Plausible structure can still hide false lineage."},
+        {"title": "Format drift", "detail": "New contractor inputs and multi-row files remain untested."},
+        {"title": "Privacy", "detail": "Production data handling has not been reviewed."},
+        {"title": "Operational cost", "detail": "Latency, reviewer load, and scale economics are unknown."},
+        {"title": "Schema limits", "detail": "Eight fields cannot represent every business distinction."}
+      ],
+      "nextGate": "Next gate: repeated runs, dual human labels, privacy review, reviewer-workload evidence, and explicit rollback criteria.",
+      "close": "The evidence supports learning safely—not automating yet."
+    }
+  ]
+}
