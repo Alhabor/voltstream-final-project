@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "VoltStream Evaluation Case",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["case_id", "title", "input_format", "difficulty", "tags", "source_name", "payload", "task"],
+  "properties": {
+    "case_id": {"type": "string", "pattern": "^EVG-[0-9]{3}$"},
+    "title": {"type": "string", "minLength": 1},
+    "input_format": {"enum": ["csv", "json", "text"]},
+    "difficulty": {"enum": ["normal", "hard", "adversarial"]},
+    "tags": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}},
+    "source_name": {"type": "string", "pattern": "^synthetic_"},
+    "payload": {"type": "string", "minLength": 1},
+    "task": {"type": "string", "minLength": 1}
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "VoltStream Evaluation Answer",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["case_id", "expected_record", "expected_decision", "expected_issue_codes", "unsupported_values_forbidden", "rationale"],
+  "properties": {
+    "case_id": {"type": "string", "pattern": "^EVG-[0-9]{3}$"},
+    "expected_record": {"$ref": "canonical_record.schema.json"},
+    "expected_decision": {"enum": ["ACCEPT", "HUMAN_REVIEW", "REJECT"]},
+    "expected_issue_codes": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+    "issue_fields": {"type": "object", "additionalProperties": {"type": "array", "uniqueItems": true, "items": {"type": "string"}}},
+    "unsupported_values_forbidden": {"const": true},
+    "rationale": {"type": "string", "minLength": 1}
+  }
+}

@@ -17,8 +17,8 @@ vision. The current recommended slice is:
 > validate every proposed transformation, and escalate uncertainty instead of
 > silently inventing data.
 
-The exact slice and evaluation design must be confirmed by the team before
-implementation.
+This slice is now frozen in `docs/PROJECT_SCOPE.md`. Ten synthetic cases and
+their prewritten answer key are versioned before any model evaluation.
 
 ## Repository map
 
@@ -30,6 +30,9 @@ implementation.
 - `evaluation/` — answer key, model outputs, scoring, and result tables
 - `build-log/` — successful and failed approaches with dated evidence
 - `presentation/` — final ten-minute HTML presentation
+- `research/` — authoritative background sources and evidence boundaries
+- `docs/` — prototype scope and architecture
+- `scripts/` — reproducible validation, evaluation, and security commands
 
 See [PROJECT_REQUIREMENTS.md](PROJECT_REQUIREMENTS.md) for the submission
 contract distilled from the assignment page.
@@ -39,3 +42,15 @@ contract distilled from the assignment page.
 The directory is initialized as a local Git repository. A GitHub remote,
 collaborators, model credentials, and team-member contribution assignments have
 not yet been configured.
+
+## Local validation
+
+The deterministic prototype uses Python 3.9+ and has no runtime dependencies.
+
+```bash
+make check
+```
+
+This runs unit tests, benchmark-contract validation, bytecode compilation, and
+the repository secret scan. API keys are read from local environment variables
+only; see `SECURITY.md` and `.env.example`.

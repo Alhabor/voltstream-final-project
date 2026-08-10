@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "VoltStream Structured Field-Mapping Answer",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["case_id", "expected_mappings"],
+  "properties": {
+    "case_id": {"type": "string", "pattern": "^EVG-[0-9]{3}$"},
+    "expected_mappings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["station_id", "address", "charger_level", "port_count", "power_kw", "connector_type", "operational_status", "source_record_id"],
+      "properties": {
+        "station_id": {"type": ["string", "null"]},
+        "address": {"type": ["string", "null"]},
+        "charger_level": {"type": ["string", "null"]},
+        "port_count": {"type": ["string", "null"]},
+        "power_kw": {"type": ["string", "null"]},
+        "connector_type": {"type": ["string", "null"]},
+        "operational_status": {"type": ["string", "null"]},
+        "source_record_id": {"type": ["string", "null"]}
+      }
+    }
+  }
+}

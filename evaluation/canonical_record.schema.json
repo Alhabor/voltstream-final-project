@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://voltstream.example/schemas/canonical-record.json",
+  "title": "VoltStream Canonical EV Charger Intake Record",
+  "description": "Eight-field normalized record. Null means the source does not safely support a single value; null must never be replaced by a guess.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "station_id",
+    "address",
+    "charger_level",
+    "port_count",
+    "power_kw",
+    "connector_type",
+    "operational_status",
+    "source_record_id"
+  ],
+  "properties": {
+    "station_id": {"type": ["string", "null"], "minLength": 1, "description": "Contractor- or operator-supplied stable station identifier; never synthesized."},
+    "address": {"type": ["string", "null"], "minLength": 1, "description": "Reported physical site address, with harmless whitespace normalization permitted."},
+    "charger_level": {"type": ["string", "null"], "enum": ["L1", "L2", "DCFC", null], "description": "Normalized charging class supported by an explicit source value."},
+    "port_count": {"type": ["integer", "null"], "description": "One unambiguous reported count of charging ports. Validation, not the schema, determines whether the integer is physically valid."},
+    "power_kw": {"type": ["number", "null"], "description": "Reported rated power per port in kW. Deterministic unit conversion is allowed."},
+    "connector_type": {"type": ["string", "null"], "enum": ["J1772", "CCS1", "NACS", "CHADEMO", "OTHER", null], "description": "Normalized physical connector standard when explicitly supported."},
+    "operational_status": {"type": ["string", "null"], "enum": ["operational", "temporarily_unavailable", "planned", "retired", "unknown", null], "description": "Normalized reported service state. Use null for absent information; use unknown only when the source explicitly reports an unknown state."},
+    "source_record_id": {"type": ["string", "null"], "minLength": 1, "description": "Identifier of the contractor submission row or message for lineage; never synthesized."}
+  }
+}
