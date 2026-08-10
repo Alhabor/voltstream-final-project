@@ -1,0 +1,10 @@
+{
+  "status": "FAILED_COMPARISON_RUN",
+  "failed_strategy": "codex-terra-guarded",
+  "affected_case_ids": ["EVG-001", "EVG-002", "EVG-003", "EVG-004", "EVG-005", "EVG-006", "EVG-007", "EVG-008", "EVG-009", "EVG-010"],
+  "provider_responses_completed": 0,
+  "sanitized_error": "Codex structured output rejected an unsupported JSON Schema keyword.",
+  "root_cause": "The response schema used uniqueItems for issue_codes; the provider's supported structured-output subset does not permit that keyword.",
+  "safety_impact": "None. Duplicate issue codes remain rejected by the independent local postprocessor.",
+  "disposition": "Preserved without use in the final comparison. Remove only the unsupported provider-side hint, verify a live schema smoke test, commit, and restart every strategy under a new run ID."
+}

@@ -28,6 +28,12 @@ class _FakeHttpResponse:
 
 
 class ProviderTests(unittest.TestCase):
+    def test_codex_output_schema_avoids_known_unsupported_keywords(self):
+        schema_path = Path(__file__).parents[1] / "evaluation" / "model_response.schema.json"
+        schema = json.loads(schema_path.read_text(encoding="utf-8"))
+
+        self.assertNotIn("uniqueItems", schema["properties"]["issue_codes"])
+
     def test_deepseek_requires_environment_key(self):
         with mock.patch.dict(os.environ, {}, clear=True):
             with self.assertRaises(ProviderError):

@@ -1,0 +1,39 @@
+{
+  "candidate": {
+    "record": {
+      "station_id": "BETA-606",
+      "address": "606 Test Lane Staten Island NY 10301",
+      "charger_level": "DCFC",
+      "port_count": 4,
+      "power_kw": 7.2,
+      "connector_type": "CCS1",
+      "operational_status": "operational",
+      "source_record_id": "B-606"
+    },
+    "source_mappings": {
+      "station_id": "stationId",
+      "address": "address",
+      "charger_level": "chargerLevel",
+      "port_count": "ports",
+      "power_kw": "ratedPowerKw",
+      "connector_type": "connector",
+      "operational_status": "status",
+      "source_record_id": "recordId"
+    },
+    "issue_codes": [
+      "LEVEL_POWER_CONFLICT"
+    ]
+  },
+  "decision": "HUMAN_REVIEW",
+  "issues": [
+    {
+      "code": "LEVEL_POWER_CONFLICT",
+      "severity": "review",
+      "message": "Rated power is inconsistent with the reported charger level.",
+      "field": "power_kw"
+    }
+  ],
+  "issue_codes": [
+    "LEVEL_POWER_CONFLICT"
+  ]
+}

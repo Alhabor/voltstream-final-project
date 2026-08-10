@@ -1,0 +1,33 @@
+{
+  "case_id": "EVG-001",
+  "record": {
+    "station_id": null,
+    "address": null,
+    "charger_level": null,
+    "port_count": null,
+    "power_kw": null,
+    "connector_type": null,
+    "operational_status": null,
+    "source_record_id": null
+  },
+  "source_mappings": {
+    "station_id": null,
+    "address": null,
+    "charger_level": null,
+    "port_count": null,
+    "power_kw": null,
+    "connector_type": null,
+    "operational_status": null,
+    "source_record_id": null
+  },
+  "decision": "REJECT",
+  "issue_codes": [
+    "PARSER_FAILURE"
+  ],
+  "latency_ms": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "estimated_cost_usd": null,
+  "model_calls": 1,
+  "provider_error": "Codex exited with status 1."
+}

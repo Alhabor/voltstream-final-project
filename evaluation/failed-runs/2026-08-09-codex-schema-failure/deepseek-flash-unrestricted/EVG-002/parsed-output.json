@@ -1,0 +1,32 @@
+{
+  "case_id": "EVG-002",
+  "record": {
+    "station_id": "BETA-204",
+    "address": "250 Sample Street Brooklyn NY 11201",
+    "charger_level": "L2",
+    "port_count": 2,
+    "power_kw": 7.2,
+    "connector_type": "J1772",
+    "operational_status": "operational",
+    "source_record_id": "B-77"
+  },
+  "source_mappings": {
+    "station_id": "Site Ref",
+    "address": "Site Location",
+    "charger_level": "Charging Tier",
+    "port_count": "Connector Qty",
+    "power_kw": "Rated Output (W)",
+    "connector_type": "Plug Standard",
+    "operational_status": "Service State",
+    "source_record_id": "Vendor Row"
+  },
+  "decision": "ACCEPT",
+  "issue_codes": [],
+  "latency_ms": 2732.662,
+  "input_tokens": 737,
+  "output_tokens": 195,
+  "cached_input_tokens": 0,
+  "estimated_cost_usd": 0.00015778,
+  "model_calls": 1,
+  "provider_model": "deepseek-v4-flash"
+}

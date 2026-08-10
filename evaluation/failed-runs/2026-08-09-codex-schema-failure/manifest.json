@@ -1,0 +1,47 @@
+{
+  "run_id": "2026-08-09-final-v2",
+  "created_at_utc": "2026-08-10T01:35:15.823286+00:00",
+  "git_commit": "9450730d6a310307d2007dedaba58654e8933b2e",
+  "git_status": "",
+  "python": "3.9.6 (default, May 22 2026, 11:13:45) \n[Clang 21.0.0 (clang-2100.1.1.101)]",
+  "platform": "macOS-26.5.2-arm64-arm-64bit",
+  "frozen_sha256": {
+    "data/cases.jsonl": "e57eb737d5984798c4760e4705f545f450f5acfa7a4bcc255abfa3c68418394d",
+    "data/answer_key.jsonl": "5dd523c26ab9cceea151536bc5a302d1e9f4a8f19b14e0f2caa50b5c30368d4e",
+    "data/mapping_answer_key.jsonl": "d39f5737defbecdea0a9e2252305b7880443cd1f1fa6d8028d9776f3346fb99b",
+    "evaluation/EVALUATION_SPEC.md": "89acc167822396de85159c1d4632890b090b911ef22a9bc1100854916a202ad1",
+    "evaluation/canonical_record.schema.json": "46439c7c46b7b4c3616d1a01e4c51f602ca134e3af79a486312d332aeab126cc",
+    "prompts/README.md": "f36a1b629b7bed339e1657bbb0a9e4dcc0e2204452cda78e1b230d3cd653af13",
+    "prompts/case_user_template_v1.md": "d5f17d556021e6f5e71fdd52bb40a0dae5848332d8130ca933bf2687ce393a1b",
+    "prompts/guarded_system_v1.md": "1966a728323e27a3f72d6a82e4586e6d2041bcfe1e312f925fee6623b6915ae3",
+    "prompts/unrestricted_cleaner_system_v1.md": "15d12015f1afe37dbdfc36d3927220da69f5300067733a5259754bfafc4e10a9",
+    "prompts/validator_feedback_v1.md": "d0575b206848344006f5f8b3ec3819afa452b52cf0965ce0e2748d402ad30a8a"
+  },
+  "pricing_snapshot": "evaluation/pricing_2026-08-09.json",
+  "strategies_completed": [
+    {
+      "strategy": "baseline",
+      "completed_at_utc": "2026-08-10T01:35:15.903377+00:00"
+    },
+    {
+      "strategy": "deepseek-flash-guarded",
+      "completed_at_utc": "2026-08-10T01:35:48.596481+00:00"
+    },
+    {
+      "strategy": "codex-terra-guarded",
+      "completed_at_utc": "2026-08-10T01:36:29.874346+00:00"
+    },
+    {
+      "strategy": "rules-first-cascade",
+      "completed_at_utc": "2026-08-10T01:36:35.390448+00:00"
+    },
+    {
+      "strategy": "deepseek-pro-quality",
+      "completed_at_utc": "2026-08-10T01:37:15.617849+00:00"
+    },
+    {
+      "strategy": "deepseek-flash-unrestricted",
+      "completed_at_utc": "2026-08-10T01:37:51.765720+00:00"
+    }
+  ]
+}

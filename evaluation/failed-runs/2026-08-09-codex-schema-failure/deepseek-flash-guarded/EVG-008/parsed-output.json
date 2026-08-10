@@ -1,0 +1,34 @@
+{
+  "case_id": "EVG-008",
+  "record": {
+    "station_id": "DELTA-808",
+    "address": "808 Prototype Blvd New York NY 10003",
+    "charger_level": "DCFC",
+    "port_count": -3,
+    "power_kw": 100,
+    "connector_type": "CCS1",
+    "operational_status": "operational",
+    "source_record_id": "D-808"
+  },
+  "source_mappings": {
+    "station_id": "station",
+    "address": "address",
+    "charger_level": "type",
+    "port_count": "number_of_ports",
+    "power_kw": "max_power_kw",
+    "connector_type": "plug",
+    "operational_status": "current_state",
+    "source_record_id": "contractor_record"
+  },
+  "decision": "REJECT",
+  "issue_codes": [
+    "INVALID_PORT_COUNT"
+  ],
+  "latency_ms": 2186.229,
+  "input_tokens": 982,
+  "output_tokens": 196,
+  "cached_input_tokens": 768,
+  "estimated_cost_usd": 8.69904e-05,
+  "model_calls": 1,
+  "provider_model": "deepseek-v4-flash"
+}

@@ -1,0 +1,28 @@
+{
+  "candidate": {
+    "record": {
+      "station_id": "GAMMA-009",
+      "address": "9 Demo Plaza Queens NY 11101",
+      "charger_level": "DCFC",
+      "port_count": 6,
+      "power_kw": 150,
+      "connector_type": "CCS1",
+      "operational_status": "operational",
+      "source_record_id": "G-9001"
+    },
+    "source_mappings": {
+      "station_id": "$.record.site.id",
+      "address": "$.record.site.location",
+      "charger_level": "$.record.equipment.level",
+      "port_count": "$.record.equipment.ports",
+      "power_kw": "$.record.equipment.rated_kw",
+      "connector_type": "$.record.equipment.connector",
+      "operational_status": "$.record.state",
+      "source_record_id": "$.record.vendor_record"
+    },
+    "issue_codes": []
+  },
+  "decision": "ACCEPT",
+  "issues": [],
+  "issue_codes": []
+}

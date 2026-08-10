@@ -1,0 +1,23 @@
+{
+  "record": {
+    "station_id": null,
+    "address": null,
+    "charger_level": null,
+    "port_count": null,
+    "power_kw": null,
+    "connector_type": null,
+    "operational_status": null,
+    "source_record_id": "G-707"
+  },
+  "source_mappings": {
+    "station_id": "station identifier",
+    "address": "address",
+    "charger_level": "charger level",
+    "port_count": "port count",
+    "power_kw": "rated power",
+    "connector_type": "connector type",
+    "operational_status": "operating status",
+    "source_record_id": "Vendor record"
+  },
+  "issue_codes": ["MISSING_REQUIRED_FIELD", "MISSING_STABLE_IDENTITY", "MISSING_SOURCE_LINEAGE"]
+}
