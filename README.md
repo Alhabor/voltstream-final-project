@@ -39,11 +39,12 @@ contract distilled from the assignment page.
 
 ## Repository status
 
-The private GitHub remote is configured at
-`Alhabor/voltstream-final-project`, and the complete v4 experiment plus final
-HTML presentation are versioned on `main`. GitHub collaborator membership and
-one attributable commit per human team member must still be verified by the
-team before submission; the repository does not fabricate that evidence.
+The repository is public at
+<https://github.com/Alhabor/voltstream-final-project>. The complete v4
+experiment plus final HTML presentation are versioned on `main`. All four team
+members are GitHub collaborators; each teammate contributed one attributable
+independent-review commit (see `team/OWNERSHIP.md` for the full who-did-what
+record, trial ownership, and the go/no-go gate).
 
 ## Local validation
 
