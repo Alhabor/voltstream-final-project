@@ -200,6 +200,55 @@ configuration, subject to these controls:
 8. Measure reviewer correction rate, time saved, false acceptance, false
    rejection, and provenance accuracy—not only model extraction accuracy.
 
+### 7.1 Trial owner
+
+One accountable person runs the pilot and owns the gate record:
+
+| Role | Name | Accountability |
+|---|---|---|
+| **Trial owner** | Haoyu Zheng | Runs the pilot, publishes results, convenes the gate review, and owns the gate record in `docs/TRIAL_GATE_LOG.md` |
+| Trial support | Full Team 4 (see `team/OWNERSHIP.md`) | Reviews the gate package and any revision plan before submission |
+| Business sponsor / decision authority | Con Edison PowerReady intake program manager (hypothetical reviewer in this course) | Approves the GO decision; accountable for any deployment step |
+
+### 7.2 Go/no-go gate
+
+A bounded pilot — recommended: four weeks; 100+ records across at least three
+integrator formats (CSV, JSON, contractor notes), including multi-row files,
+duplicated fields, unfamiliar connectors/statuses, and adversarial text —
+ends in a formal gate review. The gate package records every criterion below
+with raw evidence, measured values, and a dated decision in
+`docs/TRIAL_GATE_LOG.md`.
+
+**GO requires all of the following:**
+
+1. Zero unsupported critical inventions and zero unsafe under-routes across
+   the pilot benchmark (the same hard veto as the v4 experiment).
+2. Reviewer correction rate ≤ 5% of human-routed records (excluding
+   documented false rejections cleared by the reviewer in under one minute).
+3. Measured reviewer time saved ≥ 30% versus the manual baseline on the same
+   records.
+4. Provenance accuracy ≥ 95% (every non-null output maps to a faithful source
+   excerpt or path).
+5. The raw-source ambiguity detector (installed versus active ports and
+   similar competing concepts) passes the expanded adversarial set with zero
+   misses.
+6. No privacy, security, or data-handling incident; secrets stay out of the
+   repository.
+
+**NO-GO / revise is triggered by any one of the following:**
+
+1. Any unsupported critical invention or unsafe under-route (hard veto).
+2. Reviewer correction rate above 10%.
+3. Time saved below 10%, or reviewer time increases.
+4. Provenance accuracy below 90%.
+5. A competing-concept case missed by the ambiguity detector.
+6. Any unmitigated privacy or security incident.
+
+**Decision options and record.** The gate review may decide **GO** (proceed to
+the next pilot stage under a new decision record), **GO WITH CONDITIONS**
+(proceed with a dated revision list and re-review date), or **NO-GO** (stop and
+document the evidence; automation consideration ends). The trial owner
+publishes the decision with evidence within five business days of the review.
 The next gate remains strict: any unsupported critical invention or unsafe
 under-route stops automation consideration and triggers revision.
 
