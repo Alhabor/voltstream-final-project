@@ -10,6 +10,7 @@ final project.
 ## Current prototype boundary
 
 The full five-layer governance pipeline in `../Doc/` is the product vision. The
+referenced workspace materials are not included in this public repository. The
 course prototype should implement and evaluate one defensible slice of that
 vision. The current recommended slice is:
 
@@ -22,8 +23,8 @@ their prewritten answer key are versioned before any model evaluation.
 
 ## Repository map
 
-- `../Doc/` — supporting English and Chinese solution-design documents kept
-  outside this code repository
+- `../Doc/` — English and Chinese solution-design documents kept in the local
+  workspace; they are not included in this public repository.
 - `data/` — public-source and synthetic evaluation inputs
 - `src/` — prototype implementation
 - `tests/` — automated software tests
